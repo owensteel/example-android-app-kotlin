@@ -23,7 +23,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 private const val HTTP_CLIENT_ACCEPT_VALUE = "application/json"
 private const val HTTP_CLIENT_USER_AGENT = "OwenSteel-StarlingChallenge"
 
-// Uses Certificate Pinner to prevent Man-In-The-Middle attacks
+// Uses Certificate Pinner (programmatic solution)
 val certificatePinner = CertificatePinner.Builder()
     .add(BASE_URL, API_SERVER_CERT_HASH)
     .build()
