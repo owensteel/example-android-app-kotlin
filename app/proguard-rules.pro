@@ -19,3 +19,16 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Obfuscation
+
+# Keep Retrofit models
+-keepclassmembers class * {
+    @retrofit2.* <methods>;
+}
+-keepattributes Signature
+-keepattributes *Annotation*
+
+# Obfuscate everything else
+-dontwarn okhttp3.**
+-dontwarn retrofit2.**
