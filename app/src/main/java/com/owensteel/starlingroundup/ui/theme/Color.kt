@@ -2,10 +2,13 @@ package com.owensteel.starlingroundup.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+val AppLightBackground = Color(0xFFFFFBFE)
+val AppDarkBackground = Color(0xFF222222)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val StarlingBrandPurple = Color(0xFF603CD2)
+val OnStarlingBrandPurple = Color.White
+
+val StarlingBrandLightPurple = Color(0xFFF7EFEB)
+
+val StarlingBrandCyan = Color(0xFF1AD3C5)
+val OnStarlingBrandCyan = Color.Black
