@@ -17,6 +17,7 @@ composeBom = "2024.09.00"
 material = "1.12.0"
 material3 = "1.3.2"
 retrofit = "3.0.0"
+rootbeerLib = "0.1.1"
 securityCrypto = "1.1.0-beta01"
 ui = "1.8.3"
 
@@ -45,6 +46,7 @@ kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-c
 material = { module = "com.google.android.material:material", version.ref = "material" }
 material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+rootbeer-lib = { module = "com.scottyab:rootbeer-lib", version.ref = "rootbeerLib" }
 ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
 
 [plugins]

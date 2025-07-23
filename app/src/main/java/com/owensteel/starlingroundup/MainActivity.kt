@@ -1,12 +1,14 @@
 package com.owensteel.starlingroundup
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import com.owensteel.starlingroundup.ui.MainScreen
 import com.owensteel.starlingroundup.ui.theme.StarlingRoundupTheme
+import com.owensteel.starlingroundup.util.DeviceSecurityCheck
 import com.owensteel.starlingroundup.viewmodel.MainViewModel
 
 /*
@@ -21,6 +23,17 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Perform device security check immediately
+        // Even in debug mode, so there is no single point
+        // of failure here
+        if(DeviceSecurityCheck.isCompromised(this)) {
+            Toast.makeText(this, "This device is not secure. Exiting.", Toast.LENGTH_LONG).show()
+            finish()
+            return
+        }
+
+        // App setup
         enableEdgeToEdge()
         setContent {
             StarlingRoundupTheme {
