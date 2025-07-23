@@ -36,6 +36,7 @@ android {
     }
     buildFeatures {
         compose = true
+        viewBinding = true
     }
 }
 
@@ -68,4 +69,7 @@ dependencies {
     // Lifecycle / ViewModel / LiveData
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.2")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.9.2")
+
+    // Extra Compose setup
+    implementation(libs.androidx.lifecycle.runtime.compose)
 }
