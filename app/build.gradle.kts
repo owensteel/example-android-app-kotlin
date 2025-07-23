@@ -32,7 +32,7 @@ android {
         // Inject secret keys into BuildConfig
         buildConfigField("String", "CLIENT_ID", "\"$clientId\"")
         buildConfigField("String", "CLIENT_SECRET", "\"$clientSecret\"")
-        buildConfigField("String", "REFRESH_TOKEN", "\"$initRefreshToken\"")
+        buildConfigField("String", "INIT_REFRESH_TOKEN", "\"$initRefreshToken\"")
     }
 
     buildTypes {
