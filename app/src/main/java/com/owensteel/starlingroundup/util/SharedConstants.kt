@@ -7,8 +7,10 @@ object SharedConstants {
     const val DATASTORE_NAME = "secure_token_store"
 
     object PreferenceKeys {
-        val ENCRYPTED_TOKEN = byteArrayPreferencesKey("encrypted_token")
-        val TOKEN_IV = byteArrayPreferencesKey("token_iv")
+        val ENCRYPTED_REFRESH_TOKEN = "encrypted_refresh_token"
+        val ENCRYPTED_ACCESS_TOKEN = "encrypted_access_token"
+        val REFRESH_TOKEN_IV = "refresh_token_iv"
+        val ACCESS_TOKEN_IV = "access_token_iv"
     }
 
     object ApiHeaders {

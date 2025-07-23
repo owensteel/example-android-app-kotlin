@@ -37,7 +37,7 @@ object StarlingService {
         // DataStore), and Retrofit's addInterceptor is not suspendable,
         // we have to use this function as a suspend wrapper to retrieve the
         // token first, and only then build the Retrofit client
-        val token = tokenStorage.getToken() ?: throw IllegalStateException("Missing API token")
+        val token = tokenStorage.getAccessToken() ?: throw IllegalStateException("Missing access token")
 
         val okHttp = OkHttpClient.Builder()
             .certificatePinner(certificatePinner)
