@@ -59,17 +59,17 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     // Retrofit + JSON converter
-    implementation("com.squareup.retrofit2:retrofit:3.0.0")
-    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
 
     // Kotlin Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
-
-    // Lifecycle / ViewModel / LiveData
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.2")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.9.2")
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
 
     // Extra Compose setup
     implementation(libs.androidx.lifecycle.runtime.compose)
+
+    // Security
+    implementation(libs.androidx.security.crypto)
+
 }
