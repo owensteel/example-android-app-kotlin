@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.owensteel.starlingroundup.ui.components.AppButton
 import com.owensteel.starlingroundup.viewmodel.MainViewModel
 
 @Composable
@@ -16,8 +17,7 @@ fun MainScreen(viewModel: MainViewModel) {
     val amount by viewModel.roundUpAmount.collectAsState()
 
     Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+        modifier = Modifier.fillMaxSize()
     ) {
         Column(
             modifier = Modifier
@@ -34,10 +34,10 @@ fun MainScreen(viewModel: MainViewModel) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Button(onClick = { viewModel.performTransfer() }) {
-                // TODO: Make reference
-                Text("Round Up & Save")
-            }
+            AppButton(
+                onClick = { viewModel.performTransfer() },
+                text = "Round Up & Save"
+            )
         }
     }
 }
