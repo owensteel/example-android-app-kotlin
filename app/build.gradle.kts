@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
 
     // Security
+    implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.security.crypto)
 
 }
