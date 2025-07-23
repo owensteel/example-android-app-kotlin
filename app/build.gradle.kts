@@ -1,8 +1,20 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
+
+// Get secret keys from local properties
+val localProperties = Properties()
+val localFile = rootProject.file("local.properties")
+if(localFile.exists()){
+    localFile.inputStream().use { localProperties.load(it) }
+}
+val clientId = localProperties["starling.clientId"] as String? ?: ""
+val clientSecret = localProperties["starling.clientSecret"] as String? ?: ""
+val initRefreshToken = localProperties["refresh.token"] as String? ?: ""
 
 android {
     namespace = "com.owensteel.starlingroundup"
@@ -16,6 +28,11 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Inject secret keys into BuildConfig
+        buildConfigField("String", "CLIENT_ID", "\"$clientId\"")
+        buildConfigField("String", "CLIENT_SECRET", "\"$clientSecret\"")
+        buildConfigField("String", "REFRESH_TOKEN", "\"$initRefreshToken\"")
     }
 
     buildTypes {
