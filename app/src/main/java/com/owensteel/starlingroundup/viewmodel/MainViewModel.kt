@@ -4,6 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 /*
@@ -14,16 +17,12 @@ import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
 
-    // Use MutableLiveData to allow value modification
-    // It is also non-null
-    private val _roundUpAmount = MutableLiveData<String>()
+    // TODO: Possibly make default value a reference?
 
-    // The public reference to the latest round up amount value
-    // Use LiveData because it notifies its observers (e.g. Activity
-    // or a Fragment) whenever its data changes — this will be best
-    // for a value that can change between requests
-    // We want this to be a String so we can display it directly
-    val roundUpAmount: LiveData<String> = _roundUpAmount
+    // Use StateFlow to maintain an observable mutable state for our
+    // value that may change between appearances
+    private val _roundUpAmount = MutableStateFlow("£0.00")
+    val roundUpAmount: StateFlow<String> = _roundUpAmount.asStateFlow()
 
     // Make sure the result is always ready to be seen by the user, so
     // run it when initialised
@@ -34,7 +33,7 @@ class MainViewModel : ViewModel() {
     private fun loadRoundUpAmount() {
         viewModelScope.launch {
             // TODO: Call API, calc round up
-            _roundUpAmount.value = "£0.00" // TODO: Possibly make a reference?
+            _roundUpAmount.value = "£0.00"
         }
     }
 
