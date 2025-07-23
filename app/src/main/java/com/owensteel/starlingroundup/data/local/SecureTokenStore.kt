@@ -1,9 +1,11 @@
 package com.owensteel.starlingroundup.data.local
 
 import android.content.Context
-import androidx.datastore.preferences.core.byteArrayPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
+import com.owensteel.starlingroundup.util.SharedConstants.DATASTORE_NAME
+import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.ENCRYPTED_TOKEN
+import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.TOKEN_IV
 import kotlinx.coroutines.flow.first
 
 /*
@@ -14,16 +16,12 @@ import kotlinx.coroutines.flow.first
 
  */
 
-private const val DATASTORE_IDENTIFIER = "secure_token_store"
-private const val TOKEN_KEY_IDENTIFIER = "encrypted_token"
-private const val IV_KEY_IDENTIFIER = "token_iv"
-
-private val Context.dataStore by preferencesDataStore(DATASTORE_IDENTIFIER)
+private val Context.dataStore by preferencesDataStore(DATASTORE_NAME)
 
 class SecureTokenStore(private val context: Context) {
 
-    private val tokenKey = byteArrayPreferencesKey(TOKEN_KEY_IDENTIFIER)
-    private val ivKey = byteArrayPreferencesKey(IV_KEY_IDENTIFIER)
+    private val tokenKey = ENCRYPTED_TOKEN
+    private val ivKey = TOKEN_IV
     private val crypto = CryptoManager(context)
 
     suspend fun saveToken(token: String) {
