@@ -15,6 +15,9 @@ import com.owensteel.starlingroundup.viewmodel.MainViewModel
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
     val amount by viewModel.roundUpAmountState.collectAsState()
+    val accountName by viewModel.accountNameState.collectAsState()
+
+    // TODO: String references
 
     Surface(
         modifier = Modifier.fillMaxSize()
@@ -26,6 +29,13 @@ fun MainScreen(viewModel: MainViewModel) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Text(
+                text = "Hi there, ${accountName}! Ready to save?",
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
             Text(
                 text = amount,
                 style = MaterialTheme.typography.headlineMedium,

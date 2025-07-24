@@ -23,17 +23,23 @@ class MainViewModel(
     application: Application,
     private val tokenManager: TokenManager
 ) : AndroidViewModel(application) {
+
     // Use StateFlow to maintain an observable mutable state for our
     // value that may change between appearances
+
     private val _roundUpAmountState = MutableStateFlow("£0.00")
     val roundUpAmountState: StateFlow<String> = _roundUpAmountState
 
     private val _feedState = MutableStateFlow<TransactionFeedResponse?>(null)
     val feedState: StateFlow<TransactionFeedResponse?> = _feedState
 
+    private val _accountNameState = MutableStateFlow("")
+    val accountNameState: StateFlow<String> = _accountNameState
+
     // 0. Fetch account details
     private var accountUid: String? = null
     private var categoryUid: String? = null
+    private var accountCurrency: String? = null
 
     private fun initialiseAccountDetails(context: Context) {
         viewModelScope.launch {
@@ -44,6 +50,10 @@ class MainViewModel(
                 accountResponse.body()?.accounts?.firstOrNull()?.let { account ->
                     accountUid = account.accountUid
                     categoryUid = account.defaultCategory
+                    accountCurrency = account.currency
+
+                    // Display name
+                    _accountNameState.value = account.name
                 }
             }
         }
