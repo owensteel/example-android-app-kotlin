@@ -32,7 +32,9 @@ fun MainScreen(viewModel: MainViewModel) {
             modifier = Modifier
                 .padding(32.dp)
                 .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
+            // Vertically arranging from top prevents elements
+            // jumping about when one lower down changes size
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (hasInitialisedDataState) {
@@ -49,7 +51,16 @@ fun MainScreen(viewModel: MainViewModel) {
                     feedState = feedState
                 )
             } else {
-                CircularProgressIndicator()
+                // Loading spinner
+                Column(
+                    modifier = Modifier
+                        .padding(0.dp)
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CircularProgressIndicator()
+                }
             }
         }
     }
@@ -57,33 +68,50 @@ fun MainScreen(viewModel: MainViewModel) {
 
 @Composable
 fun MainFeature(viewModel: MainViewModel, amount: String, accountHolderName: String) {
-    Text(
-        text = stringResource(id = R.string.main_feature_greeting, accountHolderName),
-        style = MaterialTheme.typography.bodyMedium
-    )
+    Column(
+        modifier = Modifier
+            .padding(0.dp)
+            .height(300.dp)
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = stringResource(id = R.string.main_feature_greeting, accountHolderName),
+            style = MaterialTheme.typography.bodyMedium
+        )
 
-    Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-    Text(
-        text = amount,
-        style = MaterialTheme.typography.headlineMedium,
-        fontWeight = FontWeight.Bold
-    )
+        Text(
+            text = amount,
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold
+        )
 
-    Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-    AppButton(
-        onClick = { viewModel.performTransfer() },
-        text = stringResource(id = R.string.main_feature_button_round_up_and_save)
-    )
+        AppButton(
+            onClick = { viewModel.performTransfer() },
+            text = stringResource(id = R.string.main_feature_button_round_up_and_save)
+        )
+    }
 }
 
 @Composable
 fun TransactionsFeedFeature(feedState: FeedUiState) {
-    when {
-        feedState.isLoading -> CircularProgressIndicator()
-        feedState.hasError -> Text("Couldn't load the Transactions Feed.")
-        else -> feedState.value?.let { TransactionsFeedLazyColumn(it) }
+    Column(
+        modifier = Modifier
+            .padding(0.dp)
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.Start
+    ) {
+        when {
+            feedState.isLoading -> CircularProgressIndicator()
+            feedState.hasError -> Text("Couldn't load the Transactions Feed.")
+            else -> feedState.value?.let { TransactionsFeedLazyColumn(it) }
+        }
     }
 }
 
