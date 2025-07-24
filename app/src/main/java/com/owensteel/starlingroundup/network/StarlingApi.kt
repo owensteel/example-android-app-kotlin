@@ -28,9 +28,10 @@ interface StarlingApi {
         @Query("maxTransactionTimestamp") toIso: String
     ): Response<TransactionFeedResponse>
 
-    @PUT("api/v2/savings-goals/{savingsGoalUid}/add-money/{transferUid}")
+    @PUT("api/v2/account/{accountUid}/savings-goals/{savingsGoalUid}/add-money/{transferUid}")
     suspend fun roundUpTransfer(
         @Header("Authorization") bearerToken: String,
+        @Path("accountUid") accountUid: String,
         @Path("savingsGoalUid") goalUid: String,
         @Path("transferUid") transferUid: String,
         @Body transfer: TransferRequest

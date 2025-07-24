@@ -105,6 +105,7 @@ object StarlingService {
     suspend fun roundUpTransfer(
         context: Context,
         tokenManager: TokenManager,
+        accountUid: String,
         goalUid: String,
         transferUid: String,
         request: TransferRequest
@@ -115,6 +116,7 @@ object StarlingService {
         val api = createAuthenticatedApi(token)
         return api.roundUpTransfer(
             bearerToken = "Bearer $token",
+            accountUid = accountUid,
             goalUid = goalUid,
             transferUid = transferUid,
             transfer = request
