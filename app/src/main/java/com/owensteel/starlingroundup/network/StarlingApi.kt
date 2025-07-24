@@ -1,5 +1,6 @@
 package com.owensteel.starlingroundup.network
 
+import com.owensteel.starlingroundup.model.AccountHolderIndividualResponse
 import com.owensteel.starlingroundup.model.AccountResponse
 import com.owensteel.starlingroundup.model.TransactionFeedResponse
 import com.owensteel.starlingroundup.model.TransferRequest
@@ -18,6 +19,11 @@ interface StarlingApi {
     suspend fun getAccountDetails(
         @Header("Authorization") bearerToken: String
     ): Response<AccountResponse>
+
+    @GET("api/v2/account-holder/individual")
+    suspend fun getAccountHolderIndividual(
+        @Header("Authorization") bearerToken: String
+    ): Response<AccountHolderIndividualResponse>
 
     @GET("api/v2/feed/account/{accountUid}/category/{categoryUid}/transactions-between")
     suspend fun getTransactionsForCurrentWeek(
