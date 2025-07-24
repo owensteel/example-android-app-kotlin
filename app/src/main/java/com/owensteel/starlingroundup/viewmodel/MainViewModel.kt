@@ -78,6 +78,9 @@ class MainViewModel(
 
                 // Now we have user's complete details, display feature UI
                 _hasInitialisedDataState.value = true
+
+                // And now we have account details, fetch the transactions
+                fetchWeeklyTransactions(context)
             }
         }
     }
@@ -131,10 +134,9 @@ class MainViewModel(
         // passing it just-in-time
         val context = application.applicationContext
 
-        // Call fetch methods sequentially
+        // Will call fetch methods sequentially
         viewModelScope.launch {
             initialiseAccountDetails(context)
-            fetchWeeklyTransactions(context)
         }
     }
 
