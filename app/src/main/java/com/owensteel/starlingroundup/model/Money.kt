@@ -2,6 +2,7 @@ package com.owensteel.starlingroundup.model
 
 import java.util.Currency
 import java.util.Locale
+import kotlin.math.abs
 
 /*
 
@@ -25,7 +26,7 @@ data class Money(
         }
 
         val pounds = minorUnits / 100
-        val pence = minorUnits % 100
+        val pence = abs(minorUnits % 100) // Prevents negative pence (impossible)
 
         return String.format(Locale.UK, "%s%d.%02d", unitSymbol, pounds, pence)
     }
