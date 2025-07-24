@@ -6,6 +6,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import com.owensteel.starlingroundup.network.StarlingService
+import com.owensteel.starlingroundup.token.TokenManager
 import com.owensteel.starlingroundup.ui.MainScreen
 import com.owensteel.starlingroundup.ui.theme.StarlingRoundupTheme
 import com.owensteel.starlingroundup.util.DeviceSecurityCheck
@@ -32,6 +34,10 @@ class MainActivity : ComponentActivity() {
             finish()
             return
         }
+
+        // API setup
+        val authApi = StarlingService.createAuthApi()
+        val tokenManager = TokenManager(applicationContext, authApi)
 
         // App setup
         enableEdgeToEdge()
