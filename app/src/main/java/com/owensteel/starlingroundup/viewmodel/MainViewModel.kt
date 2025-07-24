@@ -25,8 +25,8 @@ class MainViewModel(
 
     // Use StateFlow to maintain an observable mutable state for our
     // value that may change between appearances
-    private val _roundUpAmountUiState = MutableStateFlow<String>("£0.00")
-    val roundUpAmountUiState: StateFlow<String> = _roundUpAmountUiState
+    private val _roundUpAmountState = MutableStateFlow<String>("£0.00")
+    val roundUpAmountState: StateFlow<String> = _roundUpAmountState
 
     private val _feedState = MutableStateFlow<TransactionFeedResponse?>(null)
     val feedState: StateFlow<TransactionFeedResponse?> = _feedState

@@ -14,7 +14,7 @@ import com.owensteel.starlingroundup.viewmodel.MainViewModel
 
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
-    val amount by viewModel.roundUpAmount.collectAsState()
+    val amount by viewModel.roundUpAmountState.collectAsState()
 
     Surface(
         modifier = Modifier.fillMaxSize()
