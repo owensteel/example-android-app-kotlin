@@ -9,7 +9,7 @@ import retrofit2.http.POST
 interface StarlingAuthApi {
 
     @FormUrlEncoded
-    @POST("oauth/token")
+    @POST("oauth/access-token")
     suspend fun refreshAccessToken(
         @Field("grant_type") grantType: String = "refresh_token",
         @Field("refresh_token") refreshToken: String,
