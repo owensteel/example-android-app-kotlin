@@ -1,6 +1,7 @@
 package com.owensteel.starlingroundup.network
 
 import android.content.Context
+import com.owensteel.starlingroundup.model.AccountResponse
 import com.owensteel.starlingroundup.model.TransactionFeedResponse
 import com.owensteel.starlingroundup.model.TransferRequest
 import com.owensteel.starlingroundup.model.TransferResponse
@@ -117,6 +118,17 @@ object StarlingService {
             goalUid = goalUid,
             transferUid = transferUid,
             transfer = request
+        )
+    }
+
+    suspend fun getAccountDetails(
+        context: Context,
+        tokenManager: TokenManager
+    ): Response<AccountResponse> {
+        val token = tokenManager.getValidAccessToken()
+        val api = createAuthenticatedApi(token)
+        return api.getAccountDetails(
+            bearerToken = "Bearer $token"
         )
     }
 
