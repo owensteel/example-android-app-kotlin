@@ -3,11 +3,14 @@ package com.owensteel.starlingroundup.data.local
 import android.content.Context
 import androidx.datastore.preferences.core.byteArrayPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.owensteel.starlingroundup.util.SharedConstants.DATASTORE_NAME
+import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.ACCESS_TOKEN_EXPIRY
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.ACCESS_TOKEN_IV
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.ENCRYPTED_ACCESS_TOKEN
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.ENCRYPTED_REFRESH_TOKEN
+import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.REFRESH_TOKEN_EXPIRY
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.REFRESH_TOKEN_IV
 import kotlinx.coroutines.flow.first
 
@@ -25,7 +28,12 @@ class SecureTokenStore(private val context: Context) {
 
     private val crypto = CryptoManager(context)
 
-    private suspend fun saveToken(token: String, tokenKey: String, ivKey: String) {
+    private suspend fun saveToken(
+        token: String,
+        tokenKey: String,
+        ivKey: String,
+        expiresInSeconds: Long? = null
+    ) {
         val tokenKeyPrefKey = byteArrayPreferencesKey(tokenKey)
         val ivKeyPrefKey = byteArrayPreferencesKey(ivKey)
 
@@ -33,6 +41,22 @@ class SecureTokenStore(private val context: Context) {
         context.dataStore.edit { prefs ->
             prefs[tokenKeyPrefKey] = encrypted
             prefs[ivKeyPrefKey] = iv
+        }
+
+        // Record expiry for token
+        if (
+            expiresInSeconds != null
+            && (tokenKey == ENCRYPTED_ACCESS_TOKEN || tokenKey == ENCRYPTED_REFRESH_TOKEN)
+        ) {
+            val expiryTime = System.currentTimeMillis() + (expiresInSeconds * 1000)
+            // Handle expiry recording for both Access and Refresh tokens (though
+            // we can apparently rely on updated Refresh tokens being sent to us
+            // by the server)
+            val tokenExpiryPrefKey = if (tokenKey == ENCRYPTED_ACCESS_TOKEN)
+                longPreferencesKey(ACCESS_TOKEN_EXPIRY) else longPreferencesKey(REFRESH_TOKEN_EXPIRY)
+            context.dataStore.edit {
+                it[tokenExpiryPrefKey] = expiryTime
+            }
         }
     }
 
@@ -48,7 +72,7 @@ class SecureTokenStore(private val context: Context) {
         } else null
     }
 
-    suspend fun saveRefreshToken(token: String){
+    suspend fun saveRefreshToken(token: String) {
         saveToken(
             token,
             ENCRYPTED_REFRESH_TOKEN,
@@ -63,11 +87,12 @@ class SecureTokenStore(private val context: Context) {
         )
     }
 
-    suspend fun saveAccessToken(token: String){
+    suspend fun saveAccessToken(token: String, expiresInSeconds: Int) {
         saveToken(
             token,
             ENCRYPTED_ACCESS_TOKEN,
-            ACCESS_TOKEN_IV
+            ACCESS_TOKEN_IV,
+            expiresInSeconds.toLong()
         )
     }
 
@@ -76,6 +101,10 @@ class SecureTokenStore(private val context: Context) {
             ENCRYPTED_ACCESS_TOKEN,
             ACCESS_TOKEN_IV
         )
+    }
+
+    suspend fun getAccessTokenExpiryTime(): Long? {
+        return context.dataStore.data.first()[longPreferencesKey(ACCESS_TOKEN_EXPIRY)]
     }
 
 }

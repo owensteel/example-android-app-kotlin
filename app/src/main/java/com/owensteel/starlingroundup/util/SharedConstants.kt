@@ -11,6 +11,8 @@ object SharedConstants {
         val ENCRYPTED_ACCESS_TOKEN = "encrypted_access_token"
         val REFRESH_TOKEN_IV = "refresh_token_iv"
         val ACCESS_TOKEN_IV = "access_token_iv"
+        val REFRESH_TOKEN_EXPIRY = "refresh_token_expiry"
+        val ACCESS_TOKEN_EXPIRY = "access_token_expiry"
     }
 
     object ApiHeaders {

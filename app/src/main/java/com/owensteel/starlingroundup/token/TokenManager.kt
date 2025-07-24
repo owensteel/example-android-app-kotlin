@@ -8,6 +8,7 @@ import com.owensteel.starlingroundup.network.StarlingAuthApi
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import retrofit2.Response
+import kotlin.math.exp
 
 /*
 
@@ -15,7 +16,7 @@ import retrofit2.Response
 
  */
 
-class TokenManager (
+class TokenManager(
     context: Context,
     private val authApi: StarlingAuthApi
 ) {
@@ -24,12 +25,20 @@ class TokenManager (
     private val mutex = Mutex()
 
     suspend fun getValidAccessToken(): String {
-        // We could cache the access token to avoid
-        // frequent decryption, but this could make
-        // the token vulnerable to exposure if memory
-        // is compromised or inspected
         return mutex.withLock {
-            tokenStore.getAccessToken() ?: fetchFromLocalAndRefresh()
+            // We could cache the access token to avoid
+            // frequent decryption, but this could make
+            // the token vulnerable to exposure if memory
+            // is compromised or inspected
+
+            val storedToken = tokenStore.getAccessToken()
+            if (storedToken != null && !isAccessTokenExpired()) {
+                return@withLock storedToken
+            }
+
+            // Token is either missing or expired, so
+            // refresh it
+            return@withLock fetchFromLocalAndRefresh()
         }
     }
 
@@ -55,19 +64,28 @@ class TokenManager (
     }
 
     private suspend fun handleTokenResponse(response: Response<TokenResponse>): String {
-        if(!response.isSuccessful){
+        if (!response.isSuccessful) {
             throw Exception("Failed to refresh access token: ${response.code()}")
         }
 
         val token = response.body() ?: throw Exception("Empty token response")
 
         // Save access token
-        tokenStore.saveAccessToken(token.access_token)
+        tokenStore.saveAccessToken(
+            token.access_token,
+            token.expires_in
+        )
 
         // Save new refresh token, if provided
         token.refresh_token?.let { tokenStore.saveRefreshToken(it) }
 
         return token.access_token
+    }
+
+    private suspend fun isAccessTokenExpired(): Boolean {
+        val expiryTime = tokenStore.getAccessTokenExpiryTime()
+        val now = System.currentTimeMillis()
+        return expiryTime == null || now >= expiryTime
     }
 
 }
