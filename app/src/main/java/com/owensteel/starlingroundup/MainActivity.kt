@@ -35,9 +35,11 @@ class MainActivity : ComponentActivity() {
             return
         }
 
-        // API setup
-        val authApi = StarlingService.createAuthApi()
-        val tokenManager = TokenManager(applicationContext, authApi)
+        // Initialise token manager
+        val tokenManager = TokenManager(
+            applicationContext,
+            StarlingService.createAuthApi()
+        )
 
         // App setup
         enableEdgeToEdge()
