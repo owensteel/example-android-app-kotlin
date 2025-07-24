@@ -12,6 +12,7 @@ import com.owensteel.starlingroundup.model.TransactionFeedResponse
 import com.owensteel.starlingroundup.network.StarlingService
 import com.owensteel.starlingroundup.token.TokenManager
 import com.owensteel.starlingroundup.util.MoneyUtils.roundUp
+import com.owensteel.starlingroundup.util.SharedConstants.Transactions.TRANSACTION_DIRECTION_OUT
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -24,7 +25,6 @@ import retrofit2.Response
  */
 
 private const val GBP = "GBP"
-private const val TRANSACTION_DIRECTION_OUT = "OUT"
 
 class MainViewModel(
     application: Application,

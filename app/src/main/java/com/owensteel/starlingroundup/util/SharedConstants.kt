@@ -27,4 +27,9 @@ object SharedConstants {
         const val API_SERVER_CERT_HASH = "sha256/QX3C0KaQ0UUy8OZDUH+92efaoBtMSSBVuYXvXs+4ud4="
     }
 
+    object Transactions {
+        const val TRANSACTION_DIRECTION_IN = "IN"
+        const val TRANSACTION_DIRECTION_OUT = "OUT"
+    }
+
 }
