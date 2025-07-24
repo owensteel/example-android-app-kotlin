@@ -11,6 +11,7 @@ import com.owensteel.starlingroundup.model.Transaction
 import com.owensteel.starlingroundup.model.TransactionFeedResponse
 import com.owensteel.starlingroundup.network.StarlingService
 import com.owensteel.starlingroundup.token.TokenManager
+import com.owensteel.starlingroundup.util.MoneyUtils.roundUp
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -140,7 +141,7 @@ class MainViewModel(
         val total = transactions
             .filter { it.direction == TRANSACTION_DIRECTION_OUT } // spending only
             .map { it.amount.minorUnits }.sumOf {
-                Money(accountCurrency!!, it).roundUp()
+                roundUp(it)
             }
         lastRoundUpTotal = total
 
