@@ -139,9 +139,12 @@ class MainViewModel(
 
         val total = transactions
             .filter { it.direction == TRANSACTION_DIRECTION_OUT } // spending only
-            .map { it.amount.minorUnits }.sumOf { roundUp(it) }
+            .map { it.amount.minorUnits }.sumOf {
+                Money(accountCurrency!!, it).roundUp()
+            }
         lastRoundUpTotal = total
 
+        // Format and display total
         _roundUpAmountState.value = Money(
             accountCurrency!!,
             total
@@ -167,15 +170,6 @@ class MainViewModel(
         }
     }
 
-}
-
-// Round up to next pound (in minor units)
-private fun roundUp(minorUnits: Long): Long {
-    // Is the transaction amount a full pound?
-    val remainder = minorUnits % 100
-    // If not a full pound, return the difference
-    // between it and a full pound
-    return if (remainder == 0L) 0L else (100 - remainder)
 }
 
 data class FeedUiState(
