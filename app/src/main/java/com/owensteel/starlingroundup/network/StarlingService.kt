@@ -1,6 +1,7 @@
 package com.owensteel.starlingroundup.network
 
 import android.content.Context
+import com.google.gson.Gson
 import com.owensteel.starlingroundup.data.local.SecureTokenStore
 import com.owensteel.starlingroundup.token.TokenManager
 import com.owensteel.starlingroundup.util.SharedConstants.ApiConfig.API_SERVER_CERT_HASH
@@ -59,6 +60,20 @@ object StarlingService {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(StarlingApi::class.java)
+    }
+
+    // Unauthenticated client necessary for calls to token refresh API
+    suspend fun createAuthApi(): StarlingAuthApi {
+        val okHttp = OkHttpClient.Builder()
+            .certificatePinner(certificatePinner)
+            .build()
+
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(okHttp)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(StarlingAuthApi::class.java)
     }
 
 }
