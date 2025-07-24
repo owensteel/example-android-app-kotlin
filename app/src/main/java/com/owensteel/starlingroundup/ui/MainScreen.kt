@@ -10,11 +10,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.owensteel.starlingroundup.R
+import com.owensteel.starlingroundup.model.CurrencyAmount
+import com.owensteel.starlingroundup.model.Money
 import com.owensteel.starlingroundup.model.Transaction
 import com.owensteel.starlingroundup.ui.components.AppButton
+import com.owensteel.starlingroundup.ui.theme.Typography
+import com.owensteel.starlingroundup.util.MoneyUtils.roundUp
+import com.owensteel.starlingroundup.util.SharedConstants.Transactions.TRANSACTION_DIRECTION_OUT
 import com.owensteel.starlingroundup.viewmodel.FeedUiState
 import com.owensteel.starlingroundup.viewmodel.MainViewModel
 
@@ -118,8 +125,91 @@ fun TransactionsFeedFeature(feedState: FeedUiState) {
 @Composable
 fun TransactionsFeedLazyColumn(transactionsList: List<Transaction>) {
     LazyColumn {
+        // Transaction list headers
+        item {
+            TransactionHeaderRow()
+        }
+        // Render the list of transactions
         items(transactionsList) { transaction ->
-            Text(transaction.amount.toString())
+            TransactionRow(transaction)
         }
     }
+}
+
+val transactionsListRowColumnCommonPadding = 8.dp
+
+@Composable
+fun TransactionHeaderRow() {
+    Row(
+        modifier = Modifier
+            .padding(0.dp)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            "Amount",
+            modifier = Modifier
+                .weight(2f)
+                .wrapContentHeight()
+                .padding(transactionsListRowColumnCommonPadding),
+            textAlign = TextAlign.Start,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            "Round Up",
+            modifier = Modifier
+                .weight(1f)
+                .wrapContentHeight()
+                .padding(transactionsListRowColumnCommonPadding),
+            textAlign = TextAlign.Start,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
+fun TransactionRow(transaction: Transaction) {
+    val transactionAmount: CurrencyAmount = transaction.amount
+
+    Row(
+        modifier = Modifier
+            .padding(0.dp)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Amount
+
+        // Make amount negative or positive depending
+        // on the transaction direction, for UX purposes
+        val inOrOutMultiplier = if (transaction.direction == TRANSACTION_DIRECTION_OUT) -1 else 1
+        Text(
+            Money(
+                transactionAmount.currency,
+                transactionAmount.minorUnits * inOrOutMultiplier
+            ).toString(),
+            modifier = Modifier
+                .weight(2f)
+                .wrapContentHeight()
+                .padding(transactionsListRowColumnCommonPadding),
+            textAlign = TextAlign.Start,
+            style = Typography.headlineSmall
+        )
+
+        // Round-up (only if transaction is for spending)
+        if (transaction.direction == TRANSACTION_DIRECTION_OUT) {
+            Text(
+                Money(
+                    transactionAmount.currency,
+                    roundUp(transactionAmount.minorUnits)
+                ).toString(),
+                modifier = Modifier
+                    .weight(1f)
+                    .wrapContentHeight()
+                    .padding(transactionsListRowColumnCommonPadding),
+                textAlign = TextAlign.Start,
+                fontStyle = FontStyle.Italic
+            )
+        }
+    }
+
 }
