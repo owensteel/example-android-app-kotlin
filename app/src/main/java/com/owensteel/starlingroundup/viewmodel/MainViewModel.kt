@@ -1,6 +1,8 @@
 package com.owensteel.starlingroundup.viewmodel
 
+import android.app.Application
 import android.content.Context
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.owensteel.starlingroundup.model.AccountResponse
@@ -19,10 +21,9 @@ import retrofit2.Response
  */
 
 class MainViewModel(
-    private val context: Context,
+    application: Application,
     private val tokenManager: TokenManager
-) : ViewModel() {
-
+) : AndroidViewModel(application) {
     // Use StateFlow to maintain an observable mutable state for our
     // value that may change between appearances
     private val _roundUpAmountState = MutableStateFlow<String>("£0.00")
@@ -35,7 +36,7 @@ class MainViewModel(
     private var accountUid: String? = null
     private var categoryUid: String? = null
 
-    private fun initialiseAccountDetails() {
+    private fun initialiseAccountDetails(context: Context) {
         viewModelScope.launch {
             val accountResponse: Response<AccountResponse> = StarlingService.getAccountDetails(
                 context, tokenManager
@@ -50,7 +51,7 @@ class MainViewModel(
     }
 
     // 1. Fetch this week's transactions
-    private fun fetchWeeklyTransactions() {
+    private fun fetchWeeklyTransactions(context: Context) {
         if (accountUid == null || categoryUid == null) return
 
         viewModelScope.launch {
@@ -78,8 +79,11 @@ class MainViewModel(
 
     // Run as soon as initialised
     init {
-        initialiseAccountDetails()
-        fetchWeeklyTransactions()
+        // Prevent context leak by getting and
+        // passing it just-in-time
+        val context = application.applicationContext
+        initialiseAccountDetails(context)
+        fetchWeeklyTransactions(context)
     }
 
 }
