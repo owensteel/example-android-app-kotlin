@@ -147,7 +147,7 @@ fun TransactionHeaderRow() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            "Amount",
+            stringResource(R.string.transactions_list_header_amount),
             modifier = Modifier
                 .weight(2f)
                 .wrapContentHeight()
@@ -156,7 +156,7 @@ fun TransactionHeaderRow() {
             fontWeight = FontWeight.Bold
         )
         Text(
-            "Round Up",
+            stringResource(R.string.transactions_list_header_roundup),
             modifier = Modifier
                 .weight(1f)
                 .wrapContentHeight()
