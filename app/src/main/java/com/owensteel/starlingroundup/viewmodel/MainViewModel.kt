@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.owensteel.starlingroundup.model.AccountHolderIndividualResponse
 import com.owensteel.starlingroundup.model.AccountResponse
 import com.owensteel.starlingroundup.model.TransactionFeedResponse
 import com.owensteel.starlingroundup.network.StarlingService
@@ -28,8 +29,8 @@ class MainViewModel(
     // Use StateFlow to maintain an observable mutable states for our
     // values that may change any time
 
-    private val _hasInitialisedAccountDetailsState = MutableStateFlow(false)
-    val hasInitialisedAccountDetailsState: StateFlow<Boolean> = _hasInitialisedAccountDetailsState
+    private val _hasInitialisedDataState = MutableStateFlow(false)
+    val hasInitialisedDataState: StateFlow<Boolean> = _hasInitialisedDataState
 
     private val _roundUpAmountState = MutableStateFlow("£0.00")
     val roundUpAmountState: StateFlow<String> = _roundUpAmountState
@@ -37,8 +38,8 @@ class MainViewModel(
     private val _feedState = MutableStateFlow<TransactionFeedResponse?>(null)
     val feedState: StateFlow<TransactionFeedResponse?> = _feedState
 
-    private val _accountNameState = MutableStateFlow("")
-    val accountNameState: StateFlow<String> = _accountNameState
+    private val _accountHolderNameState = MutableStateFlow("")
+    val accountHolderNameState: StateFlow<String> = _accountHolderNameState
 
     // 0. Fetch account details
     private var accountUid: String? = null
@@ -56,12 +57,26 @@ class MainViewModel(
                     categoryUid = account.defaultCategory
                     accountCurrency = account.currency
 
-                    // Display name
-                    _accountNameState.value = account.name
-
-                    // Now we are ready, show the feature's UI
-                    _hasInitialisedAccountDetailsState.value = true
+                    // Get account holder details
+                    fetchAccountHolderDetails(context)
                 }
+            }
+        }
+    }
+
+    private fun fetchAccountHolderDetails(context: Context) {
+        viewModelScope.launch {
+            val accountHolderIndividualResponse: Response<AccountHolderIndividualResponse> =
+                StarlingService.getAccountHolderIndividual(
+                    context, tokenManager
+                )
+            if (accountHolderIndividualResponse.isSuccessful) {
+                accountHolderIndividualResponse.body()?.let {
+                    _accountHolderNameState.value = it.firstName
+                }
+
+                // Now we have user's complete details, display feature UI
+                _hasInitialisedDataState.value = true
             }
         }
     }

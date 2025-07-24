@@ -16,9 +16,9 @@ import com.owensteel.starlingroundup.viewmodel.MainViewModel
 
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
-    val hasInitialisedAccountDetails by viewModel.hasInitialisedAccountDetailsState.collectAsState()
+    val hasInitialisedDataState by viewModel.hasInitialisedDataState.collectAsState()
     val amount by viewModel.roundUpAmountState.collectAsState()
-    val accountName by viewModel.accountNameState.collectAsState()
+    val accountHolderName by viewModel.accountHolderNameState.collectAsState()
 
     Surface(
         modifier = Modifier.fillMaxSize()
@@ -30,11 +30,11 @@ fun MainScreen(viewModel: MainViewModel) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (hasInitialisedAccountDetails) {
+            if (hasInitialisedDataState) {
                 MainFeature(
                     viewModel = viewModel,
                     amount = amount,
-                    accountName = accountName
+                    accountHolderName = accountHolderName
                 )
             } else {
                 CircularProgressIndicator()
@@ -44,9 +44,9 @@ fun MainScreen(viewModel: MainViewModel) {
 }
 
 @Composable
-fun MainFeature(viewModel: MainViewModel, amount: String, accountName: String) {
+fun MainFeature(viewModel: MainViewModel, amount: String, accountHolderName: String) {
     Text(
-        text = stringResource(id = R.string.main_feature_greeting, accountName),
+        text = stringResource(id = R.string.main_feature_greeting, accountHolderName),
         style = MaterialTheme.typography.bodyMedium
     )
 
