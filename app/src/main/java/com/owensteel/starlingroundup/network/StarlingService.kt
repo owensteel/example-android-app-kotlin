@@ -2,6 +2,7 @@ package com.owensteel.starlingroundup.network
 
 import android.content.Context
 import com.owensteel.starlingroundup.data.local.SecureTokenStore
+import com.owensteel.starlingroundup.token.TokenManager
 import com.owensteel.starlingroundup.util.SharedConstants.ApiConfig.API_SERVER_CERT_HASH
 import com.owensteel.starlingroundup.util.SharedConstants.ApiConfig.BASE_URL
 import com.owensteel.starlingroundup.util.SharedConstants.ApiHeaders.ACCEPT
@@ -30,14 +31,13 @@ val certificatePinner = CertificatePinner.Builder()
 
 object StarlingService {
 
-    suspend fun create(context: Context): StarlingApi {
-        // Get our access token from encrypted storage
-        val tokenStorage = SecureTokenStore(context)
+    suspend fun create(context: Context, tokenManager: TokenManager): StarlingApi {
+        // Get our access token
         // Since getToken is a suspend function (because it's reading from
         // DataStore), and Retrofit's addInterceptor is not suspendable,
         // we have to use this function as a suspend wrapper to retrieve the
         // token first, and only then build the Retrofit client
-        val token = tokenStorage.getAccessToken() ?: throw IllegalStateException("Missing access token")
+        val token = tokenManager.getValidAccessToken()
 
         val okHttp = OkHttpClient.Builder()
             .certificatePinner(certificatePinner)
