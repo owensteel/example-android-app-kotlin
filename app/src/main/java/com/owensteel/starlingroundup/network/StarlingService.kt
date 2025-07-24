@@ -1,8 +1,9 @@
 package com.owensteel.starlingroundup.network
 
 import android.content.Context
-import com.google.gson.Gson
-import com.owensteel.starlingroundup.data.local.SecureTokenStore
+import com.owensteel.starlingroundup.model.TransactionFeedResponse
+import com.owensteel.starlingroundup.model.TransferRequest
+import com.owensteel.starlingroundup.model.TransferResponse
 import com.owensteel.starlingroundup.token.TokenManager
 import com.owensteel.starlingroundup.util.SharedConstants.ApiConfig.API_SERVER_CERT_HASH
 import com.owensteel.starlingroundup.util.SharedConstants.ApiConfig.BASE_URL
@@ -12,8 +13,11 @@ import com.owensteel.starlingroundup.util.SharedConstants.ApiHeaders.AUTHORIZATI
 import com.owensteel.starlingroundup.util.SharedConstants.ApiHeaders.USER_AGENT
 import okhttp3.CertificatePinner
 import okhttp3.OkHttpClient
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 /*
 
@@ -33,14 +37,7 @@ val certificatePinner = CertificatePinner.Builder()
 
 object StarlingService {
 
-    suspend fun create(context: Context, tokenManager: TokenManager): StarlingApi {
-        // Get our access token
-        // Since getToken is a suspend function (because it's reading from
-        // DataStore), and Retrofit's addInterceptor is not suspendable,
-        // we have to use this function as a suspend wrapper to retrieve the
-        // token first, and only then build the Retrofit client
-        val token = tokenManager.getValidAccessToken()
-
+    private fun createAuthenticatedApi(token: String): StarlingApi {
         val okHttp = OkHttpClient.Builder()
             .certificatePinner(certificatePinner)
             .addInterceptor { chain ->
@@ -75,6 +72,52 @@ object StarlingService {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(StarlingAuthApi::class.java)
+    }
+
+    // API functions
+
+    suspend fun getTransactionsForCurrentWeek(
+        context: Context,
+        tokenManager: TokenManager,
+        accountUid: String,
+        categoryUid: String
+    ): Response<TransactionFeedResponse> {
+        // Get timestamps for the start of the week
+        // and now
+        val now = ZonedDateTime.now()
+        val startOfWeek = now.with(java.time.DayOfWeek.MONDAY).toLocalDate().atStartOfDay(now.zone)
+        val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+
+        // Fetch token here so we may pass it in the
+        // header
+        val token = tokenManager.getValidAccessToken()
+        val api = createAuthenticatedApi(token)
+        return api.getTransactionsForCurrentWeek(
+            bearerToken = "Bearer $token",
+            accountUid = accountUid,
+            categoryUid = categoryUid,
+            fromIso = formatter.format(startOfWeek),
+            toIso = formatter.format(now)
+        )
+    }
+
+    suspend fun roundUpTransfer(
+        context: Context,
+        tokenManager: TokenManager,
+        goalUid: String,
+        transferUid: String,
+        request: TransferRequest
+    ): Response<TransferResponse> {
+        // Fetch token here so we may pass it in the
+        // header
+        val token = tokenManager.getValidAccessToken()
+        val api = createAuthenticatedApi(token)
+        return api.roundUpTransfer(
+            bearerToken = "Bearer $token",
+            goalUid = goalUid,
+            transferUid = transferUid,
+            transfer = request
+        )
     }
 
 }
