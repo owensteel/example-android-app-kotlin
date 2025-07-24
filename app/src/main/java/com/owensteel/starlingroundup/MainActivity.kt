@@ -5,7 +5,6 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import com.owensteel.starlingroundup.network.StarlingService
 import com.owensteel.starlingroundup.token.TokenManager
 import com.owensteel.starlingroundup.ui.MainScreen
@@ -21,7 +20,6 @@ import com.owensteel.starlingroundup.viewmodel.MainViewModel
 
  */
 class MainActivity : ComponentActivity() {
-    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +27,7 @@ class MainActivity : ComponentActivity() {
         // Perform device security check immediately
         // Even in debug mode, so there is no single point
         // of failure here
-        if(DeviceSecurityCheck.isCompromised(this)) {
+        if (DeviceSecurityCheck.isCompromised(this)) {
             Toast.makeText(this, "This device is not secure. Exiting.", Toast.LENGTH_LONG).show()
             finish()
             return
@@ -41,12 +39,19 @@ class MainActivity : ComponentActivity() {
             StarlingService.createAuthApi()
         )
 
+        // Initialise MainViewModel
+        val mainViewModel = MainViewModel(
+            application,
+            tokenManager
+        )
+
         // App setup
         enableEdgeToEdge()
         setContent {
             StarlingRoundupTheme {
-                MainScreen(viewModel)
+                MainScreen(mainViewModel)
             }
         }
     }
+
 }
