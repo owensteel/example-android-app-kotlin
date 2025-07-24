@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.owensteel.starlingroundup.model.AccountHolderIndividualResponse
 import com.owensteel.starlingroundup.model.AccountResponse
+import com.owensteel.starlingroundup.model.Transaction
 import com.owensteel.starlingroundup.model.TransactionFeedResponse
 import com.owensteel.starlingroundup.network.StarlingService
 import com.owensteel.starlingroundup.token.TokenManager
@@ -35,8 +36,8 @@ class MainViewModel(
     private val _roundUpAmountState = MutableStateFlow("£0.00")
     val roundUpAmountState: StateFlow<String> = _roundUpAmountState
 
-    private val _feedState = MutableStateFlow<TransactionFeedResponse?>(null)
-    val feedState: StateFlow<TransactionFeedResponse?> = _feedState
+    private val _feedState = MutableStateFlow(FeedUiState())
+    val feedState: StateFlow<FeedUiState> = _feedState
 
     private val _accountHolderNameState = MutableStateFlow("")
     val accountHolderNameState: StateFlow<String> = _accountHolderNameState
@@ -86,6 +87,12 @@ class MainViewModel(
         if (accountUid == null || categoryUid == null) return
 
         viewModelScope.launch {
+            _feedState.value = _feedState.value.copy(
+                value = null,
+                isLoading = true,
+                hasError = false
+            )
+
             val transactionFeedResponse: Response<TransactionFeedResponse> =
                 StarlingService.getTransactionsForCurrentWeek(
                     context,
@@ -94,7 +101,17 @@ class MainViewModel(
                     categoryUid!!
                 )
             if (transactionFeedResponse.isSuccessful) {
-                _feedState.value = transactionFeedResponse.body()
+                _feedState.value = _feedState.value.copy(
+                    value = transactionFeedResponse.body()?.feedItems,
+                    isLoading = false,
+                    hasError = false
+                )
+            } else {
+                _feedState.value = _feedState.value.copy(
+                    value = null,
+                    isLoading = false,
+                    hasError = true
+                )
             }
         }
     }
@@ -122,3 +139,9 @@ class MainViewModel(
     }
 
 }
+
+data class FeedUiState(
+    val value: List<Transaction>? = null,
+    val isLoading: Boolean = true,
+    val hasError: Boolean = false
+)
