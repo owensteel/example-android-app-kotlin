@@ -14,6 +14,7 @@ import com.owensteel.starlingroundup.viewmodel.MainViewModel
 
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
+    val hasInitialisedAccountDetails by viewModel.hasInitialisedAccountDetailsState.collectAsState()
     val amount by viewModel.roundUpAmountState.collectAsState()
     val accountName by viewModel.accountNameState.collectAsState()
 
@@ -29,25 +30,29 @@ fun MainScreen(viewModel: MainViewModel) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Hi there, ${accountName}! Ready to save?",
-                style = MaterialTheme.typography.bodyMedium
-            )
+            if (hasInitialisedAccountDetails) {
+                Text(
+                    text = "Hi there, ${accountName}! Ready to save?",
+                    style = MaterialTheme.typography.bodyMedium
+                )
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-            Text(
-                text = amount,
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
-            )
+                Text(
+                    text = amount,
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
+                )
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-            AppButton(
-                onClick = { viewModel.performTransfer() },
-                text = "Round Up & Save"
-            )
+                AppButton(
+                    onClick = { viewModel.performTransfer() },
+                    text = "Round Up & Save"
+                )
+            } else {
+                CircularProgressIndicator()
+            }
         }
     }
 }

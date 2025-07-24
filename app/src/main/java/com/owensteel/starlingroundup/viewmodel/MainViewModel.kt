@@ -25,8 +25,11 @@ class MainViewModel(
     private val tokenManager: TokenManager
 ) : AndroidViewModel(application) {
 
-    // Use StateFlow to maintain an observable mutable state for our
-    // value that may change between appearances
+    // Use StateFlow to maintain an observable mutable states for our
+    // values that may change any time
+
+    private val _hasInitialisedAccountDetailsState = MutableStateFlow(false)
+    val hasInitialisedAccountDetailsState: StateFlow<Boolean> = _hasInitialisedAccountDetailsState
 
     private val _roundUpAmountState = MutableStateFlow("£0.00")
     val roundUpAmountState: StateFlow<String> = _roundUpAmountState
@@ -55,6 +58,9 @@ class MainViewModel(
 
                     // Display name
                     _accountNameState.value = account.name
+
+                    // Now we are ready, show the feature's UI
+                    _hasInitialisedAccountDetailsState.value = true
                 }
             }
         }
