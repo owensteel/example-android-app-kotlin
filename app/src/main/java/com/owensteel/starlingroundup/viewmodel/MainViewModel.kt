@@ -2,11 +2,11 @@ package com.owensteel.starlingroundup.viewmodel
 
 import android.app.Application
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.owensteel.starlingroundup.model.AccountHolderIndividualResponse
 import com.owensteel.starlingroundup.model.AccountResponse
+import com.owensteel.starlingroundup.model.Money
 import com.owensteel.starlingroundup.model.Transaction
 import com.owensteel.starlingroundup.model.TransactionFeedResponse
 import com.owensteel.starlingroundup.network.StarlingService
@@ -22,6 +22,9 @@ import retrofit2.Response
 
  */
 
+private const val GBP = "GBP"
+private const val TRANSACTION_DIRECTION_OUT = "OUT"
+
 class MainViewModel(
     application: Application,
     private val tokenManager: TokenManager
@@ -33,7 +36,9 @@ class MainViewModel(
     private val _hasInitialisedDataState = MutableStateFlow(false)
     val hasInitialisedDataState: StateFlow<Boolean> = _hasInitialisedDataState
 
-    private val _roundUpAmountState = MutableStateFlow("£0.00")
+    private val _roundUpAmountState = MutableStateFlow(
+        Money(GBP, 0L).toString()
+    )
     val roundUpAmountState: StateFlow<String> = _roundUpAmountState
 
     private val _feedState = MutableStateFlow(FeedUiState())
@@ -86,6 +91,7 @@ class MainViewModel(
     }
 
     // 1. Fetch this week's transactions
+    private var transactionsCached: List<Transaction> = emptyList()
     private fun fetchWeeklyTransactions(context: Context) {
         if (accountUid == null || categoryUid == null) return
 
@@ -104,8 +110,15 @@ class MainViewModel(
                     categoryUid!!
                 )
             if (transactionFeedResponse.isSuccessful) {
+                val transactions = transactionFeedResponse.body()?.feedItems.orEmpty()
+                transactionsCached = transactions
+
+                // Round up amount
+                calculateAndDisplayRoundUp(transactions)
+
+                // Feed UI
                 _feedState.value = _feedState.value.copy(
-                    value = transactionFeedResponse.body()?.feedItems,
+                    value = transactions,
                     isLoading = false,
                     hasError = false
                 )
@@ -120,6 +133,20 @@ class MainViewModel(
     }
 
     // 2. Calculate the round-up
+    private var lastRoundUpTotal: Long = 0L
+    private fun calculateAndDisplayRoundUp(transactions: List<Transaction>) {
+        if (accountCurrency == null) return
+
+        val total = transactions
+            .filter { it.direction == TRANSACTION_DIRECTION_OUT } // spending only
+            .map { it.amount.minorUnits }.sumOf { roundUp(it) }
+        lastRoundUpTotal = total
+
+        _roundUpAmountState.value = Money(
+            accountCurrency!!,
+            total
+        ).toString()
+    }
 
     // 3. Perform the transfer
     fun performTransfer() {
@@ -140,6 +167,15 @@ class MainViewModel(
         }
     }
 
+}
+
+// Round up to next pound (in minor units)
+private fun roundUp(minorUnits: Long): Long {
+    // Is the transaction amount a full pound?
+    val remainder = minorUnits % 100
+    // If not a full pound, return the difference
+    // between it and a full pound
+    return if (remainder == 0L) 0L else (100 - remainder)
 }
 
 data class FeedUiState(
