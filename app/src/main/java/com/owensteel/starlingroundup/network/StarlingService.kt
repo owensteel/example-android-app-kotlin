@@ -63,7 +63,7 @@ object StarlingService {
     }
 
     // Unauthenticated client necessary for calls to token refresh API
-    suspend fun createAuthApi(): StarlingAuthApi {
+    fun createAuthApi(): StarlingAuthApi {
         val okHttp = OkHttpClient.Builder()
             .certificatePinner(certificatePinner)
             .build()
