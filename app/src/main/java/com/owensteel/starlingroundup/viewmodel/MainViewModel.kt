@@ -2,6 +2,7 @@ package com.owensteel.starlingroundup.viewmodel
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.owensteel.starlingroundup.model.AccountResponse
@@ -91,8 +92,12 @@ class MainViewModel(
         // Prevent context leak by getting and
         // passing it just-in-time
         val context = application.applicationContext
-        initialiseAccountDetails(context)
-        fetchWeeklyTransactions(context)
+
+        // Call fetch methods sequentially
+        viewModelScope.launch {
+            initialiseAccountDetails(context)
+            fetchWeeklyTransactions(context)
+        }
     }
 
 }
