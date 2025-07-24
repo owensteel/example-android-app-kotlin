@@ -6,6 +6,7 @@ import com.owensteel.starlingroundup.data.local.SecureTokenStore
 import com.owensteel.starlingroundup.token.TokenManager
 import com.owensteel.starlingroundup.util.SharedConstants.ApiConfig.API_SERVER_CERT_HASH
 import com.owensteel.starlingroundup.util.SharedConstants.ApiConfig.BASE_URL
+import com.owensteel.starlingroundup.util.SharedConstants.ApiConfig.HOSTNAME
 import com.owensteel.starlingroundup.util.SharedConstants.ApiHeaders.ACCEPT
 import com.owensteel.starlingroundup.util.SharedConstants.ApiHeaders.AUTHORIZATION
 import com.owensteel.starlingroundup.util.SharedConstants.ApiHeaders.USER_AGENT
@@ -27,7 +28,7 @@ private const val HTTP_CLIENT_USER_AGENT = "OwenSteel-StarlingChallenge"
 
 // Uses Certificate Pinner (programmatic solution)
 val certificatePinner = CertificatePinner.Builder()
-    .add(BASE_URL, API_SERVER_CERT_HASH)
+    .add(HOSTNAME, API_SERVER_CERT_HASH)
     .build()
 
 object StarlingService {

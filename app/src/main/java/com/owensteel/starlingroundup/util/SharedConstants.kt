@@ -21,6 +21,7 @@ object SharedConstants {
 
     object ApiConfig {
         const val BASE_URL = "https://api-sandbox.starlingbank.com"
+        const val HOSTNAME = "api-sandbox.starlingbank.com"
         const val API_SERVER_CERT_HASH = "sha256/QX3C0KaQ0UUy8OZDUH+92efaoBtMSSBVuYXvXs+4ud4="
     }
 
