@@ -1,5 +1,7 @@
 package com.owensteel.starlingroundup.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -127,11 +129,12 @@ fun TransactionsFeedFeature(feedState: FeedUiState) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class) // allows use of stickyHeader
 @Composable
 fun TransactionsFeedLazyColumn(transactionsList: List<Transaction>) {
     LazyColumn {
         // Transaction list headers
-        item {
+        stickyHeader {
             TransactionHeaderRow()
         }
         // Render the list of transactions
@@ -147,6 +150,7 @@ val transactionsListRowColumnCommonPadding = 8.dp
 fun TransactionHeaderRow() {
     Row(
         modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
             .padding(0.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
