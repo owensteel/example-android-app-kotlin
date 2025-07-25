@@ -9,16 +9,20 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.owensteel.starlingroundup.R
 import com.owensteel.starlingroundup.model.CurrencyAmount
 import com.owensteel.starlingroundup.model.Money
 import com.owensteel.starlingroundup.model.Transaction
 import com.owensteel.starlingroundup.ui.components.AppButton
+import com.owensteel.starlingroundup.ui.theme.TransactionInBgGreen
 import com.owensteel.starlingroundup.ui.theme.Typography
 import com.owensteel.starlingroundup.util.MoneyUtils.roundUp
 import com.owensteel.starlingroundup.util.SharedConstants.Transactions.TRANSACTION_DIRECTION_OUT
@@ -182,6 +186,10 @@ fun TransactionRow(transaction: Transaction) {
         // Make amount negative or positive depending
         // on the transaction direction, for UX purposes
         val inOrOutMultiplier = if (transaction.direction == TRANSACTION_DIRECTION_OUT) -1 else 1
+        // Change highlight colour depending on transaction
+        // direction
+        val amountBgColour =
+            if (transaction.direction == TRANSACTION_DIRECTION_OUT) Color.Transparent else TransactionInBgGreen
         Text(
             Money(
                 transactionAmount.currency,
@@ -192,7 +200,10 @@ fun TransactionRow(transaction: Transaction) {
                 .wrapContentHeight()
                 .padding(transactionsListRowColumnCommonPadding),
             textAlign = TextAlign.Start,
-            style = Typography.headlineSmall
+            style = TextStyle(
+                background = amountBgColour,
+                fontSize = 24.sp
+            )
         )
 
         // Round-up (only if transaction is for spending)
