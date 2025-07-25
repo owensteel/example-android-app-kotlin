@@ -6,6 +6,7 @@ import com.owensteel.starlingroundup.data.local.SecureTokenStore
 import com.owensteel.starlingroundup.model.TokenResponse
 import com.owensteel.starlingroundup.network.StarlingService
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import retrofit2.Response
@@ -24,7 +25,7 @@ class TokenManager @Inject constructor(
     private val tokenStore = SecureTokenStore(context)
     private val mutex = Mutex()
 
-    suspend fun getValidAccessToken(): String {
+    private suspend fun getValidAccessToken(): String {
         return mutex.withLock {
             // We could cache the access token to avoid
             // frequent decryption, but this could make
@@ -40,6 +41,18 @@ class TokenManager @Inject constructor(
             // refresh it
             return@withLock fetchFromLocalAndRefresh()
         }
+    }
+
+    fun getValidAccessTokenBlocking(): String = runBlocking {
+        return@runBlocking getValidAccessToken()
+    }
+
+    private suspend fun invalidateAndRefreshCurrentAccessToken(): String {
+        return fetchFromLocalAndRefresh()
+    }
+
+    fun invalidateAndRefreshCurrentAccessTokenBlocking(): String = runBlocking {
+        return@runBlocking invalidateAndRefreshCurrentAccessToken()
     }
 
     private suspend fun fetchFromLocalAndRefresh(): String {

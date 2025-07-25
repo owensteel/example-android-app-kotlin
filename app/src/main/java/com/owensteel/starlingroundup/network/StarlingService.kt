@@ -19,6 +19,7 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.CertificatePinner
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -48,13 +49,19 @@ val certificatePinner = CertificatePinner.Builder()
 object StarlingService {
 
     // Create authenticated API client
-    private fun createAuthenticatedApi(token: String): StarlingApi {
+    // This is the primary client for API calls
+    private fun createAuthenticatedApi(tokenManager: TokenManager): StarlingApi {
         val okHttp = OkHttpClient.Builder()
             .certificatePinner(certificatePinner)
+            // Fetch access token and add Authorization
+            // header, and monitor for bad responses in
+            // case token has expired for some other reason
+            // than time
+            .addInterceptor(AuthInterceptor(tokenManager))
+            // Add regular headers
             .addInterceptor { chain ->
                 val original = chain.request()
                 val request = original.newBuilder()
-                    .header(AUTHORIZATION, "Bearer $token")
                     .header(ACCEPT, HTTP_CLIENT_ACCEPT_VALUE)
                     .header(USER_AGENT, HTTP_CLIENT_USER_AGENT)
                     .method(original.method, original.body)
@@ -113,10 +120,8 @@ object StarlingService {
 
         // Fetch token here so we may pass it in the
         // header
-        val token = tokenManager.getValidAccessToken()
-        val api = createAuthenticatedApi(token)
+        val api = createAuthenticatedApi(tokenManager)
         return api.getTransactionsForCurrentWeek(
-            bearerToken = "Bearer $token",
             accountUid = accountUid,
             categoryUid = categoryUid,
             fromIso = formatter.format(startOfWeek),
@@ -134,10 +139,8 @@ object StarlingService {
     ): Response<TransferResponse> {
         // Fetch token here so we may pass it in the
         // header
-        val token = tokenManager.getValidAccessToken()
-        val api = createAuthenticatedApi(token)
+        val api = createAuthenticatedApi(tokenManager)
         return api.roundUpTransfer(
-            bearerToken = "Bearer $token",
             accountUid = accountUid,
             goalUid = goalUid,
             transferUid = transferUid,
@@ -149,22 +152,57 @@ object StarlingService {
         context: Context,
         tokenManager: TokenManager
     ): Response<AccountResponse> {
-        val token = tokenManager.getValidAccessToken()
-        val api = createAuthenticatedApi(token)
-        return api.getAccountDetails(
-            bearerToken = "Bearer $token"
-        )
+        val api = createAuthenticatedApi(tokenManager)
+        return api.getAccountDetails()
     }
 
     suspend fun getAccountHolderIndividual(
         context: Context,
         tokenManager: TokenManager
     ): Response<AccountHolderIndividualResponse> {
-        val token = tokenManager.getValidAccessToken()
-        val api = createAuthenticatedApi(token)
-        return api.getAccountHolderIndividual(
-            bearerToken = "Bearer $token"
-        )
+        val api = createAuthenticatedApi(tokenManager)
+        return api.getAccountHolderIndividual()
     }
 
+}
+
+/*
+
+    Attaches access token to request
+    and monitors for bad responses
+
+ */
+
+class AuthInterceptor(
+    private val tokenManager: TokenManager
+) : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
+        var request = chain.request()
+
+        // Attach token in Authorization header
+        val token = tokenManager.getValidAccessTokenBlocking()
+        request = request.newBuilder()
+            .header(AUTHORIZATION, "Bearer $token")
+            .build()
+
+        // Monitor response
+        val response = chain.proceed(request)
+
+        // Access token may have expired for some external
+        // reason, refresh access code and retry once
+        if (response.code == 403) {
+            response.close()
+
+            val newToken = tokenManager.invalidateAndRefreshCurrentAccessTokenBlocking()
+
+            // Retry request with new access token
+            val newRequest = request.newBuilder()
+                .header("Authorization", "Bearer $newToken")
+                .build()
+
+            return chain.proceed(newRequest)
+        }
+
+        return response
+    }
 }

@@ -17,17 +17,14 @@ interface StarlingApi {
 
     @GET("api/v2/accounts")
     suspend fun getAccountDetails(
-        @Header("Authorization") bearerToken: String
     ): Response<AccountResponse>
 
     @GET("api/v2/account-holder/individual")
     suspend fun getAccountHolderIndividual(
-        @Header("Authorization") bearerToken: String
     ): Response<AccountHolderIndividualResponse>
 
     @GET("api/v2/feed/account/{accountUid}/category/{categoryUid}/transactions-between")
     suspend fun getTransactionsForCurrentWeek(
-        @Header("Authorization") bearerToken: String,
         @Path("accountUid") accountUid: String,
         @Path("categoryUid") categoryUid: String,
         @Query("minTransactionTimestamp") fromIso: String,
@@ -36,7 +33,6 @@ interface StarlingApi {
 
     @PUT("api/v2/account/{accountUid}/savings-goals/{savingsGoalUid}/add-money/{transferUid}")
     suspend fun roundUpTransfer(
-        @Header("Authorization") bearerToken: String,
         @Path("accountUid") accountUid: String,
         @Path("savingsGoalUid") goalUid: String,
         @Path("transferUid") transferUid: String,
