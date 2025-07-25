@@ -72,6 +72,17 @@ class SecureTokenStore(private val context: Context) {
         } else null
     }
 
+    suspend fun deleteSavedRefreshToken() {
+        // In case the saved refresh token is
+        // expired or invalid, this allows us to
+        // fallback to the initial hardcoded one
+        context.dataStore.edit { preferences ->
+            preferences.remove(
+                byteArrayPreferencesKey(ENCRYPTED_REFRESH_TOKEN)
+            )
+        }
+    }
+
     suspend fun saveRefreshToken(token: String) {
         saveToken(
             token,

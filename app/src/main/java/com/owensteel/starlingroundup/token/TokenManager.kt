@@ -73,8 +73,16 @@ class TokenManager @Inject constructor(
 
     private suspend fun handleTokenResponse(response: Response<TokenResponse>): String {
         if (!response.isSuccessful) {
-            // TODO: handle invalid refresh token (code 400, invalid_grant)
-            throw Exception("Failed to refresh access token: ${response.code()}")
+            // Handle invalid refresh token (code 400, invalid_grant)
+            if (response.code() == 400 && tokenStore.getRefreshToken() != null) {
+                // Saved refresh token is probably expired
+                // Fallback to the initial one
+                tokenStore.deleteSavedRefreshToken()
+                // Retry
+                return fetchFromLocalAndRefresh()
+            } else {
+                throw Exception("Failed to refresh access token: ${response.code()}")
+            }
         }
 
         val token = response.body() ?: throw Exception("Empty token response")
