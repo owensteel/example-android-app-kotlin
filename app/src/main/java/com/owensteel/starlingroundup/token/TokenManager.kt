@@ -5,9 +5,11 @@ import com.owensteel.starlingroundup.BuildConfig
 import com.owensteel.starlingroundup.data.local.SecureTokenStore
 import com.owensteel.starlingroundup.model.TokenResponse
 import com.owensteel.starlingroundup.network.StarlingAuthApi
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import retrofit2.Response
+import javax.inject.Inject
 
 /*
 
@@ -15,8 +17,8 @@ import retrofit2.Response
 
  */
 
-class TokenManager(
-    context: Context,
+class TokenManager @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val authApi: StarlingAuthApi
 ) {
 

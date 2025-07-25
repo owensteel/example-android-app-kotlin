@@ -4,21 +4,23 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import com.owensteel.starlingroundup.network.StarlingService
-import com.owensteel.starlingroundup.token.TokenManager
-import com.owensteel.starlingroundup.ui.MainScreen
-import com.owensteel.starlingroundup.ui.theme.StarlingRoundupTheme
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.owensteel.starlingroundup.ui.RoundUpAndSaveScreen
 import com.owensteel.starlingroundup.util.DeviceSecurityCheck
-import com.owensteel.starlingroundup.viewmodel.MainViewModel
+import com.owensteel.starlingroundup.viewmodel.RoundUpAndSaveViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
 /*
 
     The entry point for the application
-    Since in this project we only want to fulfil one function for
+    Since in this project we only want to fulfil one feature for
     the user, this directly presents our single UI feature
 
  */
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,25 +35,20 @@ class MainActivity : ComponentActivity() {
             return
         }
 
-        // Initialise token manager
-        val tokenManager = TokenManager(
-            applicationContext,
-            StarlingService.createAuthApi()
-        )
-
-        // Initialise MainViewModel
-        val mainViewModel = MainViewModel(
-            application,
-            tokenManager
-        )
-
-        // App setup
-        enableEdgeToEdge()
+        // Single-page application setup
         setContent {
-            StarlingRoundupTheme {
-                MainScreen(mainViewModel)
+            val navController = rememberNavController()
+
+            NavHost(navController, startDestination = "RoundUpAndSave") {
+                composable("RoundUpAndSave") { backStackEntry ->
+                    val roundUpAndSaveViewModel: RoundUpAndSaveViewModel = hiltViewModel(backStackEntry)
+                    RoundUpAndSaveScreen(
+                        viewModel = roundUpAndSaveViewModel
+                    )
+                }
             }
         }
+
     }
 
 }

@@ -13,6 +13,10 @@ import com.owensteel.starlingroundup.util.SharedConstants.ApiConfig.HOSTNAME
 import com.owensteel.starlingroundup.util.SharedConstants.ApiHeaders.ACCEPT
 import com.owensteel.starlingroundup.util.SharedConstants.ApiHeaders.AUTHORIZATION
 import com.owensteel.starlingroundup.util.SharedConstants.ApiHeaders.USER_AGENT
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import okhttp3.CertificatePinner
 import okhttp3.OkHttpClient
 import retrofit2.Response
@@ -20,6 +24,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import javax.inject.Singleton
 
 /*
 
@@ -37,8 +42,18 @@ val certificatePinner = CertificatePinner.Builder()
     .add(HOSTNAME, API_SERVER_CERT_HASH)
     .build()
 
+@Module
+@InstallIn(SingletonComponent::class)
 object StarlingService {
 
+    // For Dagger
+    @Provides
+    @Singleton
+    fun provideStarlingAuthApi(): StarlingAuthApi {
+        return createAuthApi()
+    }
+
+    // Create authenticated API client
     private fun createAuthenticatedApi(token: String): StarlingApi {
         val okHttp = OkHttpClient.Builder()
             .certificatePinner(certificatePinner)
@@ -63,7 +78,7 @@ object StarlingService {
     }
 
     // Unauthenticated client necessary for calls to token refresh API
-    fun createAuthApi(): StarlingAuthApi {
+    private fun createAuthApi(): StarlingAuthApi {
         val okHttp = OkHttpClient.Builder()
             .certificatePinner(certificatePinner)
             .build()

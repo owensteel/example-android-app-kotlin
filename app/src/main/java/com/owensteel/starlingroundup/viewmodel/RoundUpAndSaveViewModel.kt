@@ -13,10 +13,12 @@ import com.owensteel.starlingroundup.network.StarlingService
 import com.owensteel.starlingroundup.token.TokenManager
 import com.owensteel.starlingroundup.util.MoneyUtils.roundUp
 import com.owensteel.starlingroundup.util.SharedConstants.Transactions.TRANSACTION_DIRECTION_OUT
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Response
+import javax.inject.Inject
 
 /*
 
@@ -26,7 +28,8 @@ import retrofit2.Response
 
 private const val GBP = "GBP"
 
-class MainViewModel(
+@HiltViewModel
+class RoundUpAndSaveViewModel @Inject constructor(
     application: Application,
     private val tokenManager: TokenManager
 ) : AndroidViewModel(application) {

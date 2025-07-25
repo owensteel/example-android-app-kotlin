@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.owensteel.starlingroundup.R
 import com.owensteel.starlingroundup.model.CurrencyAmount
 import com.owensteel.starlingroundup.model.Money
@@ -42,10 +43,12 @@ import com.owensteel.starlingroundup.ui.theme.TransactionInBgGreen
 import com.owensteel.starlingroundup.util.MoneyUtils.roundUp
 import com.owensteel.starlingroundup.util.SharedConstants.Transactions.TRANSACTION_DIRECTION_OUT
 import com.owensteel.starlingroundup.viewmodel.FeedUiState
-import com.owensteel.starlingroundup.viewmodel.MainViewModel
+import com.owensteel.starlingroundup.viewmodel.RoundUpAndSaveViewModel
 
 @Composable
-fun MainScreen(viewModel: MainViewModel) {
+fun RoundUpAndSaveScreen(
+    viewModel: RoundUpAndSaveViewModel = hiltViewModel()
+) {
     val hasInitialisedDataState by viewModel.hasInitialisedDataState.collectAsState()
     val amount by viewModel.roundUpAmountState.collectAsState()
     val accountHolderName by viewModel.accountHolderNameState.collectAsState()
@@ -93,7 +96,7 @@ fun MainScreen(viewModel: MainViewModel) {
 }
 
 @Composable
-fun MainFeature(viewModel: MainViewModel, amount: String, accountHolderName: String) {
+fun MainFeature(viewModel: RoundUpAndSaveViewModel, amount: String, accountHolderName: String) {
     Column(
         modifier = Modifier
             .padding(0.dp)
