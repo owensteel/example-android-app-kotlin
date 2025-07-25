@@ -58,16 +58,7 @@ object StarlingService {
             // case token has expired for some other reason
             // than time
             .addInterceptor(AuthInterceptor(tokenManager))
-            // Add regular headers
-            .addInterceptor { chain ->
-                val original = chain.request()
-                val request = original.newBuilder()
-                    .header(ACCEPT, HTTP_CLIENT_ACCEPT_VALUE)
-                    .header(USER_AGENT, HTTP_CLIENT_USER_AGENT)
-                    .method(original.method, original.body)
-                    .build()
-                chain.proceed(request)
-            }
+            .addInterceptor(RegularHeadersInterceptor())
             .build()
 
         return Retrofit.Builder()
@@ -82,6 +73,8 @@ object StarlingService {
     private fun createAuthApi(): StarlingAuthApi {
         val okHttp = OkHttpClient.Builder()
             .certificatePinner(certificatePinner)
+            // Just add regular headers
+            .addInterceptor(RegularHeadersInterceptor())
             .build()
 
         return Retrofit.Builder()
@@ -160,6 +153,24 @@ object StarlingService {
         return api.getAccountHolderIndividual()
     }
 
+}
+
+/*
+
+    Regular headers for requests
+
+ */
+
+class RegularHeadersInterceptor : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
+        val original = chain.request()
+        val request = original.newBuilder()
+            .header(ACCEPT, HTTP_CLIENT_ACCEPT_VALUE)
+            .header(USER_AGENT, HTTP_CLIENT_USER_AGENT)
+            .method(original.method, original.body)
+            .build()
+        return chain.proceed(request)
+    }
 }
 
 /*
