@@ -121,6 +121,16 @@ fun TransactionsFeedFeature(feedState: FeedUiState) {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
+        Text(
+            text = stringResource(R.string.transactions_this_week_title),
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                // Only pad bottom, as the top is
+                // padded by the divider
+                .padding(0.dp, 0.dp, 0.dp, 15.dp)
+                .fillMaxWidth(),
+        )
         when {
             feedState.isLoading -> CircularProgressIndicator()
             feedState.hasError -> Text("Couldn't load the Transactions Feed.")

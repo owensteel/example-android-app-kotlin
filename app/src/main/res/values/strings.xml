@@ -6,6 +6,7 @@
     <string name="main_feature_button_round_up_and_save">Round Up &amp; Save</string>
 
     <!-- Transactions List -->
+    <string name="transactions_this_week_title">Transactions this week</string>
     <string name="transactions_list_header_amount">Amount</string>
     <string name="transactions_list_header_roundup">Round Up</string>
 </resources>
