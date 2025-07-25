@@ -7,12 +7,12 @@ object SharedConstants {
     const val DATASTORE_NAME = "secure_token_store"
 
     object PreferenceKeys {
-        val ENCRYPTED_REFRESH_TOKEN = "encrypted_refresh_token"
-        val ENCRYPTED_ACCESS_TOKEN = "encrypted_access_token"
-        val REFRESH_TOKEN_IV = "refresh_token_iv"
-        val ACCESS_TOKEN_IV = "access_token_iv"
-        val REFRESH_TOKEN_EXPIRY = "refresh_token_expiry"
-        val ACCESS_TOKEN_EXPIRY = "access_token_expiry"
+        const val ENCRYPTED_REFRESH_TOKEN = "encrypted_refresh_token"
+        const val ENCRYPTED_ACCESS_TOKEN = "encrypted_access_token"
+        const val REFRESH_TOKEN_IV = "refresh_token_iv"
+        const val ACCESS_TOKEN_IV = "access_token_iv"
+        const val REFRESH_TOKEN_EXPIRY = "refresh_token_expiry"
+        const val ACCESS_TOKEN_EXPIRY = "access_token_expiry"
     }
 
     object ApiHeaders {
