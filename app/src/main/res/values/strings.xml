@@ -13,4 +13,7 @@
     <!-- Generic -->
     <string name="transaction_outgoing_symbol">-</string>
     <string name="transaction_ingoing_symbol">+</string>
+
+    <!-- Error messages -->
+    <string name="error_could_not_fetch_data">Sorry, we could not fetch your data at this time.</string>
 </resources>

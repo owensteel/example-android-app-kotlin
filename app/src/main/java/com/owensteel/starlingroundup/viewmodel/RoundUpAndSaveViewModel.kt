@@ -37,8 +37,8 @@ class RoundUpAndSaveViewModel @Inject constructor(
     // Use StateFlow to maintain an observable mutable states for our
     // values that may change any time
 
-    private val _hasInitialisedDataState = MutableStateFlow(false)
-    val hasInitialisedDataState: StateFlow<Boolean> = _hasInitialisedDataState
+    private val _hasInitialisedDataState = MutableStateFlow(HasInitialisedDataState())
+    val hasInitialisedDataState: StateFlow<HasInitialisedDataState> = _hasInitialisedDataState
 
     private val _roundUpAmountState = MutableStateFlow(
         Money(GBP, 0L).toString()
@@ -50,6 +50,17 @@ class RoundUpAndSaveViewModel @Inject constructor(
 
     private val _accountHolderNameState = MutableStateFlow("")
     val accountHolderNameState: StateFlow<String> = _accountHolderNameState
+
+    // Handle an error occurring during initialisation of
+    // account data
+    private fun handleInitialisationError(){
+        // TODO: Handle specific errors
+        _hasInitialisedDataState.value = _hasInitialisedDataState.value.copy(
+            value = false,
+            isLoading = false,
+            hasError = true
+        )
+    }
 
     // 0. Fetch account details
     private var accountUid: String? = null
@@ -70,6 +81,8 @@ class RoundUpAndSaveViewModel @Inject constructor(
                     // Get account holder details
                     fetchAccountHolderDetails(context)
                 }
+            } else {
+                handleInitialisationError()
             }
         }
     }
@@ -86,10 +99,16 @@ class RoundUpAndSaveViewModel @Inject constructor(
                 }
 
                 // Now we have user's complete details, display feature UI
-                _hasInitialisedDataState.value = true
+                _hasInitialisedDataState.value = _hasInitialisedDataState.value.copy(
+                    value = true,
+                    isLoading = false,
+                    hasError = false
+                )
 
                 // And now we have account details, fetch the transactions
                 fetchWeeklyTransactions(context)
+            } else {
+                handleInitialisationError()
             }
         }
     }
@@ -127,6 +146,7 @@ class RoundUpAndSaveViewModel @Inject constructor(
                     hasError = false
                 )
             } else {
+                // Error loading transactions feed
                 _feedState.value = _feedState.value.copy(
                     value = null,
                     isLoading = false,
@@ -178,6 +198,12 @@ class RoundUpAndSaveViewModel @Inject constructor(
 
 data class FeedUiState(
     val value: List<Transaction>? = null,
+    val isLoading: Boolean = true,
+    val hasError: Boolean = false
+)
+
+data class HasInitialisedDataState(
+    val value: Boolean = false,
     val isLoading: Boolean = true,
     val hasError: Boolean = false
 )

@@ -66,7 +66,7 @@ fun RoundUpAndSaveScreen(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (hasInitialisedDataState) {
+            if (hasInitialisedDataState.value) {
                 MainFeature(
                     viewModel = viewModel,
                     amount = amount,
@@ -80,7 +80,7 @@ fun RoundUpAndSaveScreen(
                     feedState = feedState
                 )
             } else {
-                // Loading spinner
+                // Placeholder
                 Column(
                     modifier = Modifier
                         .padding(0.dp)
@@ -88,7 +88,14 @@ fun RoundUpAndSaveScreen(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    CircularProgressIndicator()
+                    if (hasInitialisedDataState.hasError) {
+                        // Error message
+                        Text(stringResource(R.string.error_could_not_fetch_data))
+                    } else {
+                        // Loading spinner
+                        CircularProgressIndicator()
+
+                    }
                 }
             }
         }
