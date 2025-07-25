@@ -118,8 +118,6 @@ object StarlingService {
         val startOfWeek = now.with(DayOfWeek.MONDAY).toLocalDate().atStartOfDay(now.zone)
         val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
-        // Fetch token here so we may pass it in the
-        // header
         val api = createAuthenticatedApi(tokenManager)
         return api.getTransactionsForCurrentWeek(
             accountUid = accountUid,
@@ -137,8 +135,6 @@ object StarlingService {
         transferUid: String,
         request: TransferRequest
     ): Response<TransferResponse> {
-        // Fetch token here so we may pass it in the
-        // header
         val api = createAuthenticatedApi(tokenManager)
         return api.roundUpTransfer(
             accountUid = accountUid,
