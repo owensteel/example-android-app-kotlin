@@ -9,6 +9,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -214,6 +215,7 @@ fun TransactionRow(transaction: Transaction) {
                     roundUp(transactionAmount.minorUnits)
                 ).toString(),
                 modifier = Modifier
+                    .alpha(0.5f) // accessibility-friendly form of grey
                     .weight(1f)
                     .wrapContentHeight()
                     .padding(transactionsListRowColumnCommonPadding),
