@@ -1,8 +1,10 @@
 package com.owensteel.starlingroundup.network
 
 import android.content.Context
+import com.owensteel.starlingroundup.BuildConfig
 import com.owensteel.starlingroundup.model.AccountHolderIndividualResponse
 import com.owensteel.starlingroundup.model.AccountResponse
+import com.owensteel.starlingroundup.model.TokenResponse
 import com.owensteel.starlingroundup.model.TransactionFeedResponse
 import com.owensteel.starlingroundup.model.TransferRequest
 import com.owensteel.starlingroundup.model.TransferResponse
@@ -14,7 +16,6 @@ import com.owensteel.starlingroundup.util.SharedConstants.ApiHeaders.ACCEPT
 import com.owensteel.starlingroundup.util.SharedConstants.ApiHeaders.AUTHORIZATION
 import com.owensteel.starlingroundup.util.SharedConstants.ApiHeaders.USER_AGENT
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.CertificatePinner
@@ -22,9 +23,9 @@ import okhttp3.OkHttpClient
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.time.DayOfWeek
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import javax.inject.Singleton
 
 /*
 
@@ -45,13 +46,6 @@ val certificatePinner = CertificatePinner.Builder()
 @Module
 @InstallIn(SingletonComponent::class)
 object StarlingService {
-
-    // For Dagger
-    @Provides
-    @Singleton
-    fun provideStarlingAuthApi(): StarlingAuthApi {
-        return createAuthApi()
-    }
 
     // Create authenticated API client
     private fun createAuthenticatedApi(token: String): StarlingApi {
@@ -91,6 +85,18 @@ object StarlingService {
             .create(StarlingAuthApi::class.java)
     }
 
+    // OAuth functions
+
+    suspend fun refreshAccessToken(refreshToken: String): Response<TokenResponse> {
+        val api = createAuthApi()
+        return api.refreshAccessToken(
+            grantType = "refresh_token",
+            refreshToken = refreshToken,
+            clientId = BuildConfig.CLIENT_ID,
+            clientSecret = BuildConfig.CLIENT_SECRET
+        )
+    }
+
     // API functions
 
     suspend fun getTransactionsForCurrentWeek(
@@ -102,7 +108,7 @@ object StarlingService {
         // Get timestamps for the start of the week
         // and now
         val now = ZonedDateTime.now()
-        val startOfWeek = now.with(java.time.DayOfWeek.MONDAY).toLocalDate().atStartOfDay(now.zone)
+        val startOfWeek = now.with(DayOfWeek.MONDAY).toLocalDate().atStartOfDay(now.zone)
         val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
         // Fetch token here so we may pass it in the

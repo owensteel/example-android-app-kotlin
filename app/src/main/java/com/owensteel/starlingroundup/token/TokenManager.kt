@@ -4,7 +4,7 @@ import android.content.Context
 import com.owensteel.starlingroundup.BuildConfig
 import com.owensteel.starlingroundup.data.local.SecureTokenStore
 import com.owensteel.starlingroundup.model.TokenResponse
-import com.owensteel.starlingroundup.network.StarlingAuthApi
+import com.owensteel.starlingroundup.network.StarlingService
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -18,8 +18,7 @@ import javax.inject.Inject
  */
 
 class TokenManager @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val authApi: StarlingAuthApi
+    @ApplicationContext private val context: Context
 ) {
 
     private val tokenStore = SecureTokenStore(context)
@@ -54,12 +53,7 @@ class TokenManager @Inject constructor(
             throw IllegalStateException("No refresh token found")
         }
 
-        val response = authApi.refreshAccessToken(
-            grantType = "refresh_token",
-            refreshToken = refreshToken,
-            clientId = BuildConfig.CLIENT_ID,
-            clientSecret = BuildConfig.CLIENT_SECRET
-        )
+        val response = StarlingService.refreshAccessToken(refreshToken)
 
         return handleTokenResponse(response)
     }
