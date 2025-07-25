@@ -90,7 +90,12 @@ fun RoundUpAndSaveScreen(
                 ) {
                     if (hasInitialisedDataState.hasError) {
                         // Error message
-                        Text(stringResource(R.string.error_could_not_fetch_data))
+                        Text(
+                            stringResource(
+                                R.string.error_could_not_fetch_data,
+                                hasInitialisedDataState.errorCode ?: ""
+                            )
+                        )
                     } else {
                         // Loading spinner
                         CircularProgressIndicator()

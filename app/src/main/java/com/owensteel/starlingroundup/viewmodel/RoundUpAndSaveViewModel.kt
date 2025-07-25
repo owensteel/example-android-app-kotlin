@@ -53,12 +53,13 @@ class RoundUpAndSaveViewModel @Inject constructor(
 
     // Handle an error occurring during initialisation of
     // account data
-    private fun handleInitialisationError(){
+    private fun handleInitialisationError(responseCode: Int){
         // TODO: Handle specific errors
         _hasInitialisedDataState.value = _hasInitialisedDataState.value.copy(
             value = false,
             isLoading = false,
-            hasError = true
+            hasError = true,
+            errorCode = responseCode
         )
     }
 
@@ -82,7 +83,7 @@ class RoundUpAndSaveViewModel @Inject constructor(
                     fetchAccountHolderDetails(context)
                 }
             } else {
-                handleInitialisationError()
+                handleInitialisationError(accountResponse.code())
             }
         }
     }
@@ -108,7 +109,7 @@ class RoundUpAndSaveViewModel @Inject constructor(
                 // And now we have account details, fetch the transactions
                 fetchWeeklyTransactions(context)
             } else {
-                handleInitialisationError()
+                handleInitialisationError(accountHolderIndividualResponse.code())
             }
         }
     }
@@ -205,5 +206,6 @@ data class FeedUiState(
 data class HasInitialisedDataState(
     val value: Boolean = false,
     val isLoading: Boolean = true,
-    val hasError: Boolean = false
+    val hasError: Boolean = false,
+    val errorCode: Int? = null
 )
