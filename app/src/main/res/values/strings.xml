@@ -9,4 +9,8 @@
     <string name="transactions_this_week_title">Transactions this week</string>
     <string name="transactions_list_header_amount">Amount</string>
     <string name="transactions_list_header_roundup">Round Up</string>
+
+    <!-- Generic -->
+    <string name="transaction_outgoing_symbol">-</string>
+    <string name="transaction_ingoing_symbol">+</string>
 </resources>

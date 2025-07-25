@@ -196,11 +196,29 @@ fun TransactionRow(transaction: Transaction) {
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Amount
+        // Amount symbol
 
         // Make amount negative or positive depending
         // on the transaction direction, for UX purposes
-        val inOrOutMultiplier = if (transaction.direction == TRANSACTION_DIRECTION_OUT) -1 else 1
+        val inOrOutSymbol =
+            if (transaction.direction == TRANSACTION_DIRECTION_OUT)
+                stringResource(R.string.transaction_outgoing_symbol)
+            else stringResource(R.string.transaction_ingoing_symbol)
+        // Symbol has its own column so numbers are aligned
+        Text(
+            inOrOutSymbol,
+            modifier = Modifier
+                .width(30.dp)
+                .wrapContentHeight()
+                .padding(transactionsListRowColumnCommonPadding),
+            textAlign = TextAlign.Center,
+            style = TextStyle(
+                fontSize = 24.sp
+            )
+        )
+
+        // Amount
+
         // Change highlight colour depending on transaction
         // direction
         val amountBgColour =
@@ -208,7 +226,7 @@ fun TransactionRow(transaction: Transaction) {
         Text(
             Money(
                 transactionAmount.currency,
-                transactionAmount.minorUnits * inOrOutMultiplier
+                transactionAmount.minorUnits
             ).toString(),
             modifier = Modifier
                 .weight(2f)
