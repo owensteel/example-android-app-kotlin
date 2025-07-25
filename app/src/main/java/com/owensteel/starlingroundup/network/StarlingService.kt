@@ -197,7 +197,7 @@ class AuthInterceptor(
 
             // Retry request with new access token
             val newRequest = request.newBuilder()
-                .header("Authorization", "Bearer $newToken")
+                .header(AUTHORIZATION, "Bearer $newToken")
                 .build()
 
             return chain.proceed(newRequest)
