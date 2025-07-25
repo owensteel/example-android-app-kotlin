@@ -73,6 +73,7 @@ class TokenManager @Inject constructor(
 
     private suspend fun handleTokenResponse(response: Response<TokenResponse>): String {
         if (!response.isSuccessful) {
+            // TODO: handle invalid refresh token (code 400, invalid_grant)
             throw Exception("Failed to refresh access token: ${response.code()}")
         }
 
