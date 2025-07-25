@@ -1,7 +1,5 @@
 package com.owensteel.starlingroundup.util
 
-import androidx.datastore.preferences.core.byteArrayPreferencesKey
-
 object SharedConstants {
 
     const val DATASTORE_NAME = "secure_token_store"

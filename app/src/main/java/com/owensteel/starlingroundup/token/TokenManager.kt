@@ -8,7 +8,6 @@ import com.owensteel.starlingroundup.network.StarlingAuthApi
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import retrofit2.Response
-import kotlin.math.exp
 
 /*
 
