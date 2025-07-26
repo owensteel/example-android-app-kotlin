@@ -389,6 +389,18 @@ fun TransferSavingsModalSheet(
                     .padding(15.dp)
                     .fillMaxWidth(),
             )
+
+            // Recoverable error gets inline error message
+            if (savingsGoalsModalUiState.hasTransferError) {
+                Text(
+                    stringResource(R.string.transfer_to_savings_modal_goals_transfer_error),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier
+                        .padding(15.dp),
+                    color = Color.Red
+                )
+            }
+
             when {
                 savingsGoalsModalUiState.isLoading -> CircularProgressIndicator(
                     modifier = Modifier
@@ -397,10 +409,6 @@ fun TransferSavingsModalSheet(
 
                 savingsGoalsModalUiState.hasLoadingError -> Text(
                     stringResource(R.string.transfer_to_savings_modal_goals_load_error)
-                )
-
-                savingsGoalsModalUiState.hasTransferError -> Text(
-                    stringResource(R.string.transfer_to_savings_modal_goals_transfer_error)
                 )
 
                 else -> SavingsGoalsLazyColumn(
