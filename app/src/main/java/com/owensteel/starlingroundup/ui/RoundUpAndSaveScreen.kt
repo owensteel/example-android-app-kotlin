@@ -146,6 +146,10 @@ fun MainFeature(
             text = stringResource(id = R.string.main_feature_greeting, accountHolderName),
             style = MaterialTheme.typography.bodyMedium
         )
+        Text(
+            text = stringResource(id = R.string.main_feature_intro, accountHolderName),
+            style = MaterialTheme.typography.bodyMedium
+        )
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -193,6 +197,7 @@ fun TransactionsFeedFeature(feedState: FeedUiState) {
                 modifier = Modifier
                     .padding(15.dp)
             )
+
             feedState.hasError -> Text(stringResource(R.string.transactions_list_load_error))
             else -> feedState.value?.let { TransactionsFeedLazyColumn(it) }
         }
