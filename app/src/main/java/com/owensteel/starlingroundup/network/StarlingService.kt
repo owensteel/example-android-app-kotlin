@@ -48,6 +48,12 @@ val certificatePinner = CertificatePinner.Builder()
 @InstallIn(SingletonComponent::class)
 object StarlingService {
 
+    /*
+
+        API Clients
+
+     */
+
     // Create authenticated API client
     // This is the primary client for API calls
     private fun createAuthenticatedApi(tokenManager: TokenManager): StarlingApi {
@@ -97,7 +103,13 @@ object StarlingService {
         )
     }
 
-    // API functions
+    /*
+
+        API functions
+
+     */
+
+    // Transactions feed
 
     suspend fun getTransactionsForCurrentWeek(
         context: Context,
@@ -120,6 +132,8 @@ object StarlingService {
         )
     }
 
+    // Savings goals
+
     suspend fun transferToSavingsGoal(
         context: Context,
         tokenManager: TokenManager,
@@ -136,6 +150,8 @@ object StarlingService {
             transfer = request
         )
     }
+
+    // Account details
 
     suspend fun getAccountDetails(
         context: Context,
