@@ -16,8 +16,8 @@
     <string name="transfer_to_savings_modal_goals_load_error">Sorry, we could not load your Savings Goals.</string>
 
     <!-- Generic -->
-    <string name="transaction_outgoing_symbol">-</string>
-    <string name="transaction_ingoing_symbol">+</string>
+    <string name="transaction_outgoing_symbol" translatable="false">-</string>
+    <string name="transaction_ingoing_symbol" translatable="false">+</string>
 
     <!-- Error messages -->
     <string name="error_could_not_fetch_data">Sorry, we could not fetch your data at this time (Error code %1$s).</string>
