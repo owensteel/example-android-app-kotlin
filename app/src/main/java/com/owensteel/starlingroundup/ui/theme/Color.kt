@@ -14,3 +14,5 @@ val StarlingBrandCyan = Color(0xFF1AD3C5)
 val OnStarlingBrandCyan = Color.Black
 
 val TransactionInBgGreen = Color(0x404CAF50)
+
+val AccessibleGrey = Color(0x40000000)
