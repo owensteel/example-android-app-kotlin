@@ -4,6 +4,7 @@ import com.owensteel.starlingroundup.model.AccountHolderIndividualResponse
 import com.owensteel.starlingroundup.model.AccountResponse
 import com.owensteel.starlingroundup.model.CreateSavingsGoalRequest
 import com.owensteel.starlingroundup.model.CreateSavingsGoalResponse
+import com.owensteel.starlingroundup.model.GetSavingsGoalsResponse
 import com.owensteel.starlingroundup.model.TransactionFeedResponse
 import com.owensteel.starlingroundup.model.TransferRequest
 import com.owensteel.starlingroundup.model.TransferResponse
@@ -52,5 +53,10 @@ interface StarlingApi {
         @Path("accountUid") accountUid: String,
         @Body request: CreateSavingsGoalRequest
     ): Response<CreateSavingsGoalResponse>
+
+    @GET("api/v2/account/{accountUid}/savings-goals")
+    suspend fun getSavingsGoals(
+        @Path("accountUid") accountUid: String
+    ): Response<GetSavingsGoalsResponse>
 
 }
