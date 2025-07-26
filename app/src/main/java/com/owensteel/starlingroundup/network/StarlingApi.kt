@@ -2,6 +2,8 @@ package com.owensteel.starlingroundup.network
 
 import com.owensteel.starlingroundup.model.AccountHolderIndividualResponse
 import com.owensteel.starlingroundup.model.AccountResponse
+import com.owensteel.starlingroundup.model.CreateSavingsGoalRequest
+import com.owensteel.starlingroundup.model.CreateSavingsGoalResponse
 import com.owensteel.starlingroundup.model.TransactionFeedResponse
 import com.owensteel.starlingroundup.model.TransferRequest
 import com.owensteel.starlingroundup.model.TransferResponse
@@ -15,6 +17,8 @@ import retrofit2.http.Query
 
 interface StarlingApi {
 
+    // Accounts
+
     @GET("api/v2/accounts")
     suspend fun getAccountDetails(
     ): Response<AccountResponse>
@@ -22,6 +26,8 @@ interface StarlingApi {
     @GET("api/v2/account-holder/individual")
     suspend fun getAccountHolderIndividual(
     ): Response<AccountHolderIndividualResponse>
+
+    // Transactions feed
 
     @GET("api/v2/feed/account/{accountUid}/category/{categoryUid}/transactions-between")
     suspend fun getTransactionsForCurrentWeek(
@@ -31,6 +37,8 @@ interface StarlingApi {
         @Query("maxTransactionTimestamp") toIso: String
     ): Response<TransactionFeedResponse>
 
+    // Savings goals
+
     @PUT("api/v2/account/{accountUid}/savings-goals/{savingsGoalUid}/add-money/{transferUid}")
     suspend fun transferToSavingsGoal(
         @Path("accountUid") accountUid: String,
@@ -38,5 +46,11 @@ interface StarlingApi {
         @Path("transferUid") transferUid: String,
         @Body transfer: TransferRequest
     ): Response<TransferResponse>
+
+    @PUT("api/v2/account/{accountUid}/savings-goals")
+    suspend fun createSavingsGoal(
+        @Path("accountUid") accountUid: String,
+        @Body request: CreateSavingsGoalRequest
+    ): Response<CreateSavingsGoalResponse>
 
 }

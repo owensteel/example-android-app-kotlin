@@ -4,6 +4,8 @@ import android.content.Context
 import com.owensteel.starlingroundup.BuildConfig
 import com.owensteel.starlingroundup.model.AccountHolderIndividualResponse
 import com.owensteel.starlingroundup.model.AccountResponse
+import com.owensteel.starlingroundup.model.CreateSavingsGoalRequest
+import com.owensteel.starlingroundup.model.CreateSavingsGoalResponse
 import com.owensteel.starlingroundup.model.TokenResponse
 import com.owensteel.starlingroundup.model.TransactionFeedResponse
 import com.owensteel.starlingroundup.model.TransferRequest
@@ -148,6 +150,19 @@ object StarlingService {
             goalUid = goalUid,
             transferUid = transferUid,
             transfer = request
+        )
+    }
+
+    suspend fun createSavingsGoal(
+        context: Context,
+        tokenManager: TokenManager,
+        accountUid: String,
+        request: CreateSavingsGoalRequest
+    ): Response<CreateSavingsGoalResponse> {
+        val api = createAuthenticatedApi(tokenManager)
+        return api.createSavingsGoal(
+            accountUid = accountUid,
+            request = request
         )
     }
 
