@@ -168,7 +168,6 @@ object StarlingService {
     }
 
     suspend fun getSavingsGoals(
-        context: Context,
         tokenManager: TokenManager,
         accountUid: String
     ): Response<GetSavingsGoalsResponse> {

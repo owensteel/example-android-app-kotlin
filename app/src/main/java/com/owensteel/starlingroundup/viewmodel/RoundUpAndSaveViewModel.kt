@@ -6,7 +6,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.owensteel.starlingroundup.model.AccountHolderIndividualResponse
 import com.owensteel.starlingroundup.model.AccountResponse
+import com.owensteel.starlingroundup.model.GetSavingsGoalsResponse
 import com.owensteel.starlingroundup.model.Money
+import com.owensteel.starlingroundup.model.SavingsGoal
 import com.owensteel.starlingroundup.model.Transaction
 import com.owensteel.starlingroundup.model.TransactionFeedResponse
 import com.owensteel.starlingroundup.network.StarlingService
@@ -48,12 +50,15 @@ class RoundUpAndSaveViewModel @Inject constructor(
     private val _feedState = MutableStateFlow(FeedUiState())
     val feedState: StateFlow<FeedUiState> = _feedState
 
+    private val _savingsGoalsListState = MutableStateFlow(SavingsGoalsUiState())
+    val savingsGoalsListState: StateFlow<SavingsGoalsUiState> = _savingsGoalsListState
+
     private val _accountHolderNameState = MutableStateFlow("")
     val accountHolderNameState: StateFlow<String> = _accountHolderNameState
 
     // Handle an error occurring during initialisation of
     // account data
-    private fun handleInitialisationError(responseCode: Int){
+    private fun handleInitialisationError(responseCode: Int) {
         // TODO: Handle specific errors
         _hasInitialisedDataState.value = _hasInitialisedDataState.value.copy(
             value = false,
@@ -176,7 +181,45 @@ class RoundUpAndSaveViewModel @Inject constructor(
         ).toString()
     }
 
-    // 3. Perform the transfer
+    // 3. Get savings goals
+    private var savingsGoalsCached: List<SavingsGoal>? = null
+    fun getAccountSavingsGoals() {
+        if (accountUid == null) return
+
+        viewModelScope.launch {
+            _savingsGoalsListState.value = _savingsGoalsListState.value.copy(
+                value = emptyList(),
+                isLoading = true,
+                hasError = false
+            )
+
+            val getSavingsGoalsResponse: Response<GetSavingsGoalsResponse> =
+                StarlingService.getSavingsGoals(
+                    tokenManager,
+                    accountUid!!
+                )
+            if (getSavingsGoalsResponse.isSuccessful) {
+                val savingsGoals = getSavingsGoalsResponse.body()?.savingsGoalList.orEmpty()
+                savingsGoalsCached = savingsGoals
+
+                // Update UI
+                _savingsGoalsListState.value = _savingsGoalsListState.value.copy(
+                    value = savingsGoals,
+                    isLoading = false,
+                    hasError = false
+                )
+            } else {
+                // Error loading transactions feed
+                _savingsGoalsListState.value = _savingsGoalsListState.value.copy(
+                    value = emptyList(),
+                    isLoading = false,
+                    hasError = true
+                )
+            }
+        }
+    }
+
+    // 4. Perform the transfer to selected savings goal
     fun performTransfer() {
         viewModelScope.launch {
             // TODO: Trigger savings goal transfer
@@ -196,6 +239,12 @@ class RoundUpAndSaveViewModel @Inject constructor(
     }
 
 }
+
+data class SavingsGoalsUiState(
+    val value: List<SavingsGoal> = emptyList(),
+    val isLoading: Boolean = true,
+    val hasError: Boolean = false
+)
 
 data class FeedUiState(
     val value: List<Transaction>? = null,

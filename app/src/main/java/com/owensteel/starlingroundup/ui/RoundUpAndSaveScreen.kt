@@ -2,6 +2,7 @@ package com.owensteel.starlingroundup.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,13 +16,18 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -37,6 +43,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.owensteel.starlingroundup.R
 import com.owensteel.starlingroundup.model.CurrencyAmount
 import com.owensteel.starlingroundup.model.Money
+import com.owensteel.starlingroundup.model.SavingsGoal
 import com.owensteel.starlingroundup.model.Transaction
 import com.owensteel.starlingroundup.ui.components.AppButton
 import com.owensteel.starlingroundup.ui.theme.TransactionInBgGreen
@@ -44,6 +51,7 @@ import com.owensteel.starlingroundup.util.MoneyUtils.roundUp
 import com.owensteel.starlingroundup.util.SharedConstants.Transactions.TRANSACTION_DIRECTION_OUT
 import com.owensteel.starlingroundup.viewmodel.FeedUiState
 import com.owensteel.starlingroundup.viewmodel.RoundUpAndSaveViewModel
+import com.owensteel.starlingroundup.viewmodel.SavingsGoalsUiState
 
 @Composable
 fun RoundUpAndSaveScreen(
@@ -53,6 +61,9 @@ fun RoundUpAndSaveScreen(
     val amount by viewModel.roundUpAmountState.collectAsState()
     val accountHolderName by viewModel.accountHolderNameState.collectAsState()
     val feedState by viewModel.feedState.collectAsState()
+    val accountSavingsGoals by viewModel.savingsGoalsListState.collectAsState()
+
+    val showTransferToSavingsSheet = remember { mutableStateOf(false) }
 
     Surface(
         modifier = Modifier.fillMaxSize()
@@ -66,11 +77,20 @@ fun RoundUpAndSaveScreen(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            if (showTransferToSavingsSheet.value) {
+                TransferSavingsModalSheet(
+                    showTransferToSavingsSheet,
+                    accountSavingsGoals,
+                    amount
+                )
+            }
+
             if (hasInitialisedDataState.value) {
                 MainFeature(
                     viewModel = viewModel,
                     amount = amount,
-                    accountHolderName = accountHolderName
+                    accountHolderName = accountHolderName,
+                    showTransferToSavingsSheet = showTransferToSavingsSheet
                 )
                 HorizontalDivider(
                     modifier = Modifier
@@ -108,7 +128,12 @@ fun RoundUpAndSaveScreen(
 }
 
 @Composable
-fun MainFeature(viewModel: RoundUpAndSaveViewModel, amount: String, accountHolderName: String) {
+fun MainFeature(
+    viewModel: RoundUpAndSaveViewModel,
+    amount: String,
+    accountHolderName: String,
+    showTransferToSavingsSheet: MutableState<Boolean>
+) {
     Column(
         modifier = Modifier
             .padding(0.dp)
@@ -133,7 +158,12 @@ fun MainFeature(viewModel: RoundUpAndSaveViewModel, amount: String, accountHolde
         Spacer(modifier = Modifier.height(24.dp))
 
         AppButton(
-            onClick = { viewModel.performTransfer() },
+            onClick = {
+                // Show modal first
+                showTransferToSavingsSheet.value = true
+                // Request fetching of savings goal list
+                viewModel.getAccountSavingsGoals()
+            },
             text = stringResource(id = R.string.main_feature_button_round_up_and_save)
         )
     }
@@ -282,6 +312,108 @@ fun TransactionRow(transaction: Transaction) {
                 fontStyle = FontStyle.Italic
             )
         }
+    }
+
+}
+
+/*
+
+    Transfer savings modal sheet
+
+ */
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+fun TransferSavingsModalSheet(
+    showTransferToSavingsSheet: MutableState<Boolean>,
+    accountSavingsGoalsUiState: SavingsGoalsUiState,
+    amount: String
+) {
+
+    ModalBottomSheet(
+        onDismissRequest = {
+            showTransferToSavingsSheet.value = false
+        }
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(0.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.Start
+        ) {
+            Text(
+                text = stringResource(R.string.transfer_to_savings_modal_header, amount),
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    // Only pad bottom, as the top is
+                    // padded by the divider
+                    .padding(15.dp)
+                    .fillMaxWidth(),
+            )
+            Text(
+                text = stringResource(R.string.transfer_to_savings_modal_intro),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier
+                    .padding(15.dp)
+                    .fillMaxWidth(),
+            )
+            when {
+                accountSavingsGoalsUiState.isLoading -> CircularProgressIndicator()
+                accountSavingsGoalsUiState.hasError -> Text(
+                    stringResource(R.string.transfer_to_savings_modal_goals_load_error)
+                )
+
+                else -> SavingsGoalsLazyColumn(accountSavingsGoalsUiState.value)
+            }
+        }
+    }
+
+}
+
+@Composable
+fun SavingsGoalsLazyColumn(savingsGoalsList: List<SavingsGoal>) {
+    LazyColumn {
+        // Render the list of transactions
+        items(savingsGoalsList) { savingsGoal ->
+            SavingsGoalRow(savingsGoal)
+        }
+    }
+}
+
+@Composable
+fun SavingsGoalRow(savingsGoal: SavingsGoal) {
+    Row(
+        modifier = Modifier
+            .padding(0.dp)
+            .fillMaxWidth()
+            .clickable {
+                // Handle click
+            },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            savingsGoal.name,
+            modifier = Modifier
+                .weight(2f)
+                .wrapContentHeight()
+                .padding(transactionsListRowColumnCommonPadding),
+            style = MaterialTheme.typography.headlineSmall,
+            textAlign = TextAlign.Start
+        )
+        Text(
+            Money(
+                savingsGoal.totalSaved.currency,
+                savingsGoal.totalSaved.minorUnits
+            ).toString(),
+            modifier = Modifier
+                .weight(2f)
+                .wrapContentHeight()
+                .padding(transactionsListRowColumnCommonPadding),
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Start
+        )
     }
 
 }
