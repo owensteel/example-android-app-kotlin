@@ -249,7 +249,7 @@ fun TransactionHeaderRow() {
                 .weight(1f)
                 .wrapContentHeight()
                 .padding(transactionsListRowColumnCommonPadding),
-            textAlign = TextAlign.Start,
+            textAlign = TextAlign.End,
             fontWeight = FontWeight.Bold
         )
     }
