@@ -189,7 +189,10 @@ fun TransactionsFeedFeature(feedState: FeedUiState) {
                 .fillMaxWidth(),
         )
         when {
-            feedState.isLoading -> CircularProgressIndicator()
+            feedState.isLoading -> CircularProgressIndicator(
+                modifier = Modifier
+                    .padding(15.dp)
+            )
             feedState.hasError -> Text("Couldn't load the Transactions Feed.")
             else -> feedState.value?.let { TransactionsFeedLazyColumn(it) }
         }
@@ -360,7 +363,11 @@ fun TransferSavingsModalSheet(
                     .fillMaxWidth(),
             )
             when {
-                accountSavingsGoalsUiState.isLoading -> CircularProgressIndicator()
+                accountSavingsGoalsUiState.isLoading -> CircularProgressIndicator(
+                    modifier = Modifier
+                        .padding(15.dp)
+                )
+
                 accountSavingsGoalsUiState.hasError -> Text(
                     stringResource(R.string.transfer_to_savings_modal_goals_load_error)
                 )
@@ -374,10 +381,19 @@ fun TransferSavingsModalSheet(
 
 @Composable
 fun SavingsGoalsLazyColumn(savingsGoalsList: List<SavingsGoal>) {
-    LazyColumn {
-        // Render the list of transactions
-        items(savingsGoalsList) { savingsGoal ->
-            SavingsGoalRow(savingsGoal)
+    when {
+        savingsGoalsList.isEmpty() -> Text(
+            stringResource(R.string.transfer_to_savings_modal_goals_empty),
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier
+                .padding(15.dp)
+                .fillMaxWidth(),
+        )
+        else -> LazyColumn {
+            // Render the list of transactions
+            items(savingsGoalsList) { savingsGoal ->
+                SavingsGoalRow(savingsGoal)
+            }
         }
     }
 }
