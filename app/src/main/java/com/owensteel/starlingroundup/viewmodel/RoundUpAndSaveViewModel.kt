@@ -210,10 +210,12 @@ class RoundUpAndSaveViewModel @Inject constructor(
         if (accountUid == null) return
 
         viewModelScope.launch {
+            // Reset to loading only
             _savingsGoalsModalUiState.value = _savingsGoalsModalUiState.value.copy(
                 value = emptyList(),
                 isLoading = true,
-                hasLoadingError = false
+                hasLoadingError = false,
+                hasTransferError = false
             )
 
             val getSavingsGoalsResponse: Response<GetSavingsGoalsResponse> =
