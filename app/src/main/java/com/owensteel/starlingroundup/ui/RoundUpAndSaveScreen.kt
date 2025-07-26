@@ -367,7 +367,7 @@ fun TransferSavingsModalSheet(
     ) {
         Column(
             modifier = Modifier
-                .padding(0.dp)
+                .padding(15.dp)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
@@ -377,16 +377,14 @@ fun TransferSavingsModalSheet(
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    // Only pad bottom, as the top is
-                    // padded by the divider
-                    .padding(15.dp)
+                    .padding(0.dp, 15.dp)
                     .fillMaxWidth(),
             )
             Text(
                 text = stringResource(R.string.transfer_to_savings_modal_intro),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier
-                    .padding(15.dp)
+                    .padding(0.dp, 15.dp)
                     .fillMaxWidth(),
             )
 
@@ -396,7 +394,7 @@ fun TransferSavingsModalSheet(
                     stringResource(R.string.transfer_to_savings_modal_goals_transfer_error),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier
-                        .padding(15.dp),
+                        .padding(0.dp, 15.dp),
                     color = Color.Red
                 )
             }
@@ -404,11 +402,13 @@ fun TransferSavingsModalSheet(
             when {
                 savingsGoalsModalUiState.isLoading -> CircularProgressIndicator(
                     modifier = Modifier
-                        .padding(15.dp)
+                        .padding(0.dp, 15.dp)
                 )
 
                 savingsGoalsModalUiState.hasLoadingError -> Text(
-                    stringResource(R.string.transfer_to_savings_modal_goals_load_error)
+                    stringResource(R.string.transfer_to_savings_modal_goals_load_error),
+                    modifier = Modifier
+                        .padding(0.dp, 15.dp)
                 )
 
                 else -> SavingsGoalsLazyColumn(
@@ -433,7 +433,7 @@ fun SavingsGoalsLazyColumn(
             stringResource(R.string.transfer_to_savings_modal_goals_empty),
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier
-                .padding(15.dp)
+                .padding(0.dp, 15.dp)
                 .fillMaxWidth(),
         )
 
@@ -460,7 +460,7 @@ fun SavingsGoalRow(
         modifier = Modifier
             .fillMaxWidth()
             // Outer padding
-            .padding(15.dp)
+            .padding(0.dp, 15.dp)
             // Rounded border
             .clip(RoundedCornerShape(12.dp))
             .border(
