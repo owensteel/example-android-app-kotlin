@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.owensteel.starlingroundup.ui.RoundUpAndSaveScreen
+import com.owensteel.starlingroundup.ui.theme.StarlingRoundupTheme
 import com.owensteel.starlingroundup.util.DeviceSecurityCheck
 import com.owensteel.starlingroundup.viewmodel.RoundUpAndSaveViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -39,12 +40,15 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
 
-            NavHost(navController, startDestination = "RoundUpAndSave") {
-                composable("RoundUpAndSave") { backStackEntry ->
-                    val roundUpAndSaveViewModel: RoundUpAndSaveViewModel = hiltViewModel(backStackEntry)
-                    RoundUpAndSaveScreen(
-                        viewModel = roundUpAndSaveViewModel
-                    )
+            StarlingRoundupTheme {
+                NavHost(navController, startDestination = "RoundUpAndSave") {
+                    composable("RoundUpAndSave") { backStackEntry ->
+                        val roundUpAndSaveViewModel: RoundUpAndSaveViewModel =
+                            hiltViewModel(backStackEntry)
+                        RoundUpAndSaveScreen(
+                            viewModel = roundUpAndSaveViewModel
+                        )
+                    }
                 }
             }
         }
