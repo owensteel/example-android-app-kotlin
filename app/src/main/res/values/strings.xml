@@ -2,7 +2,7 @@
     <string name="app_name">StarlingRoundup</string>
 
     <!-- Main Feature -->
-    <string name="main_feature_greeting">Welcome, %1$s! Here is your Round Up Total!</string>
+    <string name="main_feature_greeting">Welcome, %1$s! Your Round Up Total for this week so far is…</string>
     <string name="main_feature_button_round_up_and_save">Round Up &amp; Save</string>
 
     <!-- Transactions List -->
