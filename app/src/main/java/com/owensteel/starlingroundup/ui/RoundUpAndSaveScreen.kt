@@ -44,7 +44,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.owensteel.starlingroundup.R
-import com.owensteel.starlingroundup.model.CurrencyAmount
 import com.owensteel.starlingroundup.model.Money
 import com.owensteel.starlingroundup.model.SavingsGoal
 import com.owensteel.starlingroundup.model.Transaction
@@ -257,7 +256,7 @@ fun TransactionHeaderRow() {
 
 @Composable
 fun TransactionRow(transaction: Transaction) {
-    val transactionAmount: CurrencyAmount = transaction.amount
+    val transactionAmount: Money = transaction.amount
 
     Row(
         modifier = Modifier
