@@ -120,7 +120,7 @@ object StarlingService {
         )
     }
 
-    suspend fun roundUpTransfer(
+    suspend fun transferToSavingsGoal(
         context: Context,
         tokenManager: TokenManager,
         accountUid: String,
