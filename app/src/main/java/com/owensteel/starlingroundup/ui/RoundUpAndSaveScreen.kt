@@ -120,7 +120,6 @@ fun RoundUpAndSaveScreen(
                     } else {
                         // Loading spinner
                         CircularProgressIndicator()
-
                     }
                 }
             }
