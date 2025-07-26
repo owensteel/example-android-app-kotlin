@@ -9,6 +9,7 @@
     <string name="transactions_this_week_title">Transactions this week</string>
     <string name="transactions_list_header_amount">Amount</string>
     <string name="transactions_list_header_roundup">Round Up</string>
+    <string name="transactions_list_load_error">Sorry, we could not load your Transactions.</string>
 
     <!-- Transfer to Savings Goal modal -->
     <string name="transfer_to_savings_modal_header">Transfer %1$s to Savings Goal</string>

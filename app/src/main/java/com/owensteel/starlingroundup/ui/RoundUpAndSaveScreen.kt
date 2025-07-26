@@ -194,8 +194,7 @@ fun TransactionsFeedFeature(feedState: FeedUiState) {
                 modifier = Modifier
                     .padding(15.dp)
             )
-
-            feedState.hasError -> Text("Couldn't load the Transactions Feed.")
+            feedState.hasError -> Text(stringResource(R.string.transactions_list_load_error))
             else -> feedState.value?.let { TransactionsFeedLazyColumn(it) }
         }
     }
