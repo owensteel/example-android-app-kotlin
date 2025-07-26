@@ -138,7 +138,6 @@ object StarlingService {
     // Savings goals
 
     suspend fun transferToSavingsGoal(
-        context: Context,
         tokenManager: TokenManager,
         accountUid: String,
         goalUid: String,

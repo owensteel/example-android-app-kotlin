@@ -51,7 +51,7 @@ import com.owensteel.starlingroundup.util.MoneyUtils.roundUp
 import com.owensteel.starlingroundup.util.SharedConstants.Transactions.TRANSACTION_DIRECTION_OUT
 import com.owensteel.starlingroundup.viewmodel.FeedUiState
 import com.owensteel.starlingroundup.viewmodel.RoundUpAndSaveViewModel
-import com.owensteel.starlingroundup.viewmodel.SavingsGoalsUiState
+import com.owensteel.starlingroundup.viewmodel.SavingsGoalsModalUiState
 
 @Composable
 fun RoundUpAndSaveScreen(
@@ -61,7 +61,7 @@ fun RoundUpAndSaveScreen(
     val amount by viewModel.roundUpAmountState.collectAsState()
     val accountHolderName by viewModel.accountHolderNameState.collectAsState()
     val feedState by viewModel.feedState.collectAsState()
-    val accountSavingsGoals by viewModel.savingsGoalsListState.collectAsState()
+    val savingsGoalsModalUiState by viewModel.savingsGoalsModalUiState.collectAsState()
 
     val showTransferToSavingsSheet = remember { mutableStateOf(false) }
 
@@ -80,8 +80,9 @@ fun RoundUpAndSaveScreen(
             if (showTransferToSavingsSheet.value) {
                 TransferSavingsModalSheet(
                     showTransferToSavingsSheet,
-                    accountSavingsGoals,
-                    amount
+                    savingsGoalsModalUiState,
+                    amount,
+                    viewModel
                 )
             }
 
@@ -193,6 +194,7 @@ fun TransactionsFeedFeature(feedState: FeedUiState) {
                 modifier = Modifier
                     .padding(15.dp)
             )
+
             feedState.hasError -> Text("Couldn't load the Transactions Feed.")
             else -> feedState.value?.let { TransactionsFeedLazyColumn(it) }
         }
@@ -329,8 +331,9 @@ fun TransactionRow(transaction: Transaction) {
 @OptIn(ExperimentalMaterial3Api::class)
 fun TransferSavingsModalSheet(
     showTransferToSavingsSheet: MutableState<Boolean>,
-    accountSavingsGoalsUiState: SavingsGoalsUiState,
-    amount: String
+    savingsGoalsModalUiState: SavingsGoalsModalUiState,
+    amount: String,
+    viewModel: RoundUpAndSaveViewModel
 ) {
 
     ModalBottomSheet(
@@ -363,16 +366,24 @@ fun TransferSavingsModalSheet(
                     .fillMaxWidth(),
             )
             when {
-                accountSavingsGoalsUiState.isLoading -> CircularProgressIndicator(
+                savingsGoalsModalUiState.isLoading -> CircularProgressIndicator(
                     modifier = Modifier
                         .padding(15.dp)
                 )
 
-                accountSavingsGoalsUiState.hasError -> Text(
+                savingsGoalsModalUiState.hasLoadingError -> Text(
                     stringResource(R.string.transfer_to_savings_modal_goals_load_error)
                 )
 
-                else -> SavingsGoalsLazyColumn(accountSavingsGoalsUiState.value)
+                savingsGoalsModalUiState.hasTransferError -> Text(
+                    stringResource(R.string.transfer_to_savings_modal_goals_transfer_error)
+                )
+
+                else -> SavingsGoalsLazyColumn(
+                    showTransferToSavingsSheet,
+                    savingsGoalsModalUiState.value,
+                    viewModel
+                )
             }
         }
     }
@@ -380,7 +391,11 @@ fun TransferSavingsModalSheet(
 }
 
 @Composable
-fun SavingsGoalsLazyColumn(savingsGoalsList: List<SavingsGoal>) {
+fun SavingsGoalsLazyColumn(
+    showTransferToSavingsSheet: MutableState<Boolean>,
+    savingsGoalsList: List<SavingsGoal>,
+    viewModel: RoundUpAndSaveViewModel
+) {
     when {
         savingsGoalsList.isEmpty() -> Text(
             stringResource(R.string.transfer_to_savings_modal_goals_empty),
@@ -389,23 +404,37 @@ fun SavingsGoalsLazyColumn(savingsGoalsList: List<SavingsGoal>) {
                 .padding(15.dp)
                 .fillMaxWidth(),
         )
+
         else -> LazyColumn {
-            // Render the list of transactions
+            // Render the list of Savings Goals
             items(savingsGoalsList) { savingsGoal ->
-                SavingsGoalRow(savingsGoal)
+                SavingsGoalRow(
+                    showTransferToSavingsSheet,
+                    savingsGoal,
+                    viewModel
+                )
             }
         }
     }
 }
 
 @Composable
-fun SavingsGoalRow(savingsGoal: SavingsGoal) {
+fun SavingsGoalRow(
+    showTransferToSavingsSheet: MutableState<Boolean>,
+    savingsGoal: SavingsGoal,
+    viewModel: RoundUpAndSaveViewModel
+) {
     Row(
         modifier = Modifier
             .padding(0.dp)
             .fillMaxWidth()
             .clickable {
-                // Handle click
+                // User selects this savings
+                // goal to transfer to
+                viewModel.performTransferToSavingsGoal(
+                    savingsGoal.savingsGoalUid,
+                    showTransferToSavingsSheet
+                )
             },
         verticalAlignment = Alignment.CenterVertically
     ) {

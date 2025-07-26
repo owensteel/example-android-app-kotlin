@@ -14,6 +14,7 @@
     <string name="transfer_to_savings_modal_header">Transfer %1$s to Savings Goal</string>
     <string name="transfer_to_savings_modal_intro">Choose a Savings Goal to transfer your Round Up Total to.</string>
     <string name="transfer_to_savings_modal_goals_load_error">Sorry, we could not load your Savings Goals.</string>
+    <string name="transfer_to_savings_modal_goals_transfer_error">Sorry, we could not transfer to that Savings Goal right now.</string>
     <string name="transfer_to_savings_modal_goals_empty">You have no existing Savings Goals.</string>
 
     <!-- Generic -->

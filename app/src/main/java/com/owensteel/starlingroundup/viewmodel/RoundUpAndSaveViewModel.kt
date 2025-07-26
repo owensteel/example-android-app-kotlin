@@ -2,6 +2,7 @@ package com.owensteel.starlingroundup.viewmodel
 
 import android.app.Application
 import android.content.Context
+import androidx.compose.runtime.MutableState
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.owensteel.starlingroundup.model.AccountHolderIndividualResponse
@@ -11,6 +12,8 @@ import com.owensteel.starlingroundup.model.Money
 import com.owensteel.starlingroundup.model.SavingsGoal
 import com.owensteel.starlingroundup.model.Transaction
 import com.owensteel.starlingroundup.model.TransactionFeedResponse
+import com.owensteel.starlingroundup.model.TransferRequest
+import com.owensteel.starlingroundup.model.TransferResponse
 import com.owensteel.starlingroundup.network.StarlingService
 import com.owensteel.starlingroundup.token.TokenManager
 import com.owensteel.starlingroundup.util.MoneyUtils.roundUp
@@ -20,6 +23,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Response
+import java.util.UUID
 import javax.inject.Inject
 
 /*
@@ -50,8 +54,8 @@ class RoundUpAndSaveViewModel @Inject constructor(
     private val _feedState = MutableStateFlow(FeedUiState())
     val feedState: StateFlow<FeedUiState> = _feedState
 
-    private val _savingsGoalsListState = MutableStateFlow(SavingsGoalsUiState())
-    val savingsGoalsListState: StateFlow<SavingsGoalsUiState> = _savingsGoalsListState
+    private val _savingsGoalsModalUiState = MutableStateFlow(SavingsGoalsModalUiState())
+    val savingsGoalsModalUiState: StateFlow<SavingsGoalsModalUiState> = _savingsGoalsModalUiState
 
     private val _accountHolderNameState = MutableStateFlow("")
     val accountHolderNameState: StateFlow<String> = _accountHolderNameState
@@ -187,10 +191,10 @@ class RoundUpAndSaveViewModel @Inject constructor(
         if (accountUid == null) return
 
         viewModelScope.launch {
-            _savingsGoalsListState.value = _savingsGoalsListState.value.copy(
+            _savingsGoalsModalUiState.value = _savingsGoalsModalUiState.value.copy(
                 value = emptyList(),
                 isLoading = true,
-                hasError = false
+                hasLoadingError = false
             )
 
             val getSavingsGoalsResponse: Response<GetSavingsGoalsResponse> =
@@ -203,26 +207,62 @@ class RoundUpAndSaveViewModel @Inject constructor(
                 savingsGoalsCached = savingsGoals
 
                 // Update UI
-                _savingsGoalsListState.value = _savingsGoalsListState.value.copy(
+                _savingsGoalsModalUiState.value = _savingsGoalsModalUiState.value.copy(
                     value = savingsGoals,
                     isLoading = false,
-                    hasError = false
+                    hasLoadingError = false
                 )
             } else {
                 // Error loading transactions feed
-                _savingsGoalsListState.value = _savingsGoalsListState.value.copy(
+                _savingsGoalsModalUiState.value = _savingsGoalsModalUiState.value.copy(
                     value = emptyList(),
                     isLoading = false,
-                    hasError = true
+                    hasLoadingError = true
                 )
             }
         }
     }
 
     // 4. Perform the transfer to selected savings goal
-    fun performTransfer() {
+    fun performTransferToSavingsGoal(
+        savingsGoalUid: String,
+        showTransferToSavingsSheet: MutableState<Boolean>
+    ) {
+        // Generate UID for transfer
+        val transferUid = UUID.randomUUID().toString()
+
         viewModelScope.launch {
-            // TODO: Trigger savings goal transfer
+            // Show spinner in UI in case API hangs
+            _savingsGoalsModalUiState.value = _savingsGoalsModalUiState.value.copy(
+                isLoading = true,
+                hasTransferError = false
+            )
+
+            val transferRequest = TransferRequest(
+                amount = lastRoundUpTotal
+            )
+            val transferResponse: Response<TransferResponse> =
+                StarlingService.transferToSavingsGoal(
+                    tokenManager,
+                    accountUid!!,
+                    savingsGoalUid,
+                    transferUid,
+                    transferRequest,
+                )
+            if (transferResponse.isSuccessful) {
+                _savingsGoalsModalUiState.value = _savingsGoalsModalUiState.value.copy(
+                    isLoading = false
+                )
+                // Hide modal
+                showTransferToSavingsSheet.value = false
+                // TODO: Refresh our Round Up feature and Transactions Feed
+            } else {
+                // Handle error
+                _savingsGoalsModalUiState.value = _savingsGoalsModalUiState.value.copy(
+                    isLoading = false,
+                    hasTransferError = true
+                )
+            }
         }
     }
 
@@ -240,10 +280,11 @@ class RoundUpAndSaveViewModel @Inject constructor(
 
 }
 
-data class SavingsGoalsUiState(
+data class SavingsGoalsModalUiState(
     val value: List<SavingsGoal> = emptyList(),
     val isLoading: Boolean = true,
-    val hasError: Boolean = false
+    val hasLoadingError: Boolean = false,
+    val hasTransferError: Boolean = false
 )
 
 data class FeedUiState(
