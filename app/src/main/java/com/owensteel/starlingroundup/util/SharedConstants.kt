@@ -11,6 +11,7 @@ object SharedConstants {
         const val ACCESS_TOKEN_IV = "access_token_iv"
         const val REFRESH_TOKEN_EXPIRY = "refresh_token_expiry"
         const val ACCESS_TOKEN_EXPIRY = "access_token_expiry"
+        const val LATEST_ROUNDUP_CUTOFF_TIMESTAMP = "latest_roundup_cutoff_timestamp"
     }
 
     object ApiHeaders {

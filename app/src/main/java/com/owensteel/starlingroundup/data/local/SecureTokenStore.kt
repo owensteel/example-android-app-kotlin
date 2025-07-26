@@ -4,12 +4,14 @@ import android.content.Context
 import androidx.datastore.preferences.core.byteArrayPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.owensteel.starlingroundup.util.SharedConstants.DATASTORE_NAME
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.ACCESS_TOKEN_EXPIRY
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.ACCESS_TOKEN_IV
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.ENCRYPTED_ACCESS_TOKEN
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.ENCRYPTED_REFRESH_TOKEN
+import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.LATEST_ROUNDUP_CUTOFF_TIMESTAMP
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.REFRESH_TOKEN_EXPIRY
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.REFRESH_TOKEN_IV
 import kotlinx.coroutines.flow.first
@@ -21,6 +23,8 @@ import kotlinx.coroutines.flow.first
     Use CryptoManager to get and save Access and Refresh tokens
 
  */
+
+// TODO: Centralise DataStore access
 
 private val Context.dataStore by preferencesDataStore(DATASTORE_NAME)
 
@@ -116,6 +120,19 @@ class SecureTokenStore(private val context: Context) {
 
     suspend fun getAccessTokenExpiryTime(): Long? {
         return context.dataStore.data.first()[longPreferencesKey(ACCESS_TOKEN_EXPIRY)]
+    }
+
+    // TODO: Separate when DataStore access is centralised
+
+    suspend fun saveLatestRoundUpCutoffTimestamp(cutoffTimestamp: String) {
+        context.dataStore.edit { prefs ->
+            prefs[stringPreferencesKey(LATEST_ROUNDUP_CUTOFF_TIMESTAMP)] = cutoffTimestamp
+        }
+    }
+
+    suspend fun getLatestRoundUpCutOffTimestamp(): String? {
+        val prefs = context.dataStore.data.first()
+        return prefs[stringPreferencesKey(LATEST_ROUNDUP_CUTOFF_TIMESTAMP)]
     }
 
 }

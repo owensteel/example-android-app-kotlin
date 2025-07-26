@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.owensteel.starlingroundup.data.local.SecureTokenStore
 import com.owensteel.starlingroundup.model.AccountHolderIndividualResponse
 import com.owensteel.starlingroundup.model.AccountResponse
 import com.owensteel.starlingroundup.model.GetSavingsGoalsResponse
@@ -23,6 +24,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Response
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 import javax.inject.Inject
 
@@ -33,6 +37,12 @@ import javax.inject.Inject
  */
 
 private const val GBP = "GBP"
+
+private val roundUpCutoffTimestampFallback = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(
+    Instant.EPOCH.atOffset(
+        ZoneOffset.UTC
+    )
+)
 
 @HiltViewModel
 class RoundUpAndSaveViewModel @Inject constructor(
@@ -152,6 +162,7 @@ class RoundUpAndSaveViewModel @Inject constructor(
                 // Feed UI
                 _feedState.value = _feedState.value.copy(
                     value = transactions,
+                    latestRoundUpCutoffTimestamp = getLatestRoundUpCutoffTimestamp(),
                     isLoading = false,
                     hasError = false
                 )
@@ -168,11 +179,19 @@ class RoundUpAndSaveViewModel @Inject constructor(
 
     // 2. Calculate the round-up
     private var lastRoundUpTotal: Long = 0L
-    private fun calculateAndDisplayRoundUp(transactions: List<Transaction>) {
+    private suspend fun calculateAndDisplayRoundUp(transactions: List<Transaction>) {
         if (accountCurrency == null) return
 
+        val latestRoundUpCutoffTimestampInstant = Instant.parse(getLatestRoundUpCutoffTimestamp())
+
         val total = transactions
-            .filter { it.direction == TRANSACTION_DIRECTION_OUT } // spending only
+            .filter {
+                // spending only
+                it.direction == TRANSACTION_DIRECTION_OUT
+                        // only count transactions after the
+                        // last recorded round-up time
+                        && Instant.parse(it.transactionTime) > latestRoundUpCutoffTimestampInstant
+            }
             .map { it.amount.minorUnits }.sumOf {
                 roundUp(it)
             }
@@ -250,12 +269,11 @@ class RoundUpAndSaveViewModel @Inject constructor(
                     transferRequest,
                 )
             if (transferResponse.isSuccessful) {
-                _savingsGoalsModalUiState.value = _savingsGoalsModalUiState.value.copy(
-                    isLoading = false
-                )
+                // Record that the round-up for these
+                // transactions has now been done
+                recordLatestRoundUpCutoffTimestamp()
                 // Hide modal
                 showTransferToSavingsSheet.value = false
-                // TODO: Refresh our Round Up feature and Transactions Feed
             } else {
                 // Handle error
                 _savingsGoalsModalUiState.value = _savingsGoalsModalUiState.value.copy(
@@ -264,6 +282,24 @@ class RoundUpAndSaveViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    // Prevent rounded-up transactions from being counted in a
+    // future round-up calculation by recording a cut-off time
+
+    private val tokenStore = SecureTokenStore(application.applicationContext)
+
+    private suspend fun recordLatestRoundUpCutoffTimestamp() {
+        // Use time and date of latest cached transaction (the
+        // latest transaction included in the round-up) instead
+        // of current timestamp in case somehow a transaction
+        // occurs between these two times
+        val cutoffTimestamp = transactionsCached.first().transactionTime
+        tokenStore.saveLatestRoundUpCutoffTimestamp(cutoffTimestamp)
+    }
+
+    private suspend fun getLatestRoundUpCutoffTimestamp(): String {
+        return tokenStore.getLatestRoundUpCutOffTimestamp() ?: roundUpCutoffTimestampFallback
     }
 
     // Run as soon as initialised
@@ -289,6 +325,7 @@ data class SavingsGoalsModalUiState(
 
 data class FeedUiState(
     val value: List<Transaction>? = null,
+    val latestRoundUpCutoffTimestamp: String = roundUpCutoffTimestampFallback,
     val isLoading: Boolean = true,
     val hasError: Boolean = false
 )

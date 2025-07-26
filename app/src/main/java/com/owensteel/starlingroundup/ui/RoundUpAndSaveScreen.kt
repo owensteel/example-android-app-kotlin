@@ -40,6 +40,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -55,6 +56,7 @@ import com.owensteel.starlingroundup.util.SharedConstants.Transactions.TRANSACTI
 import com.owensteel.starlingroundup.viewmodel.FeedUiState
 import com.owensteel.starlingroundup.viewmodel.RoundUpAndSaveViewModel
 import com.owensteel.starlingroundup.viewmodel.SavingsGoalsModalUiState
+import java.time.Instant
 
 @Composable
 fun RoundUpAndSaveScreen(
@@ -202,14 +204,23 @@ fun TransactionsFeedFeature(feedState: FeedUiState) {
             )
 
             feedState.hasError -> Text(stringResource(R.string.transactions_list_load_error))
-            else -> feedState.value?.let { TransactionsFeedLazyColumn(it) }
+            else -> feedState.value?.let {
+                TransactionsFeedLazyColumn(
+                    it,
+                    feedState.latestRoundUpCutoffTimestamp
+                )
+            }
         }
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class) // allows use of stickyHeader
 @Composable
-fun TransactionsFeedLazyColumn(transactionsList: List<Transaction>) {
+fun TransactionsFeedLazyColumn(
+    transactionsList: List<Transaction>,
+    latestRoundUpCutoffTimestamp: String
+) {
+    val latestRoundUpCutoffTimestampAsInstant = Instant.parse(latestRoundUpCutoffTimestamp)
     LazyColumn {
         // Transaction list headers
         stickyHeader {
@@ -217,7 +228,10 @@ fun TransactionsFeedLazyColumn(transactionsList: List<Transaction>) {
         }
         // Render the list of transactions
         items(transactionsList) { transaction ->
-            TransactionRow(transaction)
+            TransactionRow(
+                transaction,
+                (Instant.parse(transaction.transactionTime) > latestRoundUpCutoffTimestampAsInstant)
+            )
         }
     }
 }
@@ -255,7 +269,10 @@ fun TransactionHeaderRow() {
 }
 
 @Composable
-fun TransactionRow(transaction: Transaction) {
+fun TransactionRow(
+    transaction: Transaction,
+    isIncludedInRoundUp: Boolean
+) {
     val transactionAmount: Money = transaction.amount
 
     Row(
@@ -320,7 +337,8 @@ fun TransactionRow(transaction: Transaction) {
                     .wrapContentHeight()
                     .padding(transactionsListRowColumnCommonPadding),
                 textAlign = TextAlign.End,
-                fontStyle = FontStyle.Italic
+                fontStyle = FontStyle.Italic,
+                textDecoration = if (!isIncludedInRoundUp) TextDecoration.LineThrough else null
             )
         }
     }
