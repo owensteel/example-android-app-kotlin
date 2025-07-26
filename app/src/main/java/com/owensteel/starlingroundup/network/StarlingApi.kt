@@ -32,7 +32,7 @@ interface StarlingApi {
     ): Response<TransactionFeedResponse>
 
     @PUT("api/v2/account/{accountUid}/savings-goals/{savingsGoalUid}/add-money/{transferUid}")
-    suspend fun roundUpTransfer(
+    suspend fun transferToSavingsGoal(
         @Path("accountUid") accountUid: String,
         @Path("savingsGoalUid") goalUid: String,
         @Path("transferUid") transferUid: String,

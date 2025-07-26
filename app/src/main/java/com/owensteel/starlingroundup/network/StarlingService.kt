@@ -129,7 +129,7 @@ object StarlingService {
         request: TransferRequest
     ): Response<TransferResponse> {
         val api = createAuthenticatedApi(tokenManager)
-        return api.roundUpTransfer(
+        return api.transferToSavingsGoal(
             accountUid = accountUid,
             goalUid = goalUid,
             transferUid = transferUid,
