@@ -78,10 +78,12 @@ fun RoundUpAndSaveScreen(
     val feedState by viewModel.feedState.collectAsState()
     val savingsGoalsModalUiState by viewModel.savingsGoalsModalUiState.collectAsState()
 
+    // Transfer to Savings Goal modal
     val showTransferToSavingsSheet = remember { mutableStateOf(false) }
 
+    // Pull to refresh states
     val isRefreshing = remember { mutableStateOf(false) }
-    val state = rememberPullToRefreshState()
+    val pullToRefreshState = rememberPullToRefreshState()
     val coroutineScope = rememberCoroutineScope()
     val onRefresh: () -> Unit = {
         isRefreshing.value = true
@@ -92,7 +94,7 @@ fun RoundUpAndSaveScreen(
     }
     val scaleFraction = {
         if (isRefreshing.value) 1f
-        else LinearOutSlowInEasing.transform(state.distanceFraction).coerceIn(0f, 1f)
+        else LinearOutSlowInEasing.transform(pullToRefreshState.distanceFraction).coerceIn(0f, 1f)
     }
 
     Surface(
@@ -105,7 +107,7 @@ fun RoundUpAndSaveScreen(
                 .fillMaxSize()
                 .pullToRefresh(
                     isRefreshing = isRefreshing.value,
-                    state = state,
+                    state = pullToRefreshState,
                     onRefresh = onRefresh
                 ),
             // Vertically arranging from top prevents elements
@@ -137,7 +139,7 @@ fun RoundUpAndSaveScreen(
                     feedState = feedState
                 )
             } else {
-                // Placeholder
+                // Placeholder container
                 Column(
                     modifier = Modifier
                         .padding(0.dp)
@@ -162,6 +164,8 @@ fun RoundUpAndSaveScreen(
         }
 
         // Pull to refresh indicator
+        // Must be at end of Composable for it to overlay
+        // all elements
         Box(
             Modifier
                 .graphicsLayer {
@@ -170,7 +174,7 @@ fun RoundUpAndSaveScreen(
                 }
         ) {
             PullToRefreshDefaults.Indicator(
-                state = state,
+                state = pullToRefreshState,
                 isRefreshing = isRefreshing.value,
                 modifier = Modifier.align(Alignment.TopCenter)
             )
