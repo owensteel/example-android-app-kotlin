@@ -5,6 +5,7 @@
     <string name="main_feature_greeting">Hello, %1$s!</string>
     <string name="main_feature_intro">Your Round Up Total for this week so far is…</string>
     <string name="main_feature_button_round_up_and_save">Round Up &amp; Save</string>
+    <string name="main_feature_last_round_up">Last round-up: %1$s</string>
 
     <!-- Transactions List -->
     <string name="transactions_this_week_title">Transactions this week</string>

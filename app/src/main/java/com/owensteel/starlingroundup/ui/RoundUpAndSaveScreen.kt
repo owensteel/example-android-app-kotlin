@@ -62,6 +62,7 @@ import com.owensteel.starlingroundup.ui.components.AppSecondaryButton
 import com.owensteel.starlingroundup.ui.components.CurrencyTextField
 import com.owensteel.starlingroundup.ui.theme.AccessibleGrey
 import com.owensteel.starlingroundup.ui.theme.TransactionInBgGreen
+import com.owensteel.starlingroundup.util.DateTimeUtils
 import com.owensteel.starlingroundup.util.MoneyUtils.roundUp
 import com.owensteel.starlingroundup.util.SharedConstants.Transactions.TRANSACTION_DIRECTION_OUT
 import com.owensteel.starlingroundup.util.SharedConstants.Transactions.TRANSACTION_SOURCE_INTERNAL_TRANSFER
@@ -135,7 +136,10 @@ fun RoundUpAndSaveScreen(
                     viewModel = viewModel,
                     roundUpAmount = roundUpAmount,
                     accountHolderName = accountHolderName,
-                    showTransferToSavingsSheet = showTransferToSavingsSheet
+                    showTransferToSavingsSheet = showTransferToSavingsSheet,
+                    // Used for getting the last
+                    // round-up timestamp when ready
+                    feedState = feedState
                 )
                 HorizontalDivider(
                     modifier = Modifier
@@ -193,7 +197,8 @@ fun MainFeature(
     viewModel: RoundUpAndSaveViewModel,
     roundUpAmount: Money,
     accountHolderName: String,
-    showTransferToSavingsSheet: MutableState<Boolean>
+    showTransferToSavingsSheet: MutableState<Boolean>,
+    feedState: FeedUiState
 ) {
     Column(
         modifier = Modifier
@@ -233,6 +238,22 @@ fun MainFeature(
             // Only enable if there is actually a Round Up total
             enabled = roundUpAmount.minorUnits > 0L
         )
+
+        // Only get timestamp when we know it has been
+        // initialised and won't be the fallback
+        if (!feedState.isLoading) {
+            Text(
+                text = stringResource(
+                    R.string.main_feature_last_round_up,
+                    DateTimeUtils.timeSince(
+                        feedState.latestRoundUpCutoffTimestamp
+                    )
+                ),
+                color = AccessibleGrey,
+                style = MaterialTheme.typography.bodySmall,
+                fontStyle = FontStyle.Italic
+            )
+        }
     }
 }
 
