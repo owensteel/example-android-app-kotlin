@@ -279,6 +279,8 @@ class RoundUpAndSaveViewModel @Inject constructor(
                     createSavingsGoalRequest,
                 )
             if (createSavingsGoalResponse.isSuccessful) {
+                // Refresh our list of Savings Goals for UX clarity
+                getAccountSavingsGoals()
                 // Now transfer the Round-Up Total to this Savings Goal
                 createSavingsGoalResponse.body()?.savingsGoalUid?.let {
                     performTransferToSavingsGoal(
