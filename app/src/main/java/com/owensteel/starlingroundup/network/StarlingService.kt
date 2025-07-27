@@ -153,7 +153,6 @@ object StarlingService {
     }
 
     suspend fun createSavingsGoal(
-        context: Context,
         tokenManager: TokenManager,
         accountUid: String,
         request: CreateSavingsGoalRequest

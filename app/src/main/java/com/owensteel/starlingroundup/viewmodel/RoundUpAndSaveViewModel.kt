@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.owensteel.starlingroundup.data.local.SecureTokenStore
 import com.owensteel.starlingroundup.model.AccountHolderIndividualResponse
 import com.owensteel.starlingroundup.model.AccountResponse
+import com.owensteel.starlingroundup.model.CreateSavingsGoalRequest
+import com.owensteel.starlingroundup.model.CreateSavingsGoalResponse
 import com.owensteel.starlingroundup.model.GetSavingsGoalsResponse
 import com.owensteel.starlingroundup.model.Money
 import com.owensteel.starlingroundup.model.SavingsGoal
@@ -241,6 +243,54 @@ class RoundUpAndSaveViewModel @Inject constructor(
                     value = emptyList(),
                     isLoading = false,
                     hasLoadingError = true
+                )
+            }
+        }
+    }
+
+    // 3.5. Create a new Savings Goal and transfer to that
+    fun createAndTransferToNewSavingsGoal(
+        savingsGoalName: String,
+        savingsGoalTargetMinorUnits: Long,
+        showTransferToSavingsSheet: MutableState<Boolean>
+    ) {
+        if (accountUid == null || accountCurrency == null) return
+
+        viewModelScope.launch {
+            // Show spinner in UI in case API hangs
+            _savingsGoalsModalUiState.value = _savingsGoalsModalUiState.value.copy(
+                isLoading = true,
+                hasTransferError = false
+            )
+
+            val createSavingsGoalRequest = CreateSavingsGoalRequest(
+                name = savingsGoalName,
+                currency = accountCurrency!!,
+                target = Money(
+                    accountCurrency!!,
+                    savingsGoalTargetMinorUnits
+                ),
+                base64EncodedPhoto = null
+            )
+            val createSavingsGoalResponse: Response<CreateSavingsGoalResponse> =
+                StarlingService.createSavingsGoal(
+                    tokenManager,
+                    accountUid!!,
+                    createSavingsGoalRequest,
+                )
+            if (createSavingsGoalResponse.isSuccessful) {
+                // Now transfer the Round-Up Total to this Savings Goal
+                createSavingsGoalResponse.body()?.savingsGoalUid?.let {
+                    performTransferToSavingsGoal(
+                        it,
+                        showTransferToSavingsSheet
+                    )
+                }
+            } else {
+                // Handle error
+                _savingsGoalsModalUiState.value = _savingsGoalsModalUiState.value.copy(
+                    isLoading = false,
+                    hasTransferError = true
                 )
             }
         }
