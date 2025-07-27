@@ -93,6 +93,7 @@ class RoundUpAndSaveViewModel @Inject constructor(
                 context, tokenManager
             )
             if (accountResponse.isSuccessful) {
+                // TODO: handle zero or multiple accounts
                 accountResponse.body()?.accounts?.firstOrNull()?.let { account ->
                     accountUid = account.accountUid
                     categoryUid = account.defaultCategory
