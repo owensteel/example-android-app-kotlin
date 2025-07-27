@@ -574,6 +574,7 @@ fun SavingsGoalRow(
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // Goal name
         Text(
             savingsGoal.name,
             modifier = Modifier
@@ -583,26 +584,30 @@ fun SavingsGoalRow(
             style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Start
         )
-        Text(
-            stringResource(
-                R.string.transfer_to_savings_modal_goal_amount_vs_target_and_percentage,
-                Money(
-                    savingsGoal.totalSaved.currency,
-                    savingsGoal.totalSaved.minorUnits
-                ).toString(),
-                Money(
-                    savingsGoal.target.currency,
-                    savingsGoal.target.minorUnits
-                ).toString(),
-                savingsGoal.savedPercentage.toString()
-            ),
-            modifier = Modifier
-                .weight(2f)
-                .wrapContentHeight()
-                .padding(transactionsListRowColumnCommonPadding),
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.End
-        )
+
+        // Show target and progress, if any
+        if (savingsGoal.target != null) {
+            Text(
+                stringResource(
+                    R.string.transfer_to_savings_modal_goal_amount_vs_target_and_percentage,
+                    Money(
+                        savingsGoal.totalSaved.currency,
+                        savingsGoal.totalSaved.minorUnits
+                    ).toString(),
+                    Money(
+                        savingsGoal.target.currency,
+                        savingsGoal.target.minorUnits
+                    ).toString(),
+                    savingsGoal.savedPercentage.toString()
+                ),
+                modifier = Modifier
+                    .weight(2f)
+                    .wrapContentHeight()
+                    .padding(transactionsListRowColumnCommonPadding),
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.End
+            )
+        }
     }
 
 }
