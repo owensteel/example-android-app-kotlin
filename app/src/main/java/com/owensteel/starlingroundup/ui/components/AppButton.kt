@@ -12,7 +12,8 @@ import androidx.compose.ui.graphics.Color
 fun AppButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    text: String
+    text: String,
+    enabled: Boolean = true
 ) {
     Button(
         onClick = onClick,
@@ -20,7 +21,8 @@ fun AppButton(
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.secondary,
             contentColor = MaterialTheme.colorScheme.onSecondary
-        )
+        ),
+        enabled = enabled
     ) {
         Text(text)
     }
@@ -30,7 +32,8 @@ fun AppButton(
 fun AppSecondaryButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    text: String
+    text: String,
+    enabled: Boolean = true
 ) {
     Button(
         onClick = onClick,
@@ -38,7 +41,8 @@ fun AppSecondaryButton(
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Transparent,
             contentColor = MaterialTheme.colorScheme.onSurface
-        )
+        ),
+        enabled = enabled
     ) {
         Text(text)
     }
