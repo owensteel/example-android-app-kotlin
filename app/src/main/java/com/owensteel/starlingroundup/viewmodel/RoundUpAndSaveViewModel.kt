@@ -60,9 +60,9 @@ class RoundUpAndSaveViewModel @Inject constructor(
     val hasInitialisedDataState: StateFlow<HasInitialisedDataState> = _hasInitialisedDataState
 
     private val _roundUpAmountState = MutableStateFlow(
-        Money(GBP, 0L).toString()
+        Money(GBP, 0L)
     )
-    val roundUpAmountState: StateFlow<String> = _roundUpAmountState
+    val roundUpAmountState: StateFlow<Money> = _roundUpAmountState
 
     private val _feedState = MutableStateFlow(FeedUiState())
     val feedState: StateFlow<FeedUiState> = _feedState
@@ -205,7 +205,7 @@ class RoundUpAndSaveViewModel @Inject constructor(
         _roundUpAmountState.value = Money(
             accountCurrency!!,
             total
-        ).toString()
+        )
     }
 
     // 3. Get savings goals
