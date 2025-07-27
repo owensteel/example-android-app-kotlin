@@ -286,7 +286,7 @@ class RoundUpAndSaveViewModel @Inject constructor(
                 // amount to reflect that the pre-existing
                 // transactions have now been rounded-up and
                 // transferred
-                fetchWeeklyTransactions()
+                refreshRoundUpTotalAndTransactionsFeed()
 
                 // Hide modal
                 showTransferToSavingsSheet.value = false
@@ -298,6 +298,11 @@ class RoundUpAndSaveViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    // Refresh round-up total and transactions feed
+    fun refreshRoundUpTotalAndTransactionsFeed() {
+        fetchWeeklyTransactions()
     }
 
     // Prevent rounded-up transactions from being counted in a

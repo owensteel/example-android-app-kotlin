@@ -1,10 +1,12 @@
 package com.owensteel.starlingroundup.ui
 
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,17 +26,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.pullToRefresh
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -57,8 +64,10 @@ import com.owensteel.starlingroundup.util.SharedConstants.Transactions.TRANSACTI
 import com.owensteel.starlingroundup.viewmodel.FeedUiState
 import com.owensteel.starlingroundup.viewmodel.RoundUpAndSaveViewModel
 import com.owensteel.starlingroundup.viewmodel.SavingsGoalsModalUiState
+import kotlinx.coroutines.launch
 import java.time.Instant
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoundUpAndSaveScreen(
     viewModel: RoundUpAndSaveViewModel = hiltViewModel()
@@ -71,13 +80,34 @@ fun RoundUpAndSaveScreen(
 
     val showTransferToSavingsSheet = remember { mutableStateOf(false) }
 
+    val isRefreshing = remember { mutableStateOf(false) }
+    val state = rememberPullToRefreshState()
+    val coroutineScope = rememberCoroutineScope()
+    val onRefresh: () -> Unit = {
+        isRefreshing.value = true
+        coroutineScope.launch {
+            viewModel.refreshRoundUpTotalAndTransactionsFeed()
+            isRefreshing.value = false
+        }
+    }
+    val scaleFraction = {
+        if (isRefreshing.value) 1f
+        else LinearOutSlowInEasing.transform(state.distanceFraction).coerceIn(0f, 1f)
+    }
+
     Surface(
         modifier = Modifier.fillMaxSize()
     ) {
+        // Main body
         Column(
             modifier = Modifier
                 .padding(32.dp)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .pullToRefresh(
+                    isRefreshing = isRefreshing.value,
+                    state = state,
+                    onRefresh = onRefresh
+                ),
             // Vertically arranging from top prevents elements
             // jumping about when one lower down changes size
             verticalArrangement = Arrangement.Top,
@@ -130,6 +160,21 @@ fun RoundUpAndSaveScreen(
                 }
             }
         }
+
+        // Pull to refresh indicator
+        Box(
+            Modifier
+                .graphicsLayer {
+                    scaleX = scaleFraction()
+                    scaleY = scaleFraction()
+                }
+        ) {
+            PullToRefreshDefaults.Indicator(
+                state = state,
+                isRefreshing = isRefreshing.value,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
+        }
     }
 }
 
@@ -180,7 +225,9 @@ fun MainFeature(
 }
 
 @Composable
-fun TransactionsFeedFeature(feedState: FeedUiState) {
+fun TransactionsFeedFeature(
+    feedState: FeedUiState
+) {
     Column(
         modifier = Modifier
             .padding(0.dp)
@@ -215,12 +262,15 @@ fun TransactionsFeedFeature(feedState: FeedUiState) {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class) // allows use of stickyHeader
+@OptIn(
+    ExperimentalFoundationApi::class
+) // allows use of stickyHeader
 @Composable
 fun TransactionsFeedLazyColumn(
     transactionsList: List<Transaction>,
     latestRoundUpCutoffTimestamp: String
 ) {
+    // Transactions scroller
     val latestRoundUpCutoffTimestampAsInstant = Instant.parse(latestRoundUpCutoffTimestamp)
     LazyColumn {
         // Transaction list headers
