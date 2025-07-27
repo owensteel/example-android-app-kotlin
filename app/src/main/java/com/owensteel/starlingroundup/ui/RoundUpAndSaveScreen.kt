@@ -32,6 +32,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -53,6 +54,9 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.owensteel.starlingroundup.R
 import com.owensteel.starlingroundup.model.Money
 import com.owensteel.starlingroundup.model.SavingsGoal
@@ -77,6 +81,8 @@ import java.time.Instant
 fun RoundUpAndSaveScreen(
     viewModel: RoundUpAndSaveViewModel = hiltViewModel()
 ) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+
     val hasInitialisedDataState by viewModel.hasInitialisedDataState.collectAsState()
     val roundUpAmount by viewModel.roundUpAmountState.collectAsState()
     val accountHolderName by viewModel.accountHolderNameState.collectAsState()
@@ -85,6 +91,19 @@ fun RoundUpAndSaveScreen(
 
     // Transfer to Savings Goal modal
     val showTransferToSavingsSheet = remember { mutableStateOf(false) }
+
+    // Refresh "onResume"
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.refreshRoundUpTotalAndTransactionsFeed()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     // Pull to refresh states
     val isRefreshing = remember { mutableStateOf(false) }
