@@ -249,6 +249,8 @@ class RoundUpAndSaveViewModel @Inject constructor(
         savingsGoalUid: String,
         showTransferToSavingsSheet: MutableState<Boolean>
     ) {
+        if (accountUid == null || accountCurrency == null) return
+
         // Generate UID for transfer
         val transferUid = UUID.randomUUID().toString()
 
@@ -260,7 +262,10 @@ class RoundUpAndSaveViewModel @Inject constructor(
             )
 
             val transferRequest = TransferRequest(
-                amount = lastRoundUpTotal
+                amount = Money(
+                    accountCurrency!!,
+                    lastRoundUpTotal
+                )
             )
             val transferResponse: Response<TransferResponse> =
                 StarlingService.transferToSavingsGoal(
@@ -274,6 +279,7 @@ class RoundUpAndSaveViewModel @Inject constructor(
                 // Record that the round-up for these
                 // transactions has now been done
                 recordLatestRoundUpCutoffTimestamp()
+
                 // Hide modal
                 showTransferToSavingsSheet.value = false
             } else {
