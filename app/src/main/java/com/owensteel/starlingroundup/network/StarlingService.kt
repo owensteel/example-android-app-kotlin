@@ -115,7 +115,6 @@ object StarlingService {
     // Transactions feed
 
     suspend fun getTransactionsForCurrentWeek(
-        context: Context,
         tokenManager: TokenManager,
         accountUid: String,
         categoryUid: String

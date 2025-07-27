@@ -126,7 +126,7 @@ class RoundUpAndSaveViewModel @Inject constructor(
                 )
 
                 // And now we have account details, fetch the transactions
-                fetchWeeklyTransactions(context)
+                fetchWeeklyTransactions()
             } else {
                 handleInitialisationError(accountHolderIndividualResponse.code())
             }
@@ -135,7 +135,7 @@ class RoundUpAndSaveViewModel @Inject constructor(
 
     // 1. Fetch this week's transactions
     private var transactionsCached: List<Transaction> = emptyList()
-    private fun fetchWeeklyTransactions(context: Context) {
+    private fun fetchWeeklyTransactions() {
         if (accountUid == null || categoryUid == null) return
 
         viewModelScope.launch {
@@ -147,7 +147,6 @@ class RoundUpAndSaveViewModel @Inject constructor(
 
             val transactionFeedResponse: Response<TransactionFeedResponse> =
                 StarlingService.getTransactionsForCurrentWeek(
-                    context,
                     tokenManager,
                     accountUid!!,
                     categoryUid!!
@@ -186,11 +185,10 @@ class RoundUpAndSaveViewModel @Inject constructor(
 
         val total = transactions
             .filter {
-                // spending only
-                it.direction == TRANSACTION_DIRECTION_OUT
-                        // only count transactions after the
-                        // last recorded round-up time
-                        && Instant.parse(it.transactionTime) > latestRoundUpCutoffTimestampInstant
+                // Spending transactions only
+                // And only count transactions after
+                // the last recorded round-up time
+                it.direction == TRANSACTION_DIRECTION_OUT && Instant.parse(it.transactionTime) > latestRoundUpCutoffTimestampInstant
             }
             .map { it.amount.minorUnits }.sumOf {
                 roundUp(it)
@@ -279,6 +277,12 @@ class RoundUpAndSaveViewModel @Inject constructor(
                 // Record that the round-up for these
                 // transactions has now been done
                 recordLatestRoundUpCutoffTimestamp()
+
+                // Refresh transactions feed and round-up
+                // amount to reflect that the pre-existing
+                // transactions have now been rounded-up and
+                // transferred
+                fetchWeeklyTransactions()
 
                 // Hide modal
                 showTransferToSavingsSheet.value = false
