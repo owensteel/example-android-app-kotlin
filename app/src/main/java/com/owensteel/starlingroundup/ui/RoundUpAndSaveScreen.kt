@@ -70,7 +70,6 @@ import com.owensteel.starlingroundup.viewmodel.RoundUpAndSaveViewModel
 import com.owensteel.starlingroundup.viewmodel.SavingsGoalsModalUiState
 import kotlinx.coroutines.launch
 import java.time.Instant
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
