@@ -564,10 +564,18 @@ fun SavingsGoalRow(
             textAlign = TextAlign.Start
         )
         Text(
-            Money(
-                savingsGoal.totalSaved.currency,
-                savingsGoal.totalSaved.minorUnits
-            ).toString(),
+            stringResource(
+                R.string.transfer_to_savings_modal_goal_amount_vs_target_and_percentage,
+                Money(
+                    savingsGoal.totalSaved.currency,
+                    savingsGoal.totalSaved.minorUnits
+                ).toString(),
+                Money(
+                    savingsGoal.target.currency,
+                    savingsGoal.target.minorUnits
+                ).toString(),
+                savingsGoal.savedPercentage.toString()
+            ),
             modifier = Modifier
                 .weight(2f)
                 .wrapContentHeight()
