@@ -22,9 +22,18 @@
     <string name="transfer_to_savings_modal_create_and_transfer">Create and transfer to a new Savings Goal</string>
     <string name="transfer_to_savings_modal_goal_amount_vs_target_and_percentage" translatable="false">%1$s / %2$s (%3$s%%)</string>
 
+    <!-- Create Savings Goal dialog -->
+    <string name="create_savings_goal_dialog_title">Create a new Savings Goal to transfer to</string>
+    <string name="create_savings_goal_dialog_goal_name_input_label">Goal name</string>
+    <string name="create_savings_goal_dialog_goal_target_input_label">Goal target</string>
+    <string name="create_savings_goal_dialog_goal_finish_button">Create Goal &amp; Transfer</string>
+    <string name="create_savings_goal_dialog_error_invalid_target">Please enter a valid currency amount for the Savings Goal Target.</string>
+    <string name="create_savings_goal_dialog_error_invalid_name">Please enter a name for the Savings Goal.</string>
+
     <!-- Generic -->
     <string name="transaction_outgoing_symbol" translatable="false">-</string>
     <string name="transaction_ingoing_symbol" translatable="false">+</string>
+    <string name="dialog_button_cancel">Cancel</string>
 
     <!-- Error messages -->
     <string name="error_could_not_fetch_data">Sorry, we could not fetch your data at this time (Error code %1$s).</string>

@@ -19,11 +19,13 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
@@ -56,6 +58,8 @@ import com.owensteel.starlingroundup.model.Money
 import com.owensteel.starlingroundup.model.SavingsGoal
 import com.owensteel.starlingroundup.model.Transaction
 import com.owensteel.starlingroundup.ui.components.AppButton
+import com.owensteel.starlingroundup.ui.components.AppSecondaryButton
+import com.owensteel.starlingroundup.ui.components.CurrencyTextField
 import com.owensteel.starlingroundup.ui.theme.AccessibleGrey
 import com.owensteel.starlingroundup.ui.theme.TransactionInBgGreen
 import com.owensteel.starlingroundup.util.MoneyUtils.roundUp
@@ -66,6 +70,7 @@ import com.owensteel.starlingroundup.viewmodel.RoundUpAndSaveViewModel
 import com.owensteel.starlingroundup.viewmodel.SavingsGoalsModalUiState
 import kotlinx.coroutines.launch
 import java.time.Instant
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -424,6 +429,7 @@ fun TransferSavingsModalSheet(
     amount: String,
     viewModel: RoundUpAndSaveViewModel
 ) {
+    val showCreateAndTransferToNewSavingsGoalDialog = remember { mutableStateOf(false) }
 
     ModalBottomSheet(
         onDismissRequest = {
@@ -487,13 +493,27 @@ fun TransferSavingsModalSheet(
             // Create Savings Goal
             AppButton(
                 onClick = {
-                    // TODO
+                    showCreateAndTransferToNewSavingsGoalDialog.value = true
                 },
                 text = stringResource(R.string.transfer_to_savings_modal_create_and_transfer)
             )
         }
     }
 
+    if (showCreateAndTransferToNewSavingsGoalDialog.value) {
+        CreateAndTransferToNewSavingsGoalDialog(
+            onDismiss = {
+                showCreateAndTransferToNewSavingsGoalDialog.value = false
+            },
+            onConfirm = { goalName: String, goalTarget: Long ->
+                showCreateAndTransferToNewSavingsGoalDialog.value = false
+                // Request create and transfer
+                viewModel.createAndTransferToNewSavingsGoal(
+                    goalName, goalTarget, showTransferToSavingsSheet
+                )
+            }
+        )
+    }
 }
 
 @Composable
@@ -585,4 +605,79 @@ fun SavingsGoalRow(
         )
     }
 
+}
+
+/*
+
+    Create Savings Goal dialog
+
+ */
+
+@Composable
+fun CreateAndTransferToNewSavingsGoalDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (String, Long) -> Unit
+) {
+    val goalNameValue = remember { mutableStateOf("") }
+    val goalTargetValue = remember { mutableStateOf("0.00") }
+
+    val dialogErrorMessageStringResourceId = remember { mutableStateOf<Int?>(null) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            AppButton(
+                onClick = {
+                    val goalTargetNumberDouble: Double? = goalTargetValue.value.toDoubleOrNull()
+
+                    if (goalTargetNumberDouble == null) {
+                        // Invalid goal target
+                        dialogErrorMessageStringResourceId.value =
+                            R.string.create_savings_goal_dialog_error_invalid_target
+                    } else {
+                        if (goalNameValue.value.isNotBlank()) {
+                            val goalTargetNumberLong: Long = (goalTargetNumberDouble * 100).toLong()
+                            onConfirm(goalNameValue.value, goalTargetNumberLong)
+                        } else {
+                            // Invalid goal name
+                            dialogErrorMessageStringResourceId.value =
+                                R.string.create_savings_goal_dialog_error_invalid_name
+                        }
+                    }
+                },
+                text = stringResource(R.string.create_savings_goal_dialog_goal_finish_button)
+            )
+        },
+        dismissButton = {
+            AppSecondaryButton(
+                onClick = onDismiss,
+                text = stringResource(R.string.dialog_button_cancel),
+            )
+        },
+        title = {
+            Text(stringResource(R.string.create_savings_goal_dialog_title))
+        },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = goalNameValue.value,
+                    onValueChange = { goalNameValue.value = it },
+                    label = { Text(stringResource(R.string.create_savings_goal_dialog_goal_name_input_label)) },
+                    singleLine = true
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                CurrencyTextField(
+                    valueState = goalTargetValue,
+                    label = stringResource(R.string.create_savings_goal_dialog_goal_target_input_label)
+                )
+                // Inline error message for invalid input
+                if (dialogErrorMessageStringResourceId.value != null) {
+                    Text(
+                        text = stringResource(dialogErrorMessageStringResourceId.value!!),
+                        color = Color.Red
+                    )
+                }
+            }
+        }
+    )
 }
