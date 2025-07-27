@@ -77,7 +77,7 @@ fun RoundUpAndSaveScreen(
     viewModel: RoundUpAndSaveViewModel = hiltViewModel()
 ) {
     val hasInitialisedDataState by viewModel.hasInitialisedDataState.collectAsState()
-    val amount by viewModel.roundUpAmountState.collectAsState()
+    val roundUpAmount by viewModel.roundUpAmountState.collectAsState()
     val accountHolderName by viewModel.accountHolderNameState.collectAsState()
     val feedState by viewModel.feedState.collectAsState()
     val savingsGoalsModalUiState by viewModel.savingsGoalsModalUiState.collectAsState()
@@ -119,11 +119,13 @@ fun RoundUpAndSaveScreen(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (showTransferToSavingsSheet.value) {
+            // Don't show Transfer modal if the Round Up total is
+            // zero (could make illegal transfer possible)
+            if (showTransferToSavingsSheet.value && roundUpAmount.minorUnits > 0L) {
                 TransferSavingsModalSheet(
                     showTransferToSavingsSheet,
                     savingsGoalsModalUiState,
-                    amount,
+                    roundUpAmount.toString(),
                     viewModel
                 )
             }
@@ -131,7 +133,7 @@ fun RoundUpAndSaveScreen(
             if (hasInitialisedDataState.value) {
                 MainFeature(
                     viewModel = viewModel,
-                    amount = amount,
+                    roundUpAmount = roundUpAmount,
                     accountHolderName = accountHolderName,
                     showTransferToSavingsSheet = showTransferToSavingsSheet
                 )
@@ -189,7 +191,7 @@ fun RoundUpAndSaveScreen(
 @Composable
 fun MainFeature(
     viewModel: RoundUpAndSaveViewModel,
-    amount: String,
+    roundUpAmount: Money,
     accountHolderName: String,
     showTransferToSavingsSheet: MutableState<Boolean>
 ) {
@@ -213,7 +215,7 @@ fun MainFeature(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = amount,
+            text = roundUpAmount.toString(),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
         )
@@ -227,7 +229,9 @@ fun MainFeature(
                 // Request fetching of savings goal list
                 viewModel.getAccountSavingsGoals()
             },
-            text = stringResource(id = R.string.main_feature_button_round_up_and_save)
+            text = stringResource(id = R.string.main_feature_button_round_up_and_save),
+            // Only enable if there is actually a Round Up total
+            enabled = roundUpAmount.minorUnits > 0L
         )
     }
 }
