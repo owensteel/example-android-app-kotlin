@@ -470,6 +470,14 @@ fun TransferSavingsModalSheet(
                 )
             }
 
+            // Create Savings Goal
+            AppButton(
+                onClick = {
+                    showCreateAndTransferToNewSavingsGoalDialog.value = true
+                },
+                text = stringResource(R.string.transfer_to_savings_modal_create_and_transfer)
+            )
+
             // Savings Goals list
             when {
                 savingsGoalsModalUiState.isLoading -> CircularProgressIndicator(
@@ -489,14 +497,6 @@ fun TransferSavingsModalSheet(
                     viewModel
                 )
             }
-
-            // Create Savings Goal
-            AppButton(
-                onClick = {
-                    showCreateAndTransferToNewSavingsGoalDialog.value = true
-                },
-                text = stringResource(R.string.transfer_to_savings_modal_create_and_transfer)
-            )
         }
     }
 
@@ -531,7 +531,10 @@ fun SavingsGoalsLazyColumn(
                 .fillMaxWidth(),
         )
 
-        else -> LazyColumn {
+        else -> LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
             // Render the list of Savings Goals
             items(savingsGoalsList) { savingsGoal ->
                 SavingsGoalRow(
