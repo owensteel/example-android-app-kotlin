@@ -53,6 +53,7 @@ import com.owensteel.starlingroundup.ui.theme.AccessibleGrey
 import com.owensteel.starlingroundup.ui.theme.TransactionInBgGreen
 import com.owensteel.starlingroundup.util.MoneyUtils.roundUp
 import com.owensteel.starlingroundup.util.SharedConstants.Transactions.TRANSACTION_DIRECTION_OUT
+import com.owensteel.starlingroundup.util.SharedConstants.Transactions.TRANSACTION_SOURCE_INTERNAL_TRANSFER
 import com.owensteel.starlingroundup.viewmodel.FeedUiState
 import com.owensteel.starlingroundup.viewmodel.RoundUpAndSaveViewModel
 import com.owensteel.starlingroundup.viewmodel.SavingsGoalsModalUiState
@@ -271,7 +272,7 @@ fun TransactionHeaderRow() {
 @Composable
 fun TransactionRow(
     transaction: Transaction,
-    isIncludedInRoundUp: Boolean
+    hasAlreadyBeenRoundedUp: Boolean
 ) {
     val transactionAmount: Money = transaction.amount
 
@@ -324,13 +325,20 @@ fun TransactionRow(
             )
         )
 
-        // Round-up (only if transaction is for spending)
+        // Potential round-up sum (only if transaction is not
+        // an internal transfer, and is spending)
         if (transaction.direction == TRANSACTION_DIRECTION_OUT) {
+            val isInternalTransfer = transaction.source == TRANSACTION_SOURCE_INTERNAL_TRANSFER
             Text(
-                Money(
-                    transactionAmount.currency,
-                    roundUp(transactionAmount.minorUnits)
-                ).toString(),
+                // Explain to user this transaction is internal, not a spend
+                if (isInternalTransfer)
+                    stringResource(R.string.transactions_list_label_not_counted)
+                // Display potential round-up sum
+                else
+                    Money(
+                        transactionAmount.currency,
+                        roundUp(transactionAmount.minorUnits)
+                    ).toString(),
                 modifier = Modifier
                     .alpha(0.5f) // accessibility-friendly form of grey
                     .weight(1f)
@@ -338,7 +346,10 @@ fun TransactionRow(
                     .padding(transactionsListRowColumnCommonPadding),
                 textAlign = TextAlign.End,
                 fontStyle = FontStyle.Italic,
-                textDecoration = if (!isIncludedInRoundUp) TextDecoration.LineThrough else null
+                // Strikethrough to indicate to user that this
+                // transaction has already been rounded-up
+                textDecoration = if (!isInternalTransfer && !hasAlreadyBeenRoundedUp)
+                    TextDecoration.LineThrough else null
             )
         }
     }

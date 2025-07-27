@@ -5,5 +5,6 @@ data class Transaction(
     val amount: Money,
     val direction: String,
     val spendingCategory: String?,
-    val transactionTime: String
+    val transactionTime: String,
+    val source: String
 )

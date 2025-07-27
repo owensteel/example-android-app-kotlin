@@ -19,6 +19,7 @@ import com.owensteel.starlingroundup.network.StarlingService
 import com.owensteel.starlingroundup.token.TokenManager
 import com.owensteel.starlingroundup.util.MoneyUtils.roundUp
 import com.owensteel.starlingroundup.util.SharedConstants.Transactions.TRANSACTION_DIRECTION_OUT
+import com.owensteel.starlingroundup.util.SharedConstants.Transactions.TRANSACTION_SOURCE_INTERNAL_TRANSFER
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -186,10 +187,12 @@ class RoundUpAndSaveViewModel @Inject constructor(
 
         val total = transactions
             .filter {
-                // Spending transactions only
-                // And only count transactions after
-                // the last recorded round-up time
-                it.direction == TRANSACTION_DIRECTION_OUT && Instant.parse(it.transactionTime) > latestRoundUpCutoffTimestampInstant
+                // Exclude transactions that have already been rounded-up
+                Instant.parse(it.transactionTime) > latestRoundUpCutoffTimestampInstant
+                        // Spending only
+                        && it.direction == TRANSACTION_DIRECTION_OUT
+                        // Exclude internal transfers
+                        && it.source != TRANSACTION_SOURCE_INTERNAL_TRANSFER
             }
             .map { it.amount.minorUnits }.sumOf {
                 roundUp(it)

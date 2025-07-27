@@ -29,6 +29,7 @@ object SharedConstants {
     object Transactions {
         const val TRANSACTION_DIRECTION_IN = "IN"
         const val TRANSACTION_DIRECTION_OUT = "OUT"
+        const val TRANSACTION_SOURCE_INTERNAL_TRANSFER = "INTERNAL_TRANSFER"
     }
 
 }
