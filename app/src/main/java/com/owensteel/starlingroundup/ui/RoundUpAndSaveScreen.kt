@@ -591,9 +591,17 @@ fun SavingsGoalRow(
             textAlign = TextAlign.Start
         )
 
-        // Show target and progress, if any
-        if (savingsGoal.target != null) {
-            Text(
+        // Show current total, and target and progress
+        // if available
+        Text(
+            if (savingsGoal.target == null)
+            // No target set, just show total
+                Money(
+                    savingsGoal.totalSaved.currency,
+                    savingsGoal.totalSaved.minorUnits
+                ).toString()
+            else
+            // Show total with target and current progress
                 stringResource(
                     R.string.transfer_to_savings_modal_goal_amount_vs_target_and_percentage,
                     Money(
@@ -606,14 +614,13 @@ fun SavingsGoalRow(
                     ).toString(),
                     savingsGoal.savedPercentage.toString()
                 ),
-                modifier = Modifier
-                    .weight(2f)
-                    .wrapContentHeight()
-                    .padding(transactionsListRowColumnCommonPadding),
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.End
-            )
-        }
+            modifier = Modifier
+                .weight(2f)
+                .wrapContentHeight()
+                .padding(transactionsListRowColumnCommonPadding),
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.End
+        )
     }
 
 }
