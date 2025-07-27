@@ -19,6 +19,7 @@
     <string name="transfer_to_savings_modal_goals_load_error">Sorry, we could not load your Savings Goals.</string>
     <string name="transfer_to_savings_modal_goals_transfer_error">Sorry, we could not transfer to that Savings Goal right now.</string>
     <string name="transfer_to_savings_modal_goals_empty">You have no existing Savings Goals.</string>
+    <string name="transfer_to_savings_modal_create_and_transfer">Create and transfer to a new Savings Goal</string>
 
     <!-- Generic -->
     <string name="transaction_outgoing_symbol" translatable="false">-</string>

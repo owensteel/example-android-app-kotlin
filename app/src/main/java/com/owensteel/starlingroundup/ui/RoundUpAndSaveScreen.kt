@@ -464,6 +464,7 @@ fun TransferSavingsModalSheet(
                 )
             }
 
+            // Savings Goals list
             when {
                 savingsGoalsModalUiState.isLoading -> CircularProgressIndicator(
                     modifier = Modifier
@@ -482,6 +483,14 @@ fun TransferSavingsModalSheet(
                     viewModel
                 )
             }
+
+            // Create Savings Goal
+            AppButton(
+                onClick = {
+                    // TODO
+                },
+                text = stringResource(R.string.transfer_to_savings_modal_create_and_transfer)
+            )
         }
     }
 
