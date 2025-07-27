@@ -34,6 +34,7 @@
     <string name="transaction_outgoing_symbol" translatable="false">-</string>
     <string name="transaction_ingoing_symbol" translatable="false">+</string>
     <string name="dialog_button_cancel">Cancel</string>
+    <string name="date_time_since_just_now">just now</string>
 
     <!-- Error messages -->
     <string name="error_could_not_fetch_data">Sorry, we could not fetch your data at this time (Error code %1$s).</string>
