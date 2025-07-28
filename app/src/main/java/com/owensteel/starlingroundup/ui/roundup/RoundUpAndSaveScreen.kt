@@ -75,7 +75,7 @@ fun RoundUpAndSaveScreen(
             isRefreshing.value = false
         }
     }
-    val scaleFraction = {
+    val pullToRefreshIndicatorScaleFraction = {
         if (isRefreshing.value) 1f
         else LinearOutSlowInEasing.transform(pullToRefreshState.distanceFraction).coerceIn(0f, 1f)
     }
@@ -157,8 +157,8 @@ fun RoundUpAndSaveScreen(
         Box(
             Modifier
                 .graphicsLayer {
-                    scaleX = scaleFraction()
-                    scaleY = scaleFraction()
+                    scaleX = pullToRefreshIndicatorScaleFraction()
+                    scaleY = pullToRefreshIndicatorScaleFraction()
                 }
         ) {
             PullToRefreshDefaults.Indicator(
