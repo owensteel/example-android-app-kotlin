@@ -20,7 +20,7 @@ data class Money(
     override fun toString(): String {
         val unitSymbol = try {
             Currency.getInstance(currency)
-                .getSymbol(Locale.UK) // locale just determines how symbols are rendered
+                .getSymbol(Locale.getDefault()) // locale just determines how symbols are rendered
         } catch (e: Exception) {
             currency
         }
@@ -28,6 +28,6 @@ data class Money(
         val pounds = minorUnits / 100
         val pence = abs(minorUnits % 100) // Prevents negative pence (impossible)
 
-        return String.format(Locale.UK, "%s%d.%02d", unitSymbol, pounds, pence)
+        return String.format(Locale.getDefault(), "%s%d.%02d", unitSymbol, pounds, pence)
     }
 }

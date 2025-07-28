@@ -24,7 +24,7 @@ fun CurrencyTextField(
             val number = cleaned.toDoubleOrNull()
             if (number != null) {
                 // Normalises, e.g. "20.0" to "20.00"
-                val formatted = String.format(Locale.UK, "%.2f", number)
+                val formatted = String.format(Locale.getDefault(), "%.2f", number)
                 valueState.value = formatted
             } else if (cleaned.isEmpty()) {
                 // Allow clearing
