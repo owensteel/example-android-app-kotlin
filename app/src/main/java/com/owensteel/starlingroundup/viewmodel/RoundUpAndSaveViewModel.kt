@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.owensteel.starlingroundup.data.local.RoundUpCutoffTimestampStore
 import com.owensteel.starlingroundup.data.local.SecureTokenStore
 import com.owensteel.starlingroundup.model.AccountHolderIndividualResponse
 import com.owensteel.starlingroundup.model.AccountResponse
@@ -367,7 +368,7 @@ class RoundUpAndSaveViewModel @Inject constructor(
     // Prevent rounded-up transactions from being counted in a
     // future round-up calculation by recording a cut-off time
 
-    private val tokenStore = SecureTokenStore(application.applicationContext)
+    private val roundUpCutoffTimestampStore = RoundUpCutoffTimestampStore(application.applicationContext)
 
     private suspend fun recordLatestRoundUpCutoffTimestamp() {
         // Use time and date of latest cached transaction (the
@@ -375,11 +376,11 @@ class RoundUpAndSaveViewModel @Inject constructor(
         // of current timestamp in case somehow a transaction
         // occurs between these two times
         val cutoffTimestamp = transactionsCached.first().transactionTime
-        tokenStore.saveLatestRoundUpCutoffTimestamp(cutoffTimestamp)
+        roundUpCutoffTimestampStore.saveLatestRoundUpCutoffTimestamp(cutoffTimestamp)
     }
 
     private suspend fun getLatestRoundUpCutoffTimestamp(): String {
-        return tokenStore.getLatestRoundUpCutOffTimestamp() ?: roundUpCutoffTimestampFallback
+        return roundUpCutoffTimestampStore.getLatestRoundUpCutOffTimestamp() ?: roundUpCutoffTimestampFallback
     }
 
     // Run as soon as initialised
