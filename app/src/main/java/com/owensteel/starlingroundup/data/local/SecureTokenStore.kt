@@ -2,11 +2,8 @@ package com.owensteel.starlingroundup.data.local
 
 import android.content.Context
 import androidx.datastore.preferences.core.byteArrayPreferencesKey
-import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
-import com.owensteel.starlingroundup.util.SharedConstants.DATASTORE_NAME
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.ACCESS_TOKEN_EXPIRY
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.ACCESS_TOKEN_IV
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.ENCRYPTED_ACCESS_TOKEN
@@ -14,7 +11,6 @@ import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.ENCRYPT
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.LATEST_ROUNDUP_CUTOFF_TIMESTAMP
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.REFRESH_TOKEN_EXPIRY
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.REFRESH_TOKEN_IV
-import kotlinx.coroutines.flow.first
 
 /*
 
@@ -24,11 +20,10 @@ import kotlinx.coroutines.flow.first
 
  */
 
-// TODO: Centralise DataStore access
-
-private val Context.dataStore by preferencesDataStore(DATASTORE_NAME)
-
-class SecureTokenStore(private val context: Context) {
+class SecureTokenStore(
+    private val context: Context,
+    private val dataStoreManager: DataStoreManager = DataStoreManager(context)
+) {
 
     private val crypto = CryptoManager(context)
 
@@ -40,12 +35,10 @@ class SecureTokenStore(private val context: Context) {
     ) {
         val tokenKeyPrefKey = byteArrayPreferencesKey(tokenKey)
         val ivKeyPrefKey = byteArrayPreferencesKey(ivKey)
-
         val (iv, encrypted) = crypto.encrypt(token)
-        context.dataStore.edit { prefs ->
-            prefs[tokenKeyPrefKey] = encrypted
-            prefs[ivKeyPrefKey] = iv
-        }
+
+        dataStoreManager.write(tokenKeyPrefKey, encrypted)
+        dataStoreManager.write(ivKeyPrefKey, iv)
 
         // Record expiry for token
         if (
@@ -58,9 +51,7 @@ class SecureTokenStore(private val context: Context) {
             // by the server)
             val tokenExpiryPrefKey = if (tokenKey == ENCRYPTED_ACCESS_TOKEN)
                 longPreferencesKey(ACCESS_TOKEN_EXPIRY) else longPreferencesKey(REFRESH_TOKEN_EXPIRY)
-            context.dataStore.edit {
-                it[tokenExpiryPrefKey] = expiryTime
-            }
+            dataStoreManager.write(tokenExpiryPrefKey, expiryTime)
         }
     }
 
@@ -68,9 +59,8 @@ class SecureTokenStore(private val context: Context) {
         val tokenKeyPrefKey = byteArrayPreferencesKey(tokenKey)
         val ivKeyPrefKey = byteArrayPreferencesKey(ivKey)
 
-        val prefs = context.dataStore.data.first()
-        val encrypted = prefs[tokenKeyPrefKey]
-        val iv = prefs[ivKeyPrefKey]
+        val encrypted = dataStoreManager.read(tokenKeyPrefKey)
+        val iv = dataStoreManager.read(ivKeyPrefKey)
         return if (encrypted != null && iv != null) {
             crypto.decrypt(iv, encrypted)
         } else null
@@ -80,11 +70,7 @@ class SecureTokenStore(private val context: Context) {
         // In case the saved refresh token is
         // expired or invalid, this allows us to
         // fallback to the initial hardcoded one
-        context.dataStore.edit { preferences ->
-            preferences.remove(
-                byteArrayPreferencesKey(ENCRYPTED_REFRESH_TOKEN)
-            )
-        }
+        dataStoreManager.remove(byteArrayPreferencesKey(ENCRYPTED_REFRESH_TOKEN))
     }
 
     suspend fun saveRefreshToken(token: String) {
@@ -119,20 +105,20 @@ class SecureTokenStore(private val context: Context) {
     }
 
     suspend fun getAccessTokenExpiryTime(): Long? {
-        return context.dataStore.data.first()[longPreferencesKey(ACCESS_TOKEN_EXPIRY)]
+        return dataStoreManager.read(longPreferencesKey(ACCESS_TOKEN_EXPIRY))
     }
 
     // TODO: Separate when DataStore access is centralised
 
     suspend fun saveLatestRoundUpCutoffTimestamp(cutoffTimestamp: String) {
-        context.dataStore.edit { prefs ->
-            prefs[stringPreferencesKey(LATEST_ROUNDUP_CUTOFF_TIMESTAMP)] = cutoffTimestamp
-        }
+        dataStoreManager.write(
+            stringPreferencesKey(LATEST_ROUNDUP_CUTOFF_TIMESTAMP),
+            cutoffTimestamp
+        )
     }
 
     suspend fun getLatestRoundUpCutOffTimestamp(): String? {
-        val prefs = context.dataStore.data.first()
-        return prefs[stringPreferencesKey(LATEST_ROUNDUP_CUTOFF_TIMESTAMP)]
+        return dataStoreManager.read(stringPreferencesKey(LATEST_ROUNDUP_CUTOFF_TIMESTAMP))
     }
 
 }
