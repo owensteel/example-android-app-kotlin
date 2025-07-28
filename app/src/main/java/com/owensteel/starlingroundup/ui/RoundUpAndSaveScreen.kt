@@ -322,19 +322,27 @@ fun TransactionsFeedLazyColumn(
     transactionsList: List<Transaction>,
     latestRoundUpCutoffTimestamp: String
 ) {
-    // Transactions scroller
-    val latestRoundUpCutoffTimestampAsInstant = Instant.parse(latestRoundUpCutoffTimestamp)
-    LazyColumn {
-        // Transaction list headers
-        stickyHeader {
-            TransactionHeaderRow()
-        }
-        // Render the list of transactions
-        items(transactionsList) { transaction ->
-            TransactionRow(
-                transaction,
-                (Instant.parse(transaction.transactionTime) > latestRoundUpCutoffTimestampAsInstant)
-            )
+    if (transactionsList.isEmpty()) {
+        Text(
+            text = stringResource(R.string.transactions_list_empty),
+            modifier = Modifier
+                .padding(15.dp)
+        )
+    } else {
+        // Transactions scroller
+        val latestRoundUpCutoffTimestampAsInstant = Instant.parse(latestRoundUpCutoffTimestamp)
+        LazyColumn {
+            // Transaction list headers
+            stickyHeader {
+                TransactionHeaderRow()
+            }
+            // Render the list of transactions
+            items(transactionsList) { transaction ->
+                TransactionRow(
+                    transaction,
+                    (Instant.parse(transaction.transactionTime) > latestRoundUpCutoffTimestampAsInstant)
+                )
+            }
         }
     }
 }
