@@ -36,7 +36,7 @@ object DateTimeUtils {
             )
 
             period.days > 0 -> resources.getQuantityString(
-                R.plurals.time_ago_months,
+                R.plurals.time_ago_days,
                 period.days,
                 period.days
             )
