@@ -451,9 +451,9 @@ fun TransactionRow(
             // Row allows us to display an icon
             Row(
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End,
                 modifier = Modifier
                     .weight(1f)
-                    .wrapContentSize()
             ) {
                 // Display round-up sum
                 Text(
@@ -477,7 +477,7 @@ fun TransactionRow(
                     textDecoration = if (!isInternalTransfer && hasAlreadyBeenRoundedUp)
                         TextDecoration.LineThrough else null
                 )
-                // Icon that leads the round-up sum
+                // Icon that follows the round-up sum
                 if (!isInternalTransfer && hasAlreadyBeenRoundedUp) {
                     Spacer(modifier = Modifier.width(8.dp))
                     // Tick icon to show user this round-up has
