@@ -1,4 +1,4 @@
-package com.owensteel.starlingroundup.ui.modals
+package com.owensteel.starlingroundup.ui.roundup
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -35,7 +35,7 @@ import com.owensteel.starlingroundup.R
 import com.owensteel.starlingroundup.model.Money
 import com.owensteel.starlingroundup.model.SavingsGoal
 import com.owensteel.starlingroundup.ui.components.AppButton
-import com.owensteel.starlingroundup.ui.components.transactionsListRowColumnCommonPadding
+import com.owensteel.starlingroundup.ui.transactionsfeed.transactionsListRowColumnCommonPadding
 import com.owensteel.starlingroundup.ui.dialogs.CreateNewSavingsGoalDialog
 import com.owensteel.starlingroundup.ui.theme.AccessibleGrey
 import com.owensteel.starlingroundup.viewmodel.RoundUpAndSaveViewModel

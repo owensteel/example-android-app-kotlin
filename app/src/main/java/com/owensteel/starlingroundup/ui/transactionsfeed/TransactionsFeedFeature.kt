@@ -1,4 +1,4 @@
-package com.owensteel.starlingroundup.ui.features
+package com.owensteel.starlingroundup.ui.transactionsfeed
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,7 +15,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.owensteel.starlingroundup.R
-import com.owensteel.starlingroundup.ui.components.TransactionsFeed
 import com.owensteel.starlingroundup.viewmodel.TransactionsFeedUiState
 
 /*

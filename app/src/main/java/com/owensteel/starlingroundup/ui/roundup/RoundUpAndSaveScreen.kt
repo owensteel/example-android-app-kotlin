@@ -1,4 +1,4 @@
-package com.owensteel.starlingroundup.ui.screens
+package com.owensteel.starlingroundup.ui.roundup
 
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.foundation.layout.Arrangement
@@ -31,9 +31,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.owensteel.starlingroundup.R
-import com.owensteel.starlingroundup.ui.features.RoundUpAndSaveFeature
-import com.owensteel.starlingroundup.ui.features.TransactionsFeedFeature
-import com.owensteel.starlingroundup.ui.modals.TransferToSavingsGoalModal
+import com.owensteel.starlingroundup.ui.transactionsfeed.TransactionsFeedFeature
 import com.owensteel.starlingroundup.viewmodel.RoundUpAndSaveViewModel
 import kotlinx.coroutines.launch
 

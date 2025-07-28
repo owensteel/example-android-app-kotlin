@@ -1,4 +1,4 @@
-package com.owensteel.starlingroundup.ui.features
+package com.owensteel.starlingroundup.ui.roundup
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
