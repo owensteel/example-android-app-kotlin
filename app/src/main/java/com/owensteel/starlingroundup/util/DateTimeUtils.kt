@@ -71,4 +71,19 @@ object DateTimeUtils {
             else -> resources.getString(R.string.date_time_since_just_now)
         }
     }
+
+    // Get day of month, with suffix
+    fun getDayWithSuffix(day: Int): String {
+        if (day !in 1..31) throw IllegalArgumentException("Day must be between 1 and 31")
+
+        val suffix = when {
+            day in 11..13 -> "th"
+            day % 10 == 1 -> "st"
+            day % 10 == 2 -> "nd"
+            day % 10 == 3 -> "rd"
+            else -> "th"
+        }
+
+        return "$day$suffix"
+    }
 }
