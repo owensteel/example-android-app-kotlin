@@ -14,15 +14,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
@@ -340,7 +345,10 @@ fun TransactionsFeedLazyColumn(
             items(transactionsList) { transaction ->
                 TransactionRow(
                     transaction,
-                    (Instant.parse(transaction.transactionTime) > latestRoundUpCutoffTimestampAsInstant)
+                    // If the transaction is before the latest round-up
+                    // cutoff timestamp, assume it has already been part
+                    // of a round-up total
+                    (Instant.parse(transaction.transactionTime) <= latestRoundUpCutoffTimestampAsInstant)
                 )
             }
         }
@@ -439,28 +447,48 @@ fun TransactionRow(
         // an internal transfer, and is spending)
         if (transaction.direction == TRANSACTION_DIRECTION_OUT) {
             val isInternalTransfer = transaction.source == TRANSACTION_SOURCE_INTERNAL_TRANSFER
-            Text(
-                // Explain to user this transaction is internal, not a spend
-                if (isInternalTransfer)
-                    stringResource(R.string.transactions_list_label_not_counted)
-                // Display potential round-up sum
-                else
-                    Money(
-                        transactionAmount.currency,
-                        roundUp(transactionAmount.minorUnits)
-                    ).toString(),
+
+            // Row allows us to display an icon
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .alpha(0.5f) // accessibility-friendly form of grey
                     .weight(1f)
-                    .wrapContentHeight()
-                    .padding(transactionsListRowColumnCommonPadding),
-                textAlign = TextAlign.End,
-                fontStyle = FontStyle.Italic,
-                // Strikethrough to indicate to user that this
-                // transaction has already been rounded-up
-                textDecoration = if (!isInternalTransfer && !hasAlreadyBeenRoundedUp)
-                    TextDecoration.LineThrough else null
-            )
+                    .wrapContentSize()
+            ) {
+                // Display round-up sum
+                Text(
+                    // Explain to user this transaction is internal, not a spend
+                    if (isInternalTransfer)
+                        stringResource(R.string.transactions_list_label_not_counted)
+                    // Display potential round-up sum
+                    else
+                        Money(
+                            transactionAmount.currency,
+                            roundUp(transactionAmount.minorUnits)
+                        ).toString(),
+                    modifier = Modifier
+                        .alpha(0.5f) // accessibility-friendly form of grey
+                        .wrapContentHeight()
+                        .padding(transactionsListRowColumnCommonPadding),
+                    textAlign = TextAlign.End,
+                    fontStyle = FontStyle.Italic,
+                    // Strikethrough to indicate to user that this
+                    // transaction has already been rounded-up
+                    textDecoration = if (!isInternalTransfer && hasAlreadyBeenRoundedUp)
+                        TextDecoration.LineThrough else null
+                )
+                // Icon that leads the round-up sum
+                if (!isInternalTransfer && hasAlreadyBeenRoundedUp) {
+                    Spacer(modifier = Modifier.width(8.dp))
+                    // Tick icon to show user this round-up has
+                    // been transferred
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = Icons.Default.Check.name,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
         }
     }
 
