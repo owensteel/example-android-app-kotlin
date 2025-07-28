@@ -16,11 +16,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.owensteel.starlingroundup.R
 import com.owensteel.starlingroundup.ui.components.TransactionsFeed
-import com.owensteel.starlingroundup.viewmodel.FeedUiState
+import com.owensteel.starlingroundup.viewmodel.TransactionsFeedUiState
+
+/*
+
+    Handles the multiple states of the Transactions Feed
+    Displays the feed, with a title, when ready
+
+ */
 
 @Composable
 fun TransactionsFeedFeature(
-    feedState: FeedUiState
+    transactionsFeedUiState: TransactionsFeedUiState
 ) {
     Column(
         modifier = Modifier
@@ -40,16 +47,17 @@ fun TransactionsFeedFeature(
                 .fillMaxWidth(),
         )
         when {
-            feedState.isLoading -> CircularProgressIndicator(
+            transactionsFeedUiState.isLoading -> CircularProgressIndicator(
                 modifier = Modifier
                     .padding(15.dp)
             )
 
-            feedState.hasError -> Text(stringResource(R.string.transactions_list_load_error))
-            else -> feedState.value?.let {
+            transactionsFeedUiState.hasError -> Text(stringResource(R.string.transactions_list_load_error))
+
+            else -> transactionsFeedUiState.value?.let {
                 TransactionsFeed(
                     it,
-                    feedState.latestRoundUpCutoffTimestamp
+                    transactionsFeedUiState.latestRoundUpCutoffTimestamp
                 )
             }
         }

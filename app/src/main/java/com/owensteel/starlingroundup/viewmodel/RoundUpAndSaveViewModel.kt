@@ -6,7 +6,6 @@ import androidx.compose.runtime.MutableState
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.owensteel.starlingroundup.data.local.RoundUpCutoffTimestampStore
-import com.owensteel.starlingroundup.data.local.SecureTokenStore
 import com.owensteel.starlingroundup.model.AccountHolderIndividualResponse
 import com.owensteel.starlingroundup.model.AccountResponse
 import com.owensteel.starlingroundup.model.CreateSavingsGoalRequest
@@ -32,7 +31,6 @@ import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Currency
-import java.util.Locale
 import java.util.UUID
 import javax.inject.Inject
 
@@ -67,8 +65,8 @@ class RoundUpAndSaveViewModel @Inject constructor(
     )
     val roundUpAmountState: StateFlow<Money> = _roundUpAmountState
 
-    private val _feedState = MutableStateFlow(FeedUiState())
-    val feedState: StateFlow<FeedUiState> = _feedState
+    private val _feedState = MutableStateFlow(TransactionsFeedUiState())
+    val feedState: StateFlow<TransactionsFeedUiState> = _feedState
 
     private val _savingsGoalsModalUiState = MutableStateFlow(SavingsGoalsModalUiState())
     val savingsGoalsModalUiState: StateFlow<SavingsGoalsModalUiState> = _savingsGoalsModalUiState
@@ -404,7 +402,7 @@ data class SavingsGoalsModalUiState(
     val hasTransferError: Boolean = false
 )
 
-data class FeedUiState(
+data class TransactionsFeedUiState(
     val value: List<Transaction>? = null,
     val latestRoundUpCutoffTimestamp: String = roundUpCutoffTimestampFallback,
     val isLoading: Boolean = true,

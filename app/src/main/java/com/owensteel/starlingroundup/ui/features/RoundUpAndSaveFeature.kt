@@ -21,7 +21,7 @@ import com.owensteel.starlingroundup.model.Money
 import com.owensteel.starlingroundup.ui.components.AppButton
 import com.owensteel.starlingroundup.ui.theme.AccessibleGrey
 import com.owensteel.starlingroundup.util.DateTimeUtils
-import com.owensteel.starlingroundup.viewmodel.FeedUiState
+import com.owensteel.starlingroundup.viewmodel.TransactionsFeedUiState
 import com.owensteel.starlingroundup.viewmodel.RoundUpAndSaveViewModel
 
 /*
@@ -39,7 +39,7 @@ fun RoundUpAndSaveFeature(
     roundUpAmount: Money,
     accountHolderName: String,
     showTransferToSavingsSheet: MutableState<Boolean>,
-    feedState: FeedUiState
+    feedState: TransactionsFeedUiState
 ) {
     Column(
         modifier = Modifier
