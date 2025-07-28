@@ -79,8 +79,11 @@ import com.owensteel.starlingroundup.viewmodel.FeedUiState
 import com.owensteel.starlingroundup.viewmodel.RoundUpAndSaveViewModel
 import com.owensteel.starlingroundup.viewmodel.SavingsGoalsModalUiState
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
 import java.time.Instant
+import java.time.ZoneId
 import java.util.Currency
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -335,22 +338,58 @@ fun TransactionsFeedLazyColumn(
                 .padding(15.dp)
         )
     } else {
-        // Transactions scroller
+        // We want to tell the user which transactions have been rounded-up already
         val latestRoundUpCutoffTimestampAsInstant = Instant.parse(latestRoundUpCutoffTimestamp)
+
+        // Group transactions by weekday
+        val transactionsGrouped = transactionsList.groupBy { transaction ->
+            val transactionTimeAsInstantZoned =
+                Instant.parse(transaction.transactionTime).atZone(ZoneId.systemDefault())
+            val transactionDayOfWeek = transactionTimeAsInstantZoned.dayOfWeek
+            val dayWithSuffix =
+                DateTimeUtils.getDayWithSuffix(transactionTimeAsInstantZoned.dayOfMonth)
+
+            // Lambda implicit return
+            "$transactionDayOfWeek $dayWithSuffix"
+        }
+
+        // Transactions scroller
         LazyColumn {
             // Transaction list headers
             stickyHeader {
                 TransactionHeaderRow()
             }
-            // Render the list of transactions
-            items(transactionsList) { transaction ->
-                TransactionRow(
-                    transaction,
-                    // If the transaction is before the latest round-up
-                    // cutoff timestamp, assume it has already been part
-                    // of a round-up total
-                    (Instant.parse(transaction.transactionTime) <= latestRoundUpCutoffTimestampAsInstant)
-                )
+
+            // Render the list of transactions in groups
+            transactionsGrouped.forEach { (headerLabel, transactions) ->
+                // Weekday header
+                item {
+                    Row {
+                        // Displays weekday and day of month
+                        // e.g. "Monday 23rd"
+                        Text(
+                            headerLabel.uppercase(),
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(15.dp),
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                }
+                // Transactions for this weekday
+                items(transactions) { transaction ->
+                    val transactionTimeAsInstant = Instant.parse(transaction.transactionTime)
+                    // Display transaction row
+                    TransactionRow(
+                        transaction,
+                        // If the transaction is before the latest round-up
+                        // cutoff timestamp, assume it has already been part
+                        // of a round-up total
+                        (transactionTimeAsInstant <= latestRoundUpCutoffTimestampAsInstant)
+                    )
+                }
             }
         }
     }
