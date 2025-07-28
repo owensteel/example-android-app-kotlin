@@ -65,8 +65,8 @@ class RoundUpAndSaveViewModel @Inject constructor(
     )
     val roundUpAmountState: StateFlow<Money> = _roundUpAmountState
 
-    private val _feedState = MutableStateFlow(TransactionsFeedUiState())
-    val feedState: StateFlow<TransactionsFeedUiState> = _feedState
+    private val _transactionsFeedUiState = MutableStateFlow(TransactionsFeedUiState())
+    val transactionsFeedUiState: StateFlow<TransactionsFeedUiState> = _transactionsFeedUiState
 
     private val _savingsGoalsModalUiState = MutableStateFlow(SavingsGoalsModalUiState())
     val savingsGoalsModalUiState: StateFlow<SavingsGoalsModalUiState> = _savingsGoalsModalUiState
@@ -149,7 +149,7 @@ class RoundUpAndSaveViewModel @Inject constructor(
         if (accountUid == null || categoryUid == null) return
 
         viewModelScope.launch {
-            _feedState.value = _feedState.value.copy(
+            _transactionsFeedUiState.value = _transactionsFeedUiState.value.copy(
                 value = null,
                 isLoading = true,
                 hasError = false
@@ -169,7 +169,7 @@ class RoundUpAndSaveViewModel @Inject constructor(
                 calculateAndDisplayRoundUp(transactions)
 
                 // Feed UI
-                _feedState.value = _feedState.value.copy(
+                _transactionsFeedUiState.value = _transactionsFeedUiState.value.copy(
                     value = transactions,
                     latestRoundUpCutoffTimestamp = getLatestRoundUpCutoffTimestamp(),
                     isLoading = false,
@@ -177,7 +177,7 @@ class RoundUpAndSaveViewModel @Inject constructor(
                 )
             } else {
                 // Error loading transactions feed
-                _feedState.value = _feedState.value.copy(
+                _transactionsFeedUiState.value = _transactionsFeedUiState.value.copy(
                     value = null,
                     isLoading = false,
                     hasError = true

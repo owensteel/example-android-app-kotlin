@@ -45,7 +45,7 @@ fun RoundUpAndSaveScreen(
     val hasInitialisedDataState by viewModel.hasInitialisedDataState.collectAsState()
     val roundUpAmount by viewModel.roundUpAmountState.collectAsState()
     val accountHolderName by viewModel.accountHolderNameState.collectAsState()
-    val feedState by viewModel.feedState.collectAsState()
+    val transactionsFeedUiState by viewModel.transactionsFeedUiState.collectAsState()
     val savingsGoalsModalUiState by viewModel.savingsGoalsModalUiState.collectAsState()
 
     // Transfer to Savings Goal modal
@@ -117,14 +117,14 @@ fun RoundUpAndSaveScreen(
                     showTransferToSavingsSheet = showTransferToSavingsSheet,
                     // Used for getting the last
                     // round-up timestamp when ready
-                    feedState = feedState
+                    transactionsFeedUiState = transactionsFeedUiState
                 )
                 HorizontalDivider(
                     modifier = Modifier
                         .padding(0.dp, 15.dp)
                 )
                 TransactionsFeedFeature(
-                    feedState = feedState
+                    transactionsFeedUiState = transactionsFeedUiState
                 )
             } else {
                 // Placeholder container

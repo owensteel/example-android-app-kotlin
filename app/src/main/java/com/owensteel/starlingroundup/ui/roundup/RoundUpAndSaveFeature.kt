@@ -39,7 +39,7 @@ fun RoundUpAndSaveFeature(
     roundUpAmount: Money,
     accountHolderName: String,
     showTransferToSavingsSheet: MutableState<Boolean>,
-    feedState: TransactionsFeedUiState
+    transactionsFeedUiState: TransactionsFeedUiState
 ) {
     Column(
         modifier = Modifier
@@ -82,12 +82,12 @@ fun RoundUpAndSaveFeature(
 
         // Only get timestamp when we know it has been
         // initialised and won't be the fallback
-        if (!feedState.isLoading) {
+        if (!transactionsFeedUiState.isLoading) {
             Text(
                 text = stringResource(
                     R.string.main_feature_last_round_up,
                     DateTimeUtils.timeSince(
-                        feedState.latestRoundUpCutoffTimestamp
+                        transactionsFeedUiState.latestRoundUpCutoffTimestamp
                     )
                 ),
                 color = AccessibleGrey,
