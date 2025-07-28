@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -25,11 +26,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -80,6 +84,8 @@ import com.owensteel.starlingroundup.viewmodel.RoundUpAndSaveViewModel
 import com.owensteel.starlingroundup.viewmodel.SavingsGoalsModalUiState
 import kotlinx.coroutines.launch
 import java.time.Instant
+import java.util.Currency
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -584,7 +590,7 @@ fun TransferSavingsModalSheet(
             onDismiss = {
                 showCreateAndTransferToNewSavingsGoalDialog.value = false
             },
-            onConfirm = { goalName: String, goalTarget: Long ->
+            onConfirm = { goalName: String, goalTarget: Money ->
                 showCreateAndTransferToNewSavingsGoalDialog.value = false
                 // Request create and transfer
                 viewModel.createAndTransferToNewSavingsGoal(
@@ -710,12 +716,21 @@ fun SavingsGoalRow(
 @Composable
 fun CreateAndTransferToNewSavingsGoalDialog(
     onDismiss: () -> Unit,
-    onConfirm: (String, Long) -> Unit
+    onConfirm: (String, Money) -> Unit
 ) {
     val goalNameValue = remember { mutableStateOf("") }
     val goalTargetValue = remember { mutableStateOf("0.00") }
 
     val dialogErrorMessageStringResourceId = remember { mutableStateOf<Int?>(null) }
+
+    val currencySelectorExpanded = remember { mutableStateOf(false) }
+    // Get currencies by available locales, instead of all "available
+    // currencies", which returns legacy and unsupported currencies
+    val currencySelectorOptions: Set<Currency> = Locale.getAvailableLocales().mapNotNull { locale ->
+        runCatching { Currency.getInstance(locale) }.getOrNull()
+    }.toSet()
+    val selectedCurrencyOption =
+        remember { mutableStateOf(Currency.getInstance(Locale.getDefault())) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -731,7 +746,12 @@ fun CreateAndTransferToNewSavingsGoalDialog(
                     } else {
                         if (goalNameValue.value.isNotBlank()) {
                             val goalTargetNumberLong: Long = (goalTargetNumberDouble * 100).toLong()
-                            onConfirm(goalNameValue.value, goalTargetNumberLong)
+                            onConfirm(
+                                goalNameValue.value, Money(
+                                    selectedCurrencyOption.value.currencyCode,
+                                    goalTargetNumberLong
+                                )
+                            )
                         } else {
                             // Invalid goal name
                             dialogErrorMessageStringResourceId.value =
@@ -760,10 +780,40 @@ fun CreateAndTransferToNewSavingsGoalDialog(
                     singleLine = true
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                CurrencyTextField(
-                    valueState = goalTargetValue,
-                    label = stringResource(R.string.create_savings_goal_dialog_goal_target_input_label)
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedButton(onClick = { currencySelectorExpanded.value = true }) {
+                        Text(selectedCurrencyOption.value.currencyCode)
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    DropdownMenu(
+                        expanded = currencySelectorExpanded.value,
+                        onDismissRequest = { currencySelectorExpanded.value = false },
+                        modifier = Modifier
+                            .heightIn(max = 300.dp)
+                    ) {
+                        currencySelectorOptions.forEach { currencySelectorOption ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        "${currencySelectorOption.currencyCode} (${currencySelectorOption.displayName})"
+                                    )
+                                },
+                                onClick = {
+                                    selectedCurrencyOption.value = currencySelectorOption
+                                    currencySelectorExpanded.value = false
+                                }
+                            )
+                        }
+                    }
+                    CurrencyTextField(
+                        valueState = goalTargetValue,
+                        label = stringResource(R.string.create_savings_goal_dialog_goal_target_input_label),
+                        modifier = Modifier
+                            .weight(1f)
+                    )
+                }
                 // Inline error message for invalid input
                 if (dialogErrorMessageStringResourceId.value != null) {
                     Text(

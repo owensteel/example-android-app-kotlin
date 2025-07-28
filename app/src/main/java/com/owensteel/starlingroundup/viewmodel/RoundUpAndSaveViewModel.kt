@@ -251,10 +251,10 @@ class RoundUpAndSaveViewModel @Inject constructor(
     // 3.5. Create a new Savings Goal and transfer to that
     fun createAndTransferToNewSavingsGoal(
         savingsGoalName: String,
-        savingsGoalTargetMinorUnits: Long,
+        savingsGoalTarget: Money,
         showTransferToSavingsSheet: MutableState<Boolean>
     ) {
-        if (accountUid == null || accountCurrency == null) return
+        if (accountUid == null) return
 
         viewModelScope.launch {
             // Show spinner in UI in case API hangs
@@ -265,11 +265,8 @@ class RoundUpAndSaveViewModel @Inject constructor(
 
             val createSavingsGoalRequest = CreateSavingsGoalRequest(
                 name = savingsGoalName,
-                currency = accountCurrency!!,
-                target = Money(
-                    accountCurrency!!,
-                    savingsGoalTargetMinorUnits
-                ),
+                currency = savingsGoalTarget.currency,
+                target = savingsGoalTarget,
                 base64EncodedPhoto = null
             )
             val createSavingsGoalResponse: Response<CreateSavingsGoalResponse> =
