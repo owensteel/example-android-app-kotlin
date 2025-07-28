@@ -3,12 +3,10 @@ package com.owensteel.starlingroundup.data.local
 import android.content.Context
 import androidx.datastore.preferences.core.byteArrayPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.ACCESS_TOKEN_EXPIRY
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.ACCESS_TOKEN_IV
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.ENCRYPTED_ACCESS_TOKEN
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.ENCRYPTED_REFRESH_TOKEN
-import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.LATEST_ROUNDUP_CUTOFF_TIMESTAMP
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.REFRESH_TOKEN_EXPIRY
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.REFRESH_TOKEN_IV
 
@@ -106,19 +104,6 @@ class SecureTokenStore(
 
     suspend fun getAccessTokenExpiryTime(): Long? {
         return dataStoreManager.read(longPreferencesKey(ACCESS_TOKEN_EXPIRY))
-    }
-
-    // TODO: Separate when DataStore access is centralised
-
-    suspend fun saveLatestRoundUpCutoffTimestamp(cutoffTimestamp: String) {
-        dataStoreManager.write(
-            stringPreferencesKey(LATEST_ROUNDUP_CUTOFF_TIMESTAMP),
-            cutoffTimestamp
-        )
-    }
-
-    suspend fun getLatestRoundUpCutOffTimestamp(): String? {
-        return dataStoreManager.read(stringPreferencesKey(LATEST_ROUNDUP_CUTOFF_TIMESTAMP))
     }
 
 }
