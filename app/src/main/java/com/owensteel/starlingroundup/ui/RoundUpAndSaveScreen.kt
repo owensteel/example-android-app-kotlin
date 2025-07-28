@@ -80,6 +80,7 @@ import com.owensteel.starlingroundup.viewmodel.RoundUpAndSaveViewModel
 import com.owensteel.starlingroundup.viewmodel.SavingsGoalsModalUiState
 import kotlinx.coroutines.launch
 import java.time.Instant
+import java.util.Currency
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -508,6 +509,7 @@ fun TransferSavingsModalSheet(
     amount: String,
     viewModel: RoundUpAndSaveViewModel
 ) {
+    val accountCurrency by viewModel.accountCurrencyState.collectAsState()
     val showCreateAndTransferToNewSavingsGoalDialog = remember { mutableStateOf(false) }
 
     ModalBottomSheet(
@@ -579,7 +581,7 @@ fun TransferSavingsModalSheet(
         }
     }
 
-    if (showCreateAndTransferToNewSavingsGoalDialog.value) {
+    if (showCreateAndTransferToNewSavingsGoalDialog.value && accountCurrency != null) {
         CreateAndTransferToNewSavingsGoalDialog(
             onDismiss = {
                 showCreateAndTransferToNewSavingsGoalDialog.value = false
@@ -590,7 +592,8 @@ fun TransferSavingsModalSheet(
                 viewModel.createAndTransferToNewSavingsGoal(
                     goalName, goalTarget, showTransferToSavingsSheet
                 )
-            }
+            },
+            accountCurrency = accountCurrency!!
         )
     }
 }
@@ -710,7 +713,8 @@ fun SavingsGoalRow(
 @Composable
 fun CreateAndTransferToNewSavingsGoalDialog(
     onDismiss: () -> Unit,
-    onConfirm: (String, Long) -> Unit
+    onConfirm: (String, Long) -> Unit,
+    accountCurrency: Currency
 ) {
     val goalNameValue = remember { mutableStateOf("") }
     val goalTargetValue = remember { mutableStateOf("0.00") }
@@ -762,7 +766,8 @@ fun CreateAndTransferToNewSavingsGoalDialog(
                 Spacer(modifier = Modifier.height(8.dp))
                 CurrencyTextField(
                     valueState = goalTargetValue,
-                    label = stringResource(R.string.create_savings_goal_dialog_goal_target_input_label)
+                    label = stringResource(R.string.create_savings_goal_dialog_goal_target_input_label),
+                    currency = accountCurrency
                 )
                 // Inline error message for invalid input
                 if (dialogErrorMessageStringResourceId.value != null) {

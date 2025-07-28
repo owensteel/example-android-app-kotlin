@@ -4,12 +4,14 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import java.util.Currency
 import java.util.Locale
 
 @Composable
 fun CurrencyTextField(
     valueState: MutableState<String>,
-    label: String
+    label: String,
+    currency: Currency
 ) {
     OutlinedTextField(
         value = valueState.value,
@@ -32,6 +34,7 @@ fun CurrencyTextField(
             // Ignores invalid, e.g. "1.0.0"
         },
         label = { Text(label) },
-        singleLine = true
+        singleLine = true,
+        leadingIcon = { Text(currency.getSymbol(Locale.getDefault())) }
     )
 }

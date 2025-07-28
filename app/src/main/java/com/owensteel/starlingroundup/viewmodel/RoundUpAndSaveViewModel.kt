@@ -30,6 +30,8 @@ import retrofit2.Response
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.util.Currency
+import java.util.Locale
 import java.util.UUID
 import javax.inject.Inject
 
@@ -73,6 +75,9 @@ class RoundUpAndSaveViewModel @Inject constructor(
     private val _accountHolderNameState = MutableStateFlow("")
     val accountHolderNameState: StateFlow<String> = _accountHolderNameState
 
+    private val _accountCurrencyState = MutableStateFlow<Currency?>(null)
+    val accountCurrencyState: StateFlow<Currency?> = _accountCurrencyState
+
     // Handle an error occurring during initialisation of
     // account data
     private fun handleInitialisationError(responseCode: Int) {
@@ -101,6 +106,8 @@ class RoundUpAndSaveViewModel @Inject constructor(
                     accountUid = account.accountUid
                     categoryUid = account.defaultCategory
                     accountCurrency = account.currency
+
+                    _accountCurrencyState.value = Currency.getInstance(accountCurrency)
 
                     // Get account holder details
                     fetchAccountHolderDetails(context)
