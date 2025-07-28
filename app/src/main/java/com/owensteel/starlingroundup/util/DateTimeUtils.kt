@@ -2,6 +2,7 @@ package com.owensteel.starlingroundup.util
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.owensteel.starlingroundup.R
 import java.time.Duration
 import java.time.Instant
@@ -73,17 +74,18 @@ object DateTimeUtils {
     }
 
     // Get day of month, with suffix
+    @Composable
     fun getDayWithSuffix(day: Int): String {
         if (day !in 1..31) throw IllegalArgumentException("Day must be between 1 and 31")
 
         val suffix = when {
-            day in 11..13 -> "th"
-            day % 10 == 1 -> "st"
-            day % 10 == 2 -> "nd"
-            day % 10 == 3 -> "rd"
-            else -> "th"
+            day in 11..13 -> stringResource(R.string.day_suffix_th)
+            day % 10 == 1 -> stringResource(R.string.day_suffix_st)
+            day % 10 == 2 -> stringResource(R.string.day_suffix_nd)
+            day % 10 == 3 -> stringResource(R.string.day_suffix_rd)
+            else -> stringResource(R.string.day_suffix_th)
         }
 
-        return "$day$suffix"
+        return stringResource(R.string.day_with_suffix, day, suffix)
     }
 }

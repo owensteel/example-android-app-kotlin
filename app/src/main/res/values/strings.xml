@@ -36,7 +36,15 @@
     <string name="transaction_outgoing_symbol" translatable="false">-</string>
     <string name="transaction_ingoing_symbol" translatable="false">+</string>
     <string name="dialog_button_cancel">Cancel</string>
+
+    <!-- Date & Time Utils -->
     <string name="date_time_since_just_now">just now</string>
+
+    <string name="day_suffix_st">st</string>
+    <string name="day_suffix_nd">nd</string>
+    <string name="day_suffix_rd">rd</string>
+    <string name="day_suffix_th">th</string>
+    <string name="day_with_suffix">%1$d%2$s</string>
 
     <!-- Error messages -->
     <string name="error_could_not_fetch_data">Sorry, we could not fetch your data at this time (Error code %1$s).</string>
