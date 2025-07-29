@@ -191,9 +191,7 @@ fun SavingsGoalRow(
             .clickable {
                 // User selects this savings
                 // goal to transfer to
-                viewModel.transferToGoal(
-                    savingsGoal.savingsGoalUid
-                )
+                viewModel.transferToGoal(savingsGoal)
             },
         verticalAlignment = Alignment.CenterVertically
     ) {

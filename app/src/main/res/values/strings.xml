@@ -32,10 +32,14 @@
     <string name="create_savings_goal_dialog_error_invalid_target">Please enter a valid currency amount for the Savings Goal Target.</string>
     <string name="create_savings_goal_dialog_error_invalid_name">Please enter a name for the Savings Goal.</string>
 
+    <!-- Round-up Transfer Complete dialog -->
+    <string name="roundup_transfer_complete_dialog">Your Round Up Total of %1$s has been successfully transferred to %2$s!</string>
+
     <!-- Generic -->
     <string name="transaction_outgoing_symbol" translatable="false">-</string>
     <string name="transaction_ingoing_symbol" translatable="false">+</string>
     <string name="dialog_button_cancel">Cancel</string>
+    <string name="dialog_button_ok">OK</string>
 
     <!-- Date & Time Utils -->
     <string name="date_time_since_just_now">just now</string>

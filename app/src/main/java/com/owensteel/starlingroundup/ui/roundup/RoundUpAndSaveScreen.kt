@@ -155,5 +155,17 @@ fun RoundUpAndSaveScreen(
                 modifier = Modifier.align(Alignment.TopCenter)
             )
         }
+
+        // Dialogs
+        if (uiState.showRoundUpTransferCompleteDialog) {
+
+            RoundUpTransferCompleteDialog(
+                uiState = uiState,
+                onDismiss = {
+                    viewModel.showRoundUpTransferCompleteDialog(false)
+                }
+            )
+
+        }
     }
 }

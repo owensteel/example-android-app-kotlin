@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.owensteel.starlingroundup.data.local.RoundUpCutoffTimestampStore
 import com.owensteel.starlingroundup.model.AccountDetails
 import com.owensteel.starlingroundup.model.Money
+import com.owensteel.starlingroundup.model.SavingsGoal
 import com.owensteel.starlingroundup.model.Transaction
 import com.owensteel.starlingroundup.model.uistates.RoundUpUiError
 import com.owensteel.starlingroundup.model.uistates.RoundUpUiState
@@ -146,7 +147,9 @@ class RoundUpAndSaveViewModel @Inject constructor(
         roundUpCutoffTimestampStore.saveLatestRoundUpCutoffTimestamp(
             cachedTransactions.first().transactionTime
         )
-        // Refresh transactions for UX
+        // UX: show "successfully transferred!" dialog
+        showRoundUpTransferCompleteDialog(true)
+        // UX: refresh transactions
         refreshTransactionsAndRoundUp()
         _uiState.update { it.copy(showModal = false) }
     }
@@ -157,6 +160,11 @@ class RoundUpAndSaveViewModel @Inject constructor(
                 return@launch
             }
 
+            val roundUpTotalAsMoney = Money(
+                currency!!.currencyCode,
+                lastRoundUpTotal
+            )
+
             val createAndTransferResult = transferToSavingsGoal.createAndTransferToNewSavingsGoal(
                 accountUid!!,
                 name,
@@ -164,12 +172,15 @@ class RoundUpAndSaveViewModel @Inject constructor(
                     currency!!.currencyCode,
                     targetMinorUnits
                 ),
-                Money(
-                    currency!!.currencyCode,
-                    lastRoundUpTotal
-                )
+                roundUpTotalAsMoney
             )
             if (createAndTransferResult.isSuccess) {
+                _uiState.update {
+                    it.copy(
+                        roundUpTransferCompleteDialogChosenSavingsGoalName = name,
+                        roundUpTransferCompleteDialogRoundUpTotal = roundUpTotalAsMoney
+                    )
+                }
                 recordAndHandleCompletedRoundUpTransfer()
             } else {
                 _uiState.update { it.copy(error = RoundUpUiError.Transfer) }
@@ -177,21 +188,29 @@ class RoundUpAndSaveViewModel @Inject constructor(
         }
     }
 
-    fun transferToGoal(goalUid: String) {
+    fun transferToGoal(goal: SavingsGoal) {
         viewModelScope.launch {
             if (accountUid == null || currency == null) {
                 return@launch
             }
 
+            val roundUpTotalAsMoney = Money(
+                currency!!.currencyCode,
+                lastRoundUpTotal
+            )
+
             val transferResult = transferToSavingsGoal.transferToSavingsGoal(
                 accountUid!!,
-                goalUid,
-                Money(
-                    currency!!.currencyCode,
-                    lastRoundUpTotal
-                )
+                goal.savingsGoalUid,
+                roundUpTotalAsMoney
             )
             if (transferResult.isSuccess) {
+                _uiState.update {
+                    it.copy(
+                        roundUpTransferCompleteDialogChosenSavingsGoalName = goal.name,
+                        roundUpTransferCompleteDialogRoundUpTotal = roundUpTotalAsMoney
+                    )
+                }
                 recordAndHandleCompletedRoundUpTransfer()
             } else {
                 _uiState.update { it.copy(error = RoundUpUiError.Transfer) }
@@ -201,6 +220,10 @@ class RoundUpAndSaveViewModel @Inject constructor(
 
     fun showModal(show: Boolean) {
         _uiState.update { it.copy(showModal = show) }
+    }
+
+    fun showRoundUpTransferCompleteDialog(show: Boolean) {
+        _uiState.update { it.copy(showRoundUpTransferCompleteDialog = show) }
     }
 
     fun dismissError() {
