@@ -12,7 +12,7 @@ plugins {
 // Get secret keys from local properties
 val localProperties = Properties()
 val localFile = rootProject.file("local.properties")
-if(localFile.exists()){
+if (localFile.exists()) {
     localFile.inputStream().use { localProperties.load(it) }
 }
 val clientId = localProperties["starling.clientId"] as String? ?: ""
@@ -60,6 +60,7 @@ android {
     }
 }
 
+val mockitoAgent = configurations.create("mockitoAgent")
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -107,8 +108,13 @@ dependencies {
     // Testing
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.mockito.inline)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.turbine)
     testImplementation(libs.junit)
 
+    mockitoAgent(libs.mockito.core) { isTransitive = false }
+}
+tasks.withType<Test>().configureEach {
+    jvmArgs("-javaagent:${mockitoAgent.asPath}")
 }
