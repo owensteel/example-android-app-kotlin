@@ -78,16 +78,18 @@ fun RoundUpAndSaveFeature(
             enabled = roundUpAmount.minorUnits > 0L
         )
 
-        Text(
-            text = stringResource(
-                R.string.main_feature_last_round_up,
-                DateTimeUtils.timeSince(
-                    uiState.cutoffTimestamp
-                )
-            ),
-            color = AccessibleGrey,
-            style = MaterialTheme.typography.bodySmall,
-            fontStyle = FontStyle.Italic
-        )
+        if(uiState.cutoffTimestamp.isNotBlank()) {
+            Text(
+                text = stringResource(
+                    R.string.main_feature_last_round_up,
+                    DateTimeUtils.timeSince(
+                        uiState.cutoffTimestamp
+                    )
+                ),
+                color = AccessibleGrey,
+                style = MaterialTheme.typography.bodySmall,
+                fontStyle = FontStyle.Italic
+            )
+        }
     }
 }
