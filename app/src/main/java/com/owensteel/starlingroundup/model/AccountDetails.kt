@@ -1,4 +1,4 @@
-package com.owensteel.starlingroundup.domain.model
+package com.owensteel.starlingroundup.model
 
 import java.util.Currency
 

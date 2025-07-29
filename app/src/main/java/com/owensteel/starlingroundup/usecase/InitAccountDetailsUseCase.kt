@@ -1,7 +1,7 @@
 package com.owensteel.starlingroundup.usecase
 
 import com.owensteel.starlingroundup.di.IoDispatcher
-import com.owensteel.starlingroundup.domain.model.AccountDetails
+import com.owensteel.starlingroundup.model.AccountDetails
 import com.owensteel.starlingroundup.domain.repository.AccountRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext

@@ -3,7 +3,7 @@ package com.owensteel.starlingroundup.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.owensteel.starlingroundup.data.local.RoundUpCutoffTimestampStore
-import com.owensteel.starlingroundup.domain.model.AccountDetails
+import com.owensteel.starlingroundup.model.AccountDetails
 import com.owensteel.starlingroundup.model.Money
 import com.owensteel.starlingroundup.model.Transaction
 import com.owensteel.starlingroundup.model.uistates.RoundUpUiError
