@@ -8,5 +8,6 @@
         <pin-set expiration="2025-12-15">
             <pin digest="SHA-256">QX3C0KaQ0UUy8OZDUH+92efaoBtMSSBVuYXvXs+4ud4=</pin>
         </pin-set>
+        <!-- Should also have a backup pin, but backup cert is not known at this time -->
     </domain-config>
 </network-security-config>
