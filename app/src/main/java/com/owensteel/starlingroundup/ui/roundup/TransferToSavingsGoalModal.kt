@@ -34,7 +34,7 @@ import com.owensteel.starlingroundup.model.SavingsGoal
 import com.owensteel.starlingroundup.model.uistates.RoundUpUiError
 import com.owensteel.starlingroundup.model.uistates.RoundUpUiState
 import com.owensteel.starlingroundup.ui.components.AppButton
-import com.owensteel.starlingroundup.ui.dialogs.CreateNewSavingsGoalDialog
+import com.owensteel.starlingroundup.ui.dialogs.NewSavingsGoalDialog
 import com.owensteel.starlingroundup.ui.theme.AccessibleGrey
 import com.owensteel.starlingroundup.viewmodel.RoundUpAndSaveViewModel
 
@@ -124,7 +124,7 @@ fun TransferToSavingsGoalModal(
     }
 
     if (showCreateAndTransferToNewSavingsGoalDialog.value && uiState.accountCurrency != null) {
-        CreateNewSavingsGoalDialog(
+        NewSavingsGoalDialog(
             onDismiss = {
                 showCreateAndTransferToNewSavingsGoalDialog.value = false
             },

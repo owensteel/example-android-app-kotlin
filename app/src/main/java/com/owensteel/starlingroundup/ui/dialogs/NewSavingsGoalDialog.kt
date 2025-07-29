@@ -26,7 +26,7 @@ import java.util.Currency
  */
 
 @Composable
-fun CreateNewSavingsGoalDialog(
+fun NewSavingsGoalDialog(
     onDismiss: () -> Unit,
     onConfirm: (String, Long) -> Unit,
     accountCurrency: Currency
