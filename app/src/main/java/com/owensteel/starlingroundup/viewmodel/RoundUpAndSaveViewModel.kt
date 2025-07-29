@@ -2,12 +2,14 @@ package com.owensteel.starlingroundup.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.owensteel.starlingroundup.data.local.RoundUpCutoffTimestampStore
 import com.owensteel.starlingroundup.domain.model.AccountDetails
 import com.owensteel.starlingroundup.model.Transaction
 import com.owensteel.starlingroundup.model.uistates.RoundUpUiError
 import com.owensteel.starlingroundup.model.uistates.RoundUpUiState
 import com.owensteel.starlingroundup.usecase.FetchTransactionsUseCase
 import com.owensteel.starlingroundup.usecase.InitAccountDetailsUseCase
+import com.owensteel.starlingroundup.usecase.TransferToSavingsGoalUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +21,9 @@ import javax.inject.Inject
 @HiltViewModel
 class RoundUpAndSaveViewModel @Inject constructor(
     private val initAccountDetails: InitAccountDetailsUseCase,
-    private val fetchTransactions: FetchTransactionsUseCase
+    private val fetchTransactions: FetchTransactionsUseCase,
+    private val transferToSavingsGoal: TransferToSavingsGoalUseCase,
+    private val roundUpCutoffTimestampStore: RoundUpCutoffTimestampStore
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RoundUpUiState())
@@ -79,7 +83,7 @@ class RoundUpAndSaveViewModel @Inject constructor(
             val fetchedTransactions = fetchTransactions(uid, catUid)
             cachedTransactions = fetchedTransactions
 
-            val cutoff = transferToSavingsGoal.getLatestCutoffTimestamp()
+            val cutoff = roundUpCutoffTimestampStore.getLatestRoundUpCutOffTimestamp()
             val roundUp = calculateRoundUp(fetchedTransactions, cutoff)
 
             _uiState.update {
