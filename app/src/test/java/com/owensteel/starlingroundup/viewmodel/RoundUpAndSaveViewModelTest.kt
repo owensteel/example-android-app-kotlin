@@ -3,7 +3,9 @@ package com.owensteel.starlingroundup.viewmodel
 import com.owensteel.starlingroundup.data.local.RoundUpCutoffTimestampStore
 import com.owensteel.starlingroundup.model.AccountDetails
 import com.owensteel.starlingroundup.model.Money
+import com.owensteel.starlingroundup.model.SavingsGoal
 import com.owensteel.starlingroundup.model.Transaction
+import com.owensteel.starlingroundup.model.uistates.RoundUpUiError
 import com.owensteel.starlingroundup.testutil.MainDispatcherRule
 import com.owensteel.starlingroundup.usecase.CalculateRoundUpUseCase
 import com.owensteel.starlingroundup.usecase.FetchTransactionsUseCase
@@ -19,6 +21,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -34,6 +37,8 @@ private const val FAKE_ACCOUNT_CURRENCY = "GBP"
 
 private const val FAKE_TRANSACTION_SOURCE = "MASTER_CARD"
 private val FAKE_TRANSACTION_SPENDING_CATEGORY = UUID.randomUUID().toString()
+
+private const val FAKE_SAVINGS_GOAL_STATE = "ACTIVE"
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RoundUpAndSaveViewModelTest {
@@ -137,5 +142,81 @@ class RoundUpAndSaveViewModelTest {
             assertEquals(121L, state.roundUpTotal.minorUnits)
             assertEquals(FAKE_ACCOUNT_CURRENCY, state.roundUpTotal.currency)
         }
+
+    @Test
+    fun `recordAndHandleCompletedRoundUpTransfer stops if transactions feed is empty`() =
+        runTest {
+            val fakeCutoffTimestamp = "2025-01-01T09:30:00Z"
+
+            whenever(fetchTransactions(any(), any())).thenReturn(fakeTransactions)
+            whenever(roundUpCutoffTimestampStore.getLatestRoundUpCutOffTimestamp()).thenReturn(
+                fakeCutoffTimestamp
+            )
+            whenever(calculateRoundUp(fakeTransactions, fakeCutoffTimestamp)).thenReturn(121L)
+
+            viewModel.refreshTransactionsAndRoundUp()
+            advanceUntilIdle()
+
+            val state = viewModel.uiState.value
+            assertFalse(state.showRoundUpTransferCompleteDialog)
+        }
+
+    @Test
+    fun `createGoalAndTransfer success shows dialog and refreshes`() = runTest {
+        // Given
+        val roundUpAmount = 500L
+        val targetAmount = 1000L
+        val goalName = "TestGoal"
+        val roundUpMoney = Money(FAKE_ACCOUNT_CURRENCY, roundUpAmount)
+
+        whenever(
+            transferToSavingsGoal.createAndTransferToNewSavingsGoal(
+                any(), any(), any(), any()
+            )
+        ).thenReturn(Result.success(Unit))
+        whenever(fetchTransactions(any(), any())).thenReturn(fakeTransactions)
+        whenever(roundUpCutoffTimestampStore.saveLatestRoundUpCutoffTimestamp(any())).thenReturn(
+            Unit
+        )
+        whenever(calculateRoundUp(any(), any())).thenReturn(roundUpAmount)
+
+        // Simulate existing round-up state
+        viewModel.refreshTransactionsAndRoundUp()
+        advanceUntilIdle()
+        viewModel.createGoalAndTransfer(goalName, targetAmount)
+        advanceUntilIdle()
+
+        // Then
+        val state = viewModel.uiState.value
+        assertTrue(state.showRoundUpTransferCompleteDialog)
+        assertEquals(goalName, state.roundUpTransferCompleteDialogChosenSavingsGoalName)
+        assertEquals(roundUpMoney, state.roundUpTransferCompleteDialogRoundUpTotal)
+    }
+
+    @Test
+    fun `transferToGoal failure sets transfer error`() = runTest {
+        // Given
+        val goal = SavingsGoal(
+            savingsGoalUid = UUID.randomUUID().toString(),
+            name = "TestGoal",
+            target = Money(FAKE_ACCOUNT_CURRENCY, 1000L),
+            totalSaved = Money(FAKE_ACCOUNT_CURRENCY, 500L),
+            savedPercentage = 50,
+            state = FAKE_SAVINGS_GOAL_STATE
+        )
+        whenever(
+            transferToSavingsGoal.transferToSavingsGoal(
+                any(),
+                any(),
+                any()
+            )
+        ).thenReturn(Result.failure(Exception("Simulated transfer failure")))
+
+        viewModel.transferToGoal(goal)
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals(RoundUpUiError.Transfer, state.error)
+    }
 
 }
