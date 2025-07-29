@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import com.owensteel.starlingroundup.util.SharedConstants.DATASTORE_NAME
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
+import javax.inject.Inject
 
 /*
 
@@ -14,7 +16,9 @@ import kotlinx.coroutines.flow.first
 
 private val Context.dataStore by preferencesDataStore(DATASTORE_NAME)
 
-class DataStoreManager(private val context: Context) {
+class DataStoreManager @Inject constructor(
+    @ApplicationContext private val context: Context
+) {
 
     suspend fun <T> write(key: Preferences.Key<T>, value: T) {
         context.dataStore.edit { prefs -> prefs[key] = value }
