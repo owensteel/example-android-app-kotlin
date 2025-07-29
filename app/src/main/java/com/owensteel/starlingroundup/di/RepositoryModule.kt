@@ -2,6 +2,8 @@ package com.owensteel.starlingroundup.di
 
 import com.owensteel.starlingroundup.domain.repository.AccountRepository
 import com.owensteel.starlingroundup.domain.repository.AccountRepositoryImpl
+import com.owensteel.starlingroundup.domain.repository.SavingsGoalRepository
+import com.owensteel.starlingroundup.domain.repository.SavingsGoalRepositoryImpl
 import com.owensteel.starlingroundup.domain.repository.TransactionsRepository
 import com.owensteel.starlingroundup.domain.repository.TransactionsRepositoryImpl
 import dagger.Binds
@@ -25,5 +27,11 @@ abstract class RepositoryModule {
     abstract fun bindTransactionsRepository(
         impl: TransactionsRepositoryImpl
     ): TransactionsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSavingsGoalRepository(
+        impl: SavingsGoalRepositoryImpl
+    ): SavingsGoalRepository
 
 }
