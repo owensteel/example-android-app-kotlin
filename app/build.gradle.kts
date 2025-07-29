@@ -104,4 +104,11 @@ dependencies {
     // Hilt + Compose integration
     implementation(libs.androidx.hilt.navigation.compose)
 
+    // Testing
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
+    testImplementation(libs.junit)
+
 }
