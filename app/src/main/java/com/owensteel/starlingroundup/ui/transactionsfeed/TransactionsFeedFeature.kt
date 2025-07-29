@@ -15,7 +15,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.owensteel.starlingroundup.R
-import com.owensteel.starlingroundup.viewmodel.TransactionsFeedUiState
+import com.owensteel.starlingroundup.model.uistates.RoundUpUiError
+import com.owensteel.starlingroundup.model.uistates.RoundUpUiState
 
 /*
 
@@ -26,7 +27,7 @@ import com.owensteel.starlingroundup.viewmodel.TransactionsFeedUiState
 
 @Composable
 fun TransactionsFeedFeature(
-    transactionsFeedUiState: TransactionsFeedUiState
+    roundUpUiState: RoundUpUiState
 ) {
     Column(
         modifier = Modifier
@@ -46,19 +47,17 @@ fun TransactionsFeedFeature(
                 .fillMaxWidth(),
         )
         when {
-            transactionsFeedUiState.isLoading -> CircularProgressIndicator(
+            roundUpUiState.isLoadingTransactionsFeed -> CircularProgressIndicator(
                 modifier = Modifier
                     .padding(15.dp)
             )
 
-            transactionsFeedUiState.hasError -> Text(stringResource(R.string.transactions_list_load_error))
+            (roundUpUiState.error is RoundUpUiError.TransactionsFeed) -> Text(stringResource(R.string.transactions_list_load_error))
 
-            else -> transactionsFeedUiState.value?.let {
-                TransactionsFeed(
-                    it,
-                    transactionsFeedUiState.latestRoundUpCutoffTimestamp
-                )
-            }
+            else -> TransactionsFeed(
+                roundUpUiState.transactions,
+                roundUpUiState.cutoffTimestamp
+            )
         }
     }
 }

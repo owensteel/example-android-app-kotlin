@@ -58,7 +58,7 @@ class RoundUpAndSaveViewModel @Inject constructor(
 
     private suspend fun initialise() {
         _uiState.update {
-            it.copy(isLoading = true)
+            it.copy(hasInitialised = false)
         }
 
         val accountResult = initAccountDetails()
@@ -72,13 +72,14 @@ class RoundUpAndSaveViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     accountHolderName = accountDetails.accountHolderName,
-                    isLoading = false
+                    accountCurrency = currency,
+                    hasInitialised = true
                 )
             }
         } else {
             _uiState.update {
                 it.copy(
-                    isLoading = false,
+                    hasInitialised = false,
                     error = RoundUpUiError.Initialisation
                 )
             }
@@ -93,7 +94,7 @@ class RoundUpAndSaveViewModel @Inject constructor(
 
             _uiState.update {
                 it.copy(
-                    isLoading = true
+                    isLoadingTransactionsFeed = true
                 )
             }
 
@@ -113,7 +114,7 @@ class RoundUpAndSaveViewModel @Inject constructor(
                         roundUp
                     ),
                     cutoffTimestamp = cutoff,
-                    isLoading = false
+                    isLoadingTransactionsFeed = false
                 )
             }
         }
@@ -125,12 +126,12 @@ class RoundUpAndSaveViewModel @Inject constructor(
                 return@launch
             }
 
-            _uiState.update { it.copy(isLoading = true) }
+            _uiState.update { it.copy(isLoadingSavingsGoals = true) }
 
             val goals = getSavingsGoals(accountUid!!)
 
             _uiState.update {
-                it.copy(savingsGoals = goals, isLoading = false)
+                it.copy(savingsGoals = goals, isLoadingSavingsGoals = false)
             }
         }
     }
