@@ -136,6 +136,7 @@ class RoundUpAndSaveViewModel @Inject constructor(
         }
     }
 
+    // TODO: is this possibly duplicate of transferToGoal?
     fun createGoalAndTransfer(name: String, targetMinorUnits: Long) {
         viewModelScope.launch {
             if (accountUid == null || currency == null) {
@@ -155,6 +156,14 @@ class RoundUpAndSaveViewModel @Inject constructor(
                 )
             )
             if (createAndTransferResult.isSuccess) {
+                // Record last transaction rounded-up
+                // ("first" is last in the chronological order
+                // of the transactions)
+                roundUpCutoffTimestampStore.saveLatestRoundUpCutoffTimestamp(
+                    cachedTransactions.first().transactionTime
+                )
+
+                // Refresh transactions for UX
                 refreshTransactionsAndRoundUp()
                 _uiState.update { it.copy(showModal = false) }
             } else {
@@ -178,6 +187,14 @@ class RoundUpAndSaveViewModel @Inject constructor(
                 )
             )
             if (transferResult.isSuccess) {
+                // Record last transaction rounded-up
+                // ("first" is last in the chronological order
+                // of the transactions)
+                roundUpCutoffTimestampStore.saveLatestRoundUpCutoffTimestamp(
+                    cachedTransactions.first().transactionTime
+                )
+
+                // Refresh transactions for UX
                 refreshTransactionsAndRoundUp()
                 _uiState.update { it.copy(showModal = false) }
             } else {
