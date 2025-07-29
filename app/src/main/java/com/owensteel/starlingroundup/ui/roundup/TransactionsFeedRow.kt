@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -134,8 +134,8 @@ fun TransactionFeedRow(
                     // Tick icon to show user this round-up has
                     // been transferred
                     Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = Icons.Default.Check.name,
+                        imageVector = Icons.Default.Done,
+                        contentDescription = Icons.Default.Done.name,
                         modifier = Modifier.size(20.dp)
                     )
                 }
