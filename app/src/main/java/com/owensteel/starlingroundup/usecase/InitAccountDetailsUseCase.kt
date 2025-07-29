@@ -1,5 +1,6 @@
 package com.owensteel.starlingroundup.usecase
 
+import com.owensteel.starlingroundup.di.IoDispatcher
 import com.owensteel.starlingroundup.domain.model.AccountDetails
 import com.owensteel.starlingroundup.domain.repository.AccountRepository
 import kotlinx.coroutines.CoroutineDispatcher
@@ -9,7 +10,7 @@ import javax.inject.Inject
 
 class InitAccountDetailsUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
-    private val dispatcher: CoroutineDispatcher
+    @IoDispatcher val dispatcher: CoroutineDispatcher
 ) {
 
     suspend operator fun invoke(): Result<AccountDetails> = withContext(dispatcher) {

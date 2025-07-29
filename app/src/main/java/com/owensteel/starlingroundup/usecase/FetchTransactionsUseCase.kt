@@ -1,5 +1,6 @@
 package com.owensteel.starlingroundup.usecase
 
+import com.owensteel.starlingroundup.di.IoDispatcher
 import com.owensteel.starlingroundup.domain.repository.TransactionsRepository
 import com.owensteel.starlingroundup.model.Transaction
 import kotlinx.coroutines.CoroutineDispatcher
@@ -8,7 +9,7 @@ import javax.inject.Inject
 
 class FetchTransactionsUseCase @Inject constructor(
     private val transactionsRepository: TransactionsRepository,
-    private val dispatcher: CoroutineDispatcher
+    @IoDispatcher val dispatcher: CoroutineDispatcher
 ) {
 
     suspend operator fun invoke(accountUid: String, categoryUid: String): List<Transaction> =

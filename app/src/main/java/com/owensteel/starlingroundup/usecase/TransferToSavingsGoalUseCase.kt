@@ -1,5 +1,6 @@
 package com.owensteel.starlingroundup.usecase
 
+import com.owensteel.starlingroundup.di.IoDispatcher
 import com.owensteel.starlingroundup.domain.repository.SavingsGoalRepository
 import com.owensteel.starlingroundup.model.Money
 import kotlinx.coroutines.CoroutineDispatcher
@@ -9,7 +10,7 @@ import javax.inject.Inject
 
 class TransferToSavingsGoalUseCase @Inject constructor(
     private val savingsGoalRepository: SavingsGoalRepository,
-    private val dispatcher: CoroutineDispatcher
+    @IoDispatcher val dispatcher: CoroutineDispatcher
 ) {
 
     suspend fun transferToSavingsGoal(

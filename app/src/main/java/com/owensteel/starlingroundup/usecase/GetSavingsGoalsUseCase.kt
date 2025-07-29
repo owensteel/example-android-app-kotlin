@@ -1,5 +1,6 @@
 package com.owensteel.starlingroundup.usecase
 
+import com.owensteel.starlingroundup.di.IoDispatcher
 import com.owensteel.starlingroundup.domain.repository.SavingsGoalRepository
 import com.owensteel.starlingroundup.model.SavingsGoal
 import kotlinx.coroutines.CoroutineDispatcher
@@ -8,7 +9,7 @@ import javax.inject.Inject
 
 class GetSavingsGoalsUseCase @Inject constructor(
     private val savingsGoalRepository: SavingsGoalRepository,
-    private val dispatcher: CoroutineDispatcher
+    @IoDispatcher val dispatcher: CoroutineDispatcher
 ) {
 
     suspend operator fun invoke(accountUid: String): List<SavingsGoal> = withContext(dispatcher) {
