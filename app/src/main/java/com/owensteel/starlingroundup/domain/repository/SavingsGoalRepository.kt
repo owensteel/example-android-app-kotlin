@@ -1,8 +1,8 @@
 package com.owensteel.starlingroundup.domain.repository
 
 import com.owensteel.starlingroundup.model.Money
+import com.owensteel.starlingroundup.model.SavingsGoal
 import com.owensteel.starlingroundup.model.TransferResponse
-import com.owensteel.starlingroundup.token.TokenManager
 
 interface SavingsGoalRepository {
 
@@ -18,5 +18,9 @@ interface SavingsGoalRepository {
         savingsGoalName: String,
         savingsGoalTarget: Money
     ): String?
+
+    suspend fun getAccountSavingsGoals(
+        accountUid: String
+    ): List<SavingsGoal>?
 
 }

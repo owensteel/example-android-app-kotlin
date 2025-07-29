@@ -2,7 +2,9 @@ package com.owensteel.starlingroundup.domain.repository
 
 import com.owensteel.starlingroundup.model.CreateSavingsGoalRequest
 import com.owensteel.starlingroundup.model.CreateSavingsGoalResponse
+import com.owensteel.starlingroundup.model.GetSavingsGoalsResponse
 import com.owensteel.starlingroundup.model.Money
+import com.owensteel.starlingroundup.model.SavingsGoal
 import com.owensteel.starlingroundup.model.TransferRequest
 import com.owensteel.starlingroundup.model.TransferResponse
 import com.owensteel.starlingroundup.network.StarlingService
@@ -69,5 +71,23 @@ class SavingsGoalRepositoryImpl @Inject constructor(
             null
         }
     }
+
+    override suspend fun getAccountSavingsGoals(accountUid: String): List<SavingsGoal>? {
+        return try {
+            val getSavingsGoalResponse: Response<GetSavingsGoalsResponse> =
+                StarlingService.getSavingsGoals(
+                    tokenManager,
+                    accountUid
+                )
+            if (getSavingsGoalResponse.isSuccessful) {
+                getSavingsGoalResponse.body()?.savingsGoalList
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
 
 }
