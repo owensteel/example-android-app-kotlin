@@ -1,4 +1,4 @@
-package com.owensteel.starlingroundup.ui.screens
+package com.owensteel.starlingroundup.ui.roundup
 
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.foundation.layout.Arrangement
@@ -31,9 +31,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.owensteel.starlingroundup.R
-import com.owensteel.starlingroundup.ui.features.RoundUpAndSaveFeature
-import com.owensteel.starlingroundup.ui.features.TransactionsFeedFeature
-import com.owensteel.starlingroundup.ui.modals.TransferToSavingsGoalModal
+import com.owensteel.starlingroundup.model.uistates.RoundUpUiError
+import com.owensteel.starlingroundup.ui.transactionsfeed.TransactionsFeedFeature
 import com.owensteel.starlingroundup.viewmodel.RoundUpAndSaveViewModel
 import kotlinx.coroutines.launch
 
@@ -44,20 +43,13 @@ fun RoundUpAndSaveScreen(
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    val hasInitialisedDataState by viewModel.hasInitialisedDataState.collectAsState()
-    val roundUpAmount by viewModel.roundUpAmountState.collectAsState()
-    val accountHolderName by viewModel.accountHolderNameState.collectAsState()
-    val feedState by viewModel.feedState.collectAsState()
-    val savingsGoalsModalUiState by viewModel.savingsGoalsModalUiState.collectAsState()
-
-    // Transfer to Savings Goal modal
-    val showTransferToSavingsSheet = remember { mutableStateOf(false) }
+    val uiState by viewModel.uiState.collectAsState()
 
     // Refresh "onResume"
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                viewModel.refreshRoundUpTotalAndTransactionsFeed()
+                viewModel.refreshTransactionsAndRoundUp()
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -73,11 +65,11 @@ fun RoundUpAndSaveScreen(
     val onRefresh: () -> Unit = {
         isRefreshing.value = true
         coroutineScope.launch {
-            viewModel.refreshRoundUpTotalAndTransactionsFeed()
+            viewModel.refreshTransactionsAndRoundUp()
             isRefreshing.value = false
         }
     }
-    val scaleFraction = {
+    val pullToRefreshIndicatorScaleFraction = {
         if (isRefreshing.value) 1f
         else LinearOutSlowInEasing.transform(pullToRefreshState.distanceFraction).coerceIn(0f, 1f)
     }
@@ -102,32 +94,26 @@ fun RoundUpAndSaveScreen(
         ) {
             // Don't show Transfer modal if the Round Up total is
             // zero (could make illegal transfer possible)
-            if (showTransferToSavingsSheet.value && roundUpAmount.minorUnits > 0L) {
+            if (uiState.showModal && uiState.roundUpTotal.minorUnits > 0L) {
                 TransferToSavingsGoalModal(
-                    showTransferToSavingsSheet,
-                    savingsGoalsModalUiState,
-                    roundUpAmount.toString(),
+                    uiState,
+                    uiState.roundUpTotal.toString(),
                     viewModel
                 )
             }
 
-            if (hasInitialisedDataState.value) {
+            if (uiState.hasInitialised) {
                 RoundUpAndSaveFeature(
                     viewModel = viewModel,
-                    roundUpAmount = roundUpAmount,
-                    accountHolderName = accountHolderName,
-                    showTransferToSavingsSheet = showTransferToSavingsSheet,
-                    // Used for getting the last
-                    // round-up timestamp when ready
-                    feedState = feedState
+                    roundUpAmount = uiState.roundUpTotal,
+                    accountHolderName = uiState.accountHolderName,
+                    uiState = uiState
                 )
                 HorizontalDivider(
                     modifier = Modifier
                         .padding(0.dp, 15.dp)
                 )
-                TransactionsFeedFeature(
-                    feedState = feedState
-                )
+                TransactionsFeedFeature(uiState)
             } else {
                 // Placeholder container
                 Column(
@@ -137,12 +123,13 @@ fun RoundUpAndSaveScreen(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    if (hasInitialisedDataState.hasError) {
+                    if (uiState.error is RoundUpUiError.Initialisation) {
                         // Error message
                         Text(
                             stringResource(
                                 R.string.error_could_not_fetch_data,
-                                hasInitialisedDataState.errorCode ?: ""
+                                // TODO get network error code here
+                                ""
                             )
                         )
                     } else {
@@ -159,8 +146,8 @@ fun RoundUpAndSaveScreen(
         Box(
             Modifier
                 .graphicsLayer {
-                    scaleX = scaleFraction()
-                    scaleY = scaleFraction()
+                    scaleX = pullToRefreshIndicatorScaleFraction()
+                    scaleY = pullToRefreshIndicatorScaleFraction()
                 }
         ) {
             PullToRefreshDefaults.Indicator(

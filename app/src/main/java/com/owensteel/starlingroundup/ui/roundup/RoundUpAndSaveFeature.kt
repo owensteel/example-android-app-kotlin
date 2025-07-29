@@ -1,4 +1,4 @@
-package com.owensteel.starlingroundup.ui.features
+package com.owensteel.starlingroundup.ui.roundup
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -18,10 +17,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.owensteel.starlingroundup.R
 import com.owensteel.starlingroundup.model.Money
+import com.owensteel.starlingroundup.model.uistates.RoundUpUiState
 import com.owensteel.starlingroundup.ui.components.AppButton
 import com.owensteel.starlingroundup.ui.theme.AccessibleGrey
 import com.owensteel.starlingroundup.util.DateTimeUtils
-import com.owensteel.starlingroundup.viewmodel.TransactionsFeedUiState
 import com.owensteel.starlingroundup.viewmodel.RoundUpAndSaveViewModel
 
 /*
@@ -38,8 +37,7 @@ fun RoundUpAndSaveFeature(
     viewModel: RoundUpAndSaveViewModel,
     roundUpAmount: Money,
     accountHolderName: String,
-    showTransferToSavingsSheet: MutableState<Boolean>,
-    feedState: TransactionsFeedUiState
+    uiState: RoundUpUiState
 ) {
     Column(
         modifier = Modifier
@@ -71,23 +69,21 @@ fun RoundUpAndSaveFeature(
         AppButton(
             onClick = {
                 // Show modal first
-                showTransferToSavingsSheet.value = true
+                viewModel.showModal(true)
                 // Request fetching of savings goal list
-                viewModel.getAccountSavingsGoals()
+                viewModel.loadSavingsGoals()
             },
             text = stringResource(id = R.string.main_feature_button_round_up_and_save),
             // Only enable if there is actually a Round Up total
             enabled = roundUpAmount.minorUnits > 0L
         )
 
-        // Only get timestamp when we know it has been
-        // initialised and won't be the fallback
-        if (!feedState.isLoading) {
+        if(uiState.cutoffTimestamp.isNotBlank()) {
             Text(
                 text = stringResource(
                     R.string.main_feature_last_round_up,
                     DateTimeUtils.timeSince(
-                        feedState.latestRoundUpCutoffTimestamp
+                        uiState.cutoffTimestamp
                     )
                 ),
                 color = AccessibleGrey,

@@ -177,7 +177,6 @@ object StarlingService {
     // Account details
 
     suspend fun getAccountDetails(
-        context: Context,
         tokenManager: TokenManager
     ): Response<AccountResponse> {
         val api = createAuthenticatedApi(tokenManager)
@@ -185,7 +184,6 @@ object StarlingService {
     }
 
     suspend fun getAccountHolderIndividual(
-        context: Context,
         tokenManager: TokenManager
     ): Response<AccountHolderIndividualResponse> {
         val api = createAuthenticatedApi(tokenManager)

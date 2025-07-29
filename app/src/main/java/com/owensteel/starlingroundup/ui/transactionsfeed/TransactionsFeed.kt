@@ -1,4 +1,4 @@
-package com.owensteel.starlingroundup.ui.components
+package com.owensteel.starlingroundup.ui.transactionsfeed
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background

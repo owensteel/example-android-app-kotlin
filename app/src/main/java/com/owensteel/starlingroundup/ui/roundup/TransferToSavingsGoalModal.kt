@@ -1,4 +1,4 @@
-package com.owensteel.starlingroundup.ui.modals
+package com.owensteel.starlingroundup.ui.roundup
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,9 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -34,12 +31,13 @@ import androidx.compose.ui.unit.dp
 import com.owensteel.starlingroundup.R
 import com.owensteel.starlingroundup.model.Money
 import com.owensteel.starlingroundup.model.SavingsGoal
+import com.owensteel.starlingroundup.model.uistates.RoundUpUiError
+import com.owensteel.starlingroundup.model.uistates.RoundUpUiState
 import com.owensteel.starlingroundup.ui.components.AppButton
-import com.owensteel.starlingroundup.ui.components.transactionsListRowColumnCommonPadding
+import com.owensteel.starlingroundup.ui.transactionsfeed.transactionsListRowColumnCommonPadding
 import com.owensteel.starlingroundup.ui.dialogs.CreateNewSavingsGoalDialog
 import com.owensteel.starlingroundup.ui.theme.AccessibleGrey
 import com.owensteel.starlingroundup.viewmodel.RoundUpAndSaveViewModel
-import com.owensteel.starlingroundup.viewmodel.SavingsGoalsModalUiState
 
 /*
 
@@ -52,17 +50,15 @@ import com.owensteel.starlingroundup.viewmodel.SavingsGoalsModalUiState
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun TransferToSavingsGoalModal(
-    showTransferToSavingsSheet: MutableState<Boolean>,
-    savingsGoalsModalUiState: SavingsGoalsModalUiState,
+    uiState: RoundUpUiState,
     amount: String,
     viewModel: RoundUpAndSaveViewModel
 ) {
-    val accountCurrency by viewModel.accountCurrencyState.collectAsState()
     val showCreateAndTransferToNewSavingsGoalDialog = remember { mutableStateOf(false) }
 
     ModalBottomSheet(
         onDismissRequest = {
-            showTransferToSavingsSheet.value = false
+            viewModel.showModal(false)
         }
     ) {
         Column(
@@ -89,7 +85,7 @@ fun TransferToSavingsGoalModal(
             )
 
             // Recoverable error gets inline error message
-            if (savingsGoalsModalUiState.hasTransferError) {
+            if (uiState.error is RoundUpUiError.Transfer) {
                 Text(
                     stringResource(R.string.transfer_to_savings_modal_goals_transfer_error),
                     style = MaterialTheme.typography.bodySmall,
@@ -109,27 +105,26 @@ fun TransferToSavingsGoalModal(
 
             // Savings Goals list
             when {
-                savingsGoalsModalUiState.isLoading -> CircularProgressIndicator(
+                uiState.isLoadingSavingsGoals -> CircularProgressIndicator(
                     modifier = Modifier
                         .padding(0.dp, 15.dp)
                 )
 
-                savingsGoalsModalUiState.hasLoadingError -> Text(
+                (uiState.error is RoundUpUiError.Network) -> Text(
                     stringResource(R.string.transfer_to_savings_modal_goals_load_error),
                     modifier = Modifier
                         .padding(0.dp, 15.dp)
                 )
 
                 else -> SavingsGoalsLazyColumn(
-                    showTransferToSavingsSheet,
-                    savingsGoalsModalUiState.value,
+                    uiState.savingsGoals,
                     viewModel
                 )
             }
         }
     }
 
-    if (showCreateAndTransferToNewSavingsGoalDialog.value && accountCurrency != null) {
+    if (showCreateAndTransferToNewSavingsGoalDialog.value && uiState.accountCurrency != null) {
         CreateNewSavingsGoalDialog(
             onDismiss = {
                 showCreateAndTransferToNewSavingsGoalDialog.value = false
@@ -137,18 +132,17 @@ fun TransferToSavingsGoalModal(
             onConfirm = { goalName: String, goalTarget: Long ->
                 showCreateAndTransferToNewSavingsGoalDialog.value = false
                 // Request create and transfer
-                viewModel.createAndTransferToNewSavingsGoal(
-                    goalName, goalTarget, showTransferToSavingsSheet
+                viewModel.createGoalAndTransfer(
+                    goalName, goalTarget
                 )
             },
-            accountCurrency = accountCurrency!!
+            accountCurrency = uiState.accountCurrency
         )
     }
 }
 
 @Composable
 fun SavingsGoalsLazyColumn(
-    showTransferToSavingsSheet: MutableState<Boolean>,
     savingsGoalsList: List<SavingsGoal>,
     viewModel: RoundUpAndSaveViewModel
 ) {
@@ -168,7 +162,6 @@ fun SavingsGoalsLazyColumn(
             // Render the list of Savings Goals
             items(savingsGoalsList) { savingsGoal ->
                 SavingsGoalRow(
-                    showTransferToSavingsSheet,
                     savingsGoal,
                     viewModel
                 )
@@ -179,7 +172,6 @@ fun SavingsGoalsLazyColumn(
 
 @Composable
 fun SavingsGoalRow(
-    showTransferToSavingsSheet: MutableState<Boolean>,
     savingsGoal: SavingsGoal,
     viewModel: RoundUpAndSaveViewModel
 ) {
@@ -200,9 +192,8 @@ fun SavingsGoalRow(
             .clickable {
                 // User selects this savings
                 // goal to transfer to
-                viewModel.performTransferToSavingsGoal(
-                    savingsGoal.savingsGoalUid,
-                    showTransferToSavingsSheet
+                viewModel.transferToGoal(
+                    savingsGoal.savingsGoalUid
                 )
             },
         verticalAlignment = Alignment.CenterVertically
