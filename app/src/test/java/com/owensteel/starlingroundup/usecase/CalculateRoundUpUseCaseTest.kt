@@ -93,11 +93,34 @@ class CalculateRoundUpUseCaseTest {
         // Cutoff that allows all but one fake transaction
         val fakeCutoffTimestamp = "2025-01-01T09:30:00Z"
         assertEquals(
+            158L,
             calculateRoundUpUseCase.invoke(
                 fakeTransactions,
                 fakeCutoffTimestamp
-            ),
-            158L
+            )
+        )
+    }
+
+    @Test
+    fun `RoundUpUseCase applies cutoff correctly`() = runTest {
+        // Cutoff being at exactly 9am disqualifies the 9am transaction
+        // As using the transaction time is how we get the cutoff timestamp
+        val fakeCutoffTimestampAtExactTransactionTime = "2025-01-01T09:00:00Z"
+        assertEquals(
+            158L,
+            calculateRoundUpUseCase.invoke(
+                fakeTransactions,
+                fakeCutoffTimestampAtExactTransactionTime
+            )
+        )
+        // Cutoff that allows all fake transactions
+        val fakeCutoffTimestampJustBeforeTransactionTime = "2025-01-01T08:59:59Z"
+        assertEquals(
+            193L,
+            calculateRoundUpUseCase.invoke(
+                fakeTransactions,
+                fakeCutoffTimestampJustBeforeTransactionTime
+            )
         )
     }
 
