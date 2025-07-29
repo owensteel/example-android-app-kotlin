@@ -141,6 +141,7 @@ class RoundUpAndSaveViewModel @Inject constructor(
     }
 
     private suspend fun recordAndHandleCompletedRoundUpTransfer() {
+        if(cachedTransactions.isEmpty()) return
         // Record last transaction rounded-up
         // ("first" is last in the chronological order
         // of the transactions)
