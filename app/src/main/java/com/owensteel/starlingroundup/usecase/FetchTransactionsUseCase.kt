@@ -2,21 +2,18 @@ package com.owensteel.starlingroundup.usecase
 
 import com.owensteel.starlingroundup.domain.repository.TransactionsRepository
 import com.owensteel.starlingroundup.model.Transaction
-import com.owensteel.starlingroundup.token.TokenManager
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class FetchTransactionsUseCase @Inject constructor(
     private val transactionsRepository: TransactionsRepository,
-    private val tokenManager: TokenManager,
     private val dispatcher: CoroutineDispatcher
 ) {
 
     suspend operator fun invoke(accountUid: String, categoryUid: String): List<Transaction> =
         withContext(dispatcher) {
             val transactionsFeed = transactionsRepository.getTransactionsFeed(
-                tokenManager,
                 accountUid,
                 categoryUid
             )

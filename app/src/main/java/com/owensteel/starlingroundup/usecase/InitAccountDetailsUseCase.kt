@@ -2,7 +2,6 @@ package com.owensteel.starlingroundup.usecase
 
 import com.owensteel.starlingroundup.domain.model.AccountDetails
 import com.owensteel.starlingroundup.domain.repository.AccountRepository
-import com.owensteel.starlingroundup.token.TokenManager
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.util.Currency
@@ -10,14 +9,13 @@ import javax.inject.Inject
 
 class InitAccountDetailsUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
-    private val tokenManager: TokenManager,
     private val dispatcher: CoroutineDispatcher
 ) {
 
     suspend operator fun invoke(): Result<AccountDetails> = withContext(dispatcher) {
         try {
-            val account = accountRepository.getPrimaryAccount(tokenManager)
-            val holder = accountRepository.getAccountHolder(tokenManager)
+            val account = accountRepository.getPrimaryAccount()
+            val holder = accountRepository.getAccountHolder()
 
             if (account == null || holder == null) {
                 return@withContext Result.failure(IllegalStateException("Missing account or holder"))

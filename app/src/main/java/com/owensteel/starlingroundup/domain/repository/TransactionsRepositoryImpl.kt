@@ -6,10 +6,11 @@ import com.owensteel.starlingroundup.token.TokenManager
 import retrofit2.Response
 import javax.inject.Inject
 
-class TransactionsRepositoryImpl @Inject constructor() : TransactionsRepository {
+class TransactionsRepositoryImpl @Inject constructor(
+    private val tokenManager: TokenManager
+) : TransactionsRepository {
 
     override suspend fun getTransactionsFeed(
-        tokenManager: TokenManager,
         accountUid: String,
         categoryUid: String
     ): TransactionFeedResponse? {

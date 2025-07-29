@@ -8,9 +8,11 @@ import com.owensteel.starlingroundup.token.TokenManager
 import retrofit2.Response
 import javax.inject.Inject
 
-class AccountRepositoryImpl @Inject constructor() : AccountRepository {
+class AccountRepositoryImpl @Inject constructor(
+    private val tokenManager: TokenManager
+) : AccountRepository {
 
-    override suspend fun getPrimaryAccount(tokenManager: TokenManager): Account? {
+    override suspend fun getPrimaryAccount(): Account? {
         return try {
             val accountResponse: Response<AccountResponse> =
                 StarlingService.getAccountDetails(tokenManager)
@@ -24,7 +26,7 @@ class AccountRepositoryImpl @Inject constructor() : AccountRepository {
         }
     }
 
-    override suspend fun getAccountHolder(tokenManager: TokenManager): AccountHolderIndividualResponse? {
+    override suspend fun getAccountHolder(): AccountHolderIndividualResponse? {
         return try {
             val accountHolderIndividualResponse: Response<AccountHolderIndividualResponse> =
                 StarlingService.getAccountHolderIndividual(tokenManager)
