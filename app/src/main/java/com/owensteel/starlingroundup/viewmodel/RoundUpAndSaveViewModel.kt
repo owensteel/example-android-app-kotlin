@@ -10,6 +10,7 @@ import com.owensteel.starlingroundup.model.uistates.RoundUpUiError
 import com.owensteel.starlingroundup.model.uistates.RoundUpUiState
 import com.owensteel.starlingroundup.usecase.CalculateRoundUpUseCase
 import com.owensteel.starlingroundup.usecase.FetchTransactionsUseCase
+import com.owensteel.starlingroundup.usecase.GetSavingsGoalsUseCase
 import com.owensteel.starlingroundup.usecase.InitAccountDetailsUseCase
 import com.owensteel.starlingroundup.usecase.TransferToSavingsGoalUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,6 +35,7 @@ class RoundUpAndSaveViewModel @Inject constructor(
     private val initAccountDetails: InitAccountDetailsUseCase,
     private val fetchTransactions: FetchTransactionsUseCase,
     private val transferToSavingsGoal: TransferToSavingsGoalUseCase,
+    private val getSavingsGoals: GetSavingsGoalsUseCase,
     private val roundUpCutoffTimestampStore: RoundUpCutoffTimestampStore,
     private val calculateRoundUp: CalculateRoundUpUseCase
 ) : ViewModel() {
@@ -115,6 +117,80 @@ class RoundUpAndSaveViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    fun loadSavingsGoals() {
+        viewModelScope.launch {
+            if (accountUid == null) {
+                return@launch
+            }
+
+            _uiState.update { it.copy(isLoading = true) }
+
+            val goals = getSavingsGoals(accountUid!!)
+
+            _uiState.update {
+                it.copy(savingsGoals = goals, isLoading = false)
+            }
+        }
+    }
+
+    fun createGoalAndTransfer(name: String, targetMinorUnits: Long) {
+        viewModelScope.launch {
+            if (accountUid == null || currency == null) {
+                return@launch
+            }
+
+            val createAndTransferResult = transferToSavingsGoal.createAndTransferToNewSavingsGoal(
+                accountUid!!,
+                name,
+                Money(
+                    currency!!.currencyCode,
+                    targetMinorUnits
+                ),
+                Money(
+                    currency!!.currencyCode,
+                    lastRoundUpTotal
+                )
+            )
+            if (createAndTransferResult.isSuccess) {
+                refreshTransactionsAndRoundUp()
+                _uiState.update { it.copy(showModal = false) }
+            } else {
+                _uiState.update { it.copy(error = RoundUpUiError.Transfer) }
+            }
+        }
+    }
+
+    fun transferToGoal(goalUid: String) {
+        viewModelScope.launch {
+            if (accountUid == null || currency == null) {
+                return@launch
+            }
+
+            val transferResult = transferToSavingsGoal.transferToSavingsGoal(
+                accountUid!!,
+                goalUid,
+                Money(
+                    currency!!.currencyCode,
+                    lastRoundUpTotal
+                )
+            )
+            if (transferResult.isSuccess) {
+                refreshTransactionsAndRoundUp()
+                _uiState.update { it.copy(showModal = false) }
+            } else {
+                _uiState.update { it.copy(error = RoundUpUiError.Transfer) }
+            }
+        }
+    }
+
+    fun showModal(show: Boolean) {
+        _uiState.update { it.copy(showModal = show) }
+    }
+
+    fun dismissError() {
+        _uiState.update { it.copy(error = null) }
     }
 
 }
