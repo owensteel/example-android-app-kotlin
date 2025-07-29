@@ -1,4 +1,4 @@
-package com.owensteel.starlingroundup.ui.transactionsfeed
+package com.owensteel.starlingroundup.ui.roundup
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

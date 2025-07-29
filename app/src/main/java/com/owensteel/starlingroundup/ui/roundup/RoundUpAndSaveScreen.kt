@@ -32,7 +32,6 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.owensteel.starlingroundup.R
 import com.owensteel.starlingroundup.model.uistates.RoundUpUiError
-import com.owensteel.starlingroundup.ui.transactionsfeed.TransactionsFeedFeature
 import com.owensteel.starlingroundup.viewmodel.RoundUpAndSaveViewModel
 import kotlinx.coroutines.launch
 
