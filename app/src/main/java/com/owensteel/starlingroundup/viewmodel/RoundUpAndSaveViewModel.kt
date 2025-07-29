@@ -226,8 +226,4 @@ class RoundUpAndSaveViewModel @Inject constructor(
         _uiState.update { it.copy(showRoundUpTransferCompleteDialog = show) }
     }
 
-    fun dismissError() {
-        _uiState.update { it.copy(error = null) }
-    }
-
 }

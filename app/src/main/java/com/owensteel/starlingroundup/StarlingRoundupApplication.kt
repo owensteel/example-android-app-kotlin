@@ -13,5 +13,4 @@ import dagger.hilt.android.HiltAndroidApp
  */
 
 @HiltAndroidApp
-class StarlingRoundupApplication: Application() {
-}
+class StarlingRoundupApplication: Application()

@@ -1,6 +1,5 @@
 package com.owensteel.starlingroundup.network
 
-import android.content.Context
 import com.owensteel.starlingroundup.BuildConfig
 import com.owensteel.starlingroundup.model.AccountHolderIndividualResponse
 import com.owensteel.starlingroundup.model.AccountResponse
