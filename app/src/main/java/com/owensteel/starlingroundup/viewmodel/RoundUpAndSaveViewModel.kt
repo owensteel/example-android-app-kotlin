@@ -76,6 +76,9 @@ class RoundUpAndSaveViewModel @Inject constructor(
                     hasInitialised = true
                 )
             }
+
+            // Initial fetch of transactions feed
+            refreshTransactionsAndRoundUp()
         } else {
             _uiState.update {
                 it.copy(
