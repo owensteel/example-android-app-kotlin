@@ -2,12 +2,16 @@ package com.owensteel.starlingroundup.viewmodel
 
 import com.owensteel.starlingroundup.data.local.RoundUpCutoffTimestampStore
 import com.owensteel.starlingroundup.model.AccountDetails
+import com.owensteel.starlingroundup.model.Money
+import com.owensteel.starlingroundup.model.Transaction
 import com.owensteel.starlingroundup.testutil.MainDispatcherRule
 import com.owensteel.starlingroundup.usecase.CalculateRoundUpUseCase
 import com.owensteel.starlingroundup.usecase.FetchTransactionsUseCase
 import com.owensteel.starlingroundup.usecase.GetSavingsGoalsUseCase
 import com.owensteel.starlingroundup.usecase.InitAccountDetailsUseCase
 import com.owensteel.starlingroundup.usecase.TransferToSavingsGoalUseCase
+import com.owensteel.starlingroundup.util.SharedConstants.Transactions.TRANSACTION_DIRECTION_IN
+import com.owensteel.starlingroundup.util.SharedConstants.Transactions.TRANSACTION_DIRECTION_OUT
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -29,6 +33,9 @@ import java.util.UUID
 private const val FAKE_ACCOUNT_HOLDER_NAME = "Joe"
 private const val FAKE_ACCOUNT_CURRENCY = "GBP"
 
+private const val FAKE_TRANSACTION_SOURCE = "MASTER_CARD"
+private val FAKE_TRANSACTION_SPENDING_CATEGORY = UUID.randomUUID().toString()
+
 @OptIn(ExperimentalCoroutinesApi::class)
 class RoundUpAndSaveViewModelTest {
 
@@ -43,6 +50,70 @@ class RoundUpAndSaveViewModelTest {
     private val getSavingsGoals: GetSavingsGoalsUseCase = mock()
     private val roundUpCutoffTimestampStore: RoundUpCutoffTimestampStore = mock()
     private val calculateRoundUp: CalculateRoundUpUseCase = mock()
+
+    // Example transactions to test round-up cutoff and calculations:
+    // OUT £2.65 at 9am
+    // OUT £4.35 at 10am
+    // OUT £5.20 at 10:10am
+    // OUT £0.87 at 10:20am
+    // IN £4.23 at 10:25am
+    private val fakeTransactions = listOf(
+        Transaction(
+            feedItemUid = UUID.randomUUID().toString(),
+            amount = Money(
+                FAKE_ACCOUNT_CURRENCY,
+                265L
+            ),
+            direction = TRANSACTION_DIRECTION_OUT,
+            transactionTime = "2025-01-01T09:00:00Z",
+            spendingCategory = FAKE_TRANSACTION_SPENDING_CATEGORY,
+            source = FAKE_TRANSACTION_SOURCE
+        ),
+        Transaction(
+            feedItemUid = UUID.randomUUID().toString(),
+            amount = Money(
+                FAKE_ACCOUNT_CURRENCY,
+                435L
+            ),
+            direction = TRANSACTION_DIRECTION_OUT,
+            transactionTime = "2025-01-01T10:00:00Z",
+            spendingCategory = FAKE_TRANSACTION_SPENDING_CATEGORY,
+            source = FAKE_TRANSACTION_SOURCE
+        ),
+        Transaction(
+            feedItemUid = UUID.randomUUID().toString(),
+            amount = Money(
+                FAKE_ACCOUNT_CURRENCY,
+                520L
+            ),
+            direction = TRANSACTION_DIRECTION_OUT,
+            transactionTime = "2025-01-01T10:10:00Z",
+            spendingCategory = FAKE_TRANSACTION_SPENDING_CATEGORY,
+            source = FAKE_TRANSACTION_SOURCE
+        ),
+        Transaction(
+            feedItemUid = UUID.randomUUID().toString(),
+            amount = Money(
+                FAKE_ACCOUNT_CURRENCY,
+                87L
+            ),
+            direction = TRANSACTION_DIRECTION_OUT,
+            transactionTime = "2025-01-01T10:20:00Z",
+            spendingCategory = FAKE_TRANSACTION_SPENDING_CATEGORY,
+            source = FAKE_TRANSACTION_SOURCE
+        ),
+        Transaction(
+            feedItemUid = UUID.randomUUID().toString(),
+            amount = Money(
+                FAKE_ACCOUNT_CURRENCY,
+                423L
+            ),
+            direction = TRANSACTION_DIRECTION_IN,
+            transactionTime = "2025-01-01T10:25:00Z",
+            spendingCategory = FAKE_TRANSACTION_SPENDING_CATEGORY,
+            source = FAKE_TRANSACTION_SOURCE
+        )
+    )
 
     @Before
     fun setUp() = runBlocking {
@@ -81,6 +152,26 @@ class RoundUpAndSaveViewModelTest {
         assertEquals(FAKE_ACCOUNT_HOLDER_NAME, state.accountHolderName)
         assertEquals(Currency.getInstance(FAKE_ACCOUNT_CURRENCY), state.accountCurrency)
         assertTrue(state.hasInitialised)
+    }
+
+    @Test
+    fun `refreshTransactionsAndRoundUp updates state with transactions and round-up total`() = runTest {
+        // Cutoff that allows all but one fake transaction
+        val fakeCutoffTimestamp = "2025-01-01T09:30:00Z"
+
+        whenever(fetchTransactions(any(),any())).thenReturn(fakeTransactions)
+        whenever(roundUpCutoffTimestampStore.getLatestRoundUpCutOffTimestamp()).thenReturn(fakeCutoffTimestamp)
+
+        // We test the actual calculation logic in the RoundUpUseCase test
+        whenever(calculateRoundUp(fakeTransactions, fakeCutoffTimestamp)).thenReturn(158L)
+
+        viewModel.refreshTransactionsAndRoundUp()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals(fakeTransactions, state.transactions)
+        assertEquals(158L, state.roundUpTotal.minorUnits)
+        assertEquals(FAKE_ACCOUNT_CURRENCY, state.roundUpTotal.currency)
     }
 
 }
