@@ -44,7 +44,9 @@ class RoundUpAndSaveViewModel @Inject constructor(
     private var accountUid: String? = null
     private var categoryUid: String? = null
     private var currency: Currency? = null
+
     private var cachedTransactions: List<Transaction> = emptyList()
+    private var lastRoundUpTotal: Long = 0L
 
     init {
         viewModelScope.launch {
@@ -99,6 +101,7 @@ class RoundUpAndSaveViewModel @Inject constructor(
             val cutoff = roundUpCutoffTimestampStore.getLatestRoundUpCutOffTimestamp()
                 ?: roundUpCutoffTimestampFallback
             val roundUp = calculateRoundUp(fetchedTransactions, cutoff)
+            lastRoundUpTotal = roundUp
 
             _uiState.update {
                 it.copy(
