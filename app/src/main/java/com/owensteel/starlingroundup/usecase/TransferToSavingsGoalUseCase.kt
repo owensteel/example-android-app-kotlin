@@ -2,19 +2,22 @@ package com.owensteel.starlingroundup.usecase
 
 import com.owensteel.starlingroundup.domain.repository.SavingsGoalRepository
 import com.owensteel.starlingroundup.model.Money
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
 
 class TransferToSavingsGoalUseCase @Inject constructor(
-    private val savingsGoalRepository: SavingsGoalRepository
+    private val savingsGoalRepository: SavingsGoalRepository,
+    private val dispatcher: CoroutineDispatcher
 ) {
 
     suspend fun transferToSavingsGoal(
         accountUid: String,
         savingsGoalUid: String,
         roundUpAmount: Money
-    ): Result<Unit> {
-        return try {
+    ): Result<Unit> = withContext(dispatcher) {
+        return@withContext try {
             val transferUid = UUID.randomUUID().toString()
 
             savingsGoalRepository.transferToGoal(
@@ -35,9 +38,8 @@ class TransferToSavingsGoalUseCase @Inject constructor(
         savingsGoalName: String,
         savingsGoalTarget: Money,
         roundUpAmount: Money
-    ): Result<Unit> {
-
-        return try {
+    ): Result<Unit> = withContext(dispatcher) {
+        return@withContext try {
             val newSavingsGoalUid = savingsGoalRepository.createGoal(
                 accountUid,
                 savingsGoalName,
