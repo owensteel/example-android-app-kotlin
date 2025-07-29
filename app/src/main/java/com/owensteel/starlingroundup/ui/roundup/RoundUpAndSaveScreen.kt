@@ -122,18 +122,13 @@ fun RoundUpAndSaveScreen(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    if (uiState.error is RoundUpUiError.Initialisation) {
-                        // Error message
-                        Text(
-                            stringResource(
-                                R.string.error_could_not_fetch_data,
-                                // TODO get network error code here
-                                ""
-                            )
+                    when {
+                        (uiState.error is RoundUpUiError.Network || uiState.error is RoundUpUiError.Initialisation) -> Text(
+                            // Display data fetch failure error
+                            stringResource(R.string.error_could_not_fetch_data)
                         )
-                    } else {
-                        // Loading spinner
-                        CircularProgressIndicator()
+
+                        else -> CircularProgressIndicator() // Loading spinner
                     }
                 }
             }
