@@ -20,11 +20,9 @@ import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.REFRESH
 
 class SecureTokenStore(
     private val context: Context,
-    private val dataStoreManager: DataStoreManager = DataStoreManager(context)
+    private val dataStoreManager: DataStoreManager = DataStoreManager(context),
+    private val crypto: CryptoManager = CryptoManager() // allows mocking
 ) {
-
-    private val crypto = CryptoManager()
-
     private suspend fun saveToken(
         token: String,
         tokenKey: String,
