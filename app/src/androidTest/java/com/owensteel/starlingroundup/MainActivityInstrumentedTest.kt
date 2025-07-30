@@ -10,6 +10,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.owensteel.starlingroundup.util.DeviceSecurityCheck
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.UninstallModules
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -17,6 +18,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+
+@UninstallModules(com.owensteel.starlingroundup.network.StarlingService::class)
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class MainActivityInstrumentedTest {
