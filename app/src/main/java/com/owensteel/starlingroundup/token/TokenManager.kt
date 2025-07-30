@@ -4,9 +4,9 @@ import android.content.Context
 import com.owensteel.starlingroundup.BuildConfig
 import com.owensteel.starlingroundup.data.local.SecureTokenStore
 import com.owensteel.starlingroundup.model.TokenResponse
-import com.owensteel.starlingroundup.network.RegularHeadersInterceptor
 import com.owensteel.starlingroundup.network.StarlingAuthApi
 import com.owensteel.starlingroundup.network.certificatePinner
+import com.owensteel.starlingroundup.network.interceptors.RegularHeadersInterceptor
 import com.owensteel.starlingroundup.util.SharedConstants.ApiConfig.BASE_URL
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.runBlocking

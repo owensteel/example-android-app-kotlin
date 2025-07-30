@@ -8,19 +8,10 @@ import com.owensteel.starlingroundup.model.GetSavingsGoalsResponse
 import com.owensteel.starlingroundup.model.TransactionFeedResponse
 import com.owensteel.starlingroundup.model.TransferRequest
 import com.owensteel.starlingroundup.model.TransferResponse
-import com.owensteel.starlingroundup.token.TokenManager
 import com.owensteel.starlingroundup.util.SharedConstants.ApiConfig.API_SERVER_CERT_HASH
-import com.owensteel.starlingroundup.util.SharedConstants.ApiConfig.BASE_URL
 import com.owensteel.starlingroundup.util.SharedConstants.ApiConfig.HOSTNAME
-import com.owensteel.starlingroundup.util.SharedConstants.ApiHeaders.ACCEPT
-import com.owensteel.starlingroundup.util.SharedConstants.ApiHeaders.AUTHORIZATION
-import com.owensteel.starlingroundup.util.SharedConstants.ApiHeaders.USER_AGENT
 import okhttp3.CertificatePinner
-import okhttp3.Interceptor
-import okhttp3.OkHttpClient
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.time.DayOfWeek
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -34,10 +25,6 @@ import javax.inject.Singleton
 
 */
 
-// Static HTTP client settings
-private const val HTTP_CLIENT_ACCEPT_VALUE = "application/json"
-private const val HTTP_CLIENT_USER_AGENT = "OwenSteel-StarlingChallenge"
-
 // Uses Certificate Pinner (programmatic solution)
 val certificatePinner = CertificatePinner.Builder()
     .add(HOSTNAME, API_SERVER_CERT_HASH)
@@ -45,41 +32,12 @@ val certificatePinner = CertificatePinner.Builder()
 
 @Singleton
 class StarlingService @Inject constructor(
-    private val tokenManager: TokenManager
+    private val apiProvider: StarlingApiProvider
 ) {
 
-    /*
-
-        API Clients
-
-     */
-
-    // Create authenticated API client
-    // This is the primary client for API calls
     private fun createAuthenticatedApi(): StarlingApi {
-        val okHttp = OkHttpClient.Builder()
-            .certificatePinner(certificatePinner)
-            // Fetch access token and add Authorization
-            // header, and monitor for bad responses in
-            // case token has expired for some other reason
-            // than time
-            .addInterceptor(AuthInterceptor(tokenManager))
-            .addInterceptor(RegularHeadersInterceptor())
-            .build()
-
-        return Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .client(okHttp)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(StarlingApi::class.java)
+        return apiProvider.getApi()
     }
-
-    /*
-
-        API functions
-
-     */
 
     // Transactions feed
 
@@ -153,61 +111,3 @@ class StarlingService @Inject constructor(
 
 }
 
-/*
-
-    Regular headers for requests
-
- */
-
-class RegularHeadersInterceptor : Interceptor {
-    override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
-        val original = chain.request()
-        val request = original.newBuilder()
-            .header(ACCEPT, HTTP_CLIENT_ACCEPT_VALUE)
-            .header(USER_AGENT, HTTP_CLIENT_USER_AGENT)
-            .method(original.method, original.body)
-            .build()
-        return chain.proceed(request)
-    }
-}
-
-/*
-
-    Attaches access token to request
-    and monitors for bad responses
-
- */
-
-class AuthInterceptor(
-    private val tokenManager: TokenManager
-) : Interceptor {
-    override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
-        var request = chain.request()
-
-        // Attach token in Authorization header
-        val token = tokenManager.getValidAccessTokenBlocking()
-        request = request.newBuilder()
-            .header(AUTHORIZATION, "Bearer $token")
-            .build()
-
-        // Monitor response
-        val response = chain.proceed(request)
-
-        // Access token may have expired for some external
-        // reason, refresh access code and retry once
-        if (response.code == 403) {
-            response.close()
-
-            val newToken = tokenManager.invalidateAndRefreshCurrentAccessTokenBlocking()
-
-            // Retry request with new access token
-            val newRequest = request.newBuilder()
-                .header(AUTHORIZATION, "Bearer $newToken")
-                .build()
-
-            return chain.proceed(newRequest)
-        }
-
-        return response
-    }
-}
