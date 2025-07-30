@@ -63,9 +63,8 @@ class RoundUpAndSaveViewModel @Inject constructor(
         }
 
         val accountResult = initAccountDetails()
-        if (accountResult.isSuccess && accountResult.getOrNull() != null) {
-            val accountDetails: AccountDetails = accountResult.getOrNull()!!
-
+        val accountDetails: AccountDetails? = accountResult.getOrNull()
+        if (accountResult.isSuccess && accountDetails != null) {
             accountUid = accountDetails.accountUid
             categoryUid = accountDetails.categoryUid
             currency = accountDetails.currency
@@ -92,7 +91,7 @@ class RoundUpAndSaveViewModel @Inject constructor(
 
     fun refreshTransactionsAndRoundUp() {
         viewModelScope.launch {
-            if (accountUid == null || categoryUid == null || currency == null) {
+            if (!uiState.value.hasInitialised || accountUid == null || categoryUid == null || currency == null) {
                 return@launch
             }
 
@@ -141,7 +140,7 @@ class RoundUpAndSaveViewModel @Inject constructor(
     }
 
     private suspend fun recordAndHandleCompletedRoundUpTransfer() {
-        if(cachedTransactions.isEmpty()) return
+        if (cachedTransactions.isEmpty()) return
         // Record last transaction rounded-up
         // ("first" is last in the chronological order
         // of the transactions)
