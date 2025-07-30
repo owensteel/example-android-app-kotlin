@@ -3,18 +3,13 @@ package com.owensteel.starlingroundup.token
 import com.owensteel.starlingroundup.BuildConfig
 import com.owensteel.starlingroundup.data.local.SecureTokenStore
 import com.owensteel.starlingroundup.model.TokenResponse
-import com.owensteel.starlingroundup.network.StarlingAuthApi
-import com.owensteel.starlingroundup.network.certificatePinner
-import com.owensteel.starlingroundup.network.interceptors.RegularHeadersInterceptor
-import com.owensteel.starlingroundup.util.SharedConstants.ApiConfig.BASE_URL
+import com.owensteel.starlingroundup.network.StarlingAuthApiProvider
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import okhttp3.OkHttpClient
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /*
 
@@ -22,8 +17,10 @@ import javax.inject.Inject
 
  */
 
+@Singleton
 class TokenManager @Inject constructor(
-    private val tokenStore: SecureTokenStore
+    private val tokenStore: SecureTokenStore,
+    private val authApiProvider: StarlingAuthApiProvider
 ) {
 
     private val mutex = Mutex()
@@ -109,26 +106,9 @@ class TokenManager @Inject constructor(
     }
 
     // OAuth API calls
-    // StarlingService itself cannot be used due to circular dependency
-
-    private fun createAuthApi(): StarlingAuthApi {
-        val okHttp = OkHttpClient.Builder()
-            .certificatePinner(certificatePinner)
-            // Just add regular headers
-            .addInterceptor(RegularHeadersInterceptor())
-            .build()
-
-        return Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .client(okHttp)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(StarlingAuthApi::class.java)
-    }
 
     private suspend fun refreshAccessToken(refreshToken: String): Response<TokenResponse> {
-        val api = createAuthApi()
-        return api.refreshAccessToken(
+        return authApiProvider.getAuthApi().refreshAccessToken(
             grantType = "refresh_token",
             refreshToken = refreshToken,
             clientId = BuildConfig.CLIENT_ID,

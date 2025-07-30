@@ -1,6 +1,5 @@
 package com.owensteel.starlingroundup.di
 
-import com.owensteel.starlingroundup.data.local.SecureTokenStore
 import com.owensteel.starlingroundup.network.DefaultStarlingApiProvider
 import com.owensteel.starlingroundup.network.StarlingApiProvider
 import com.owensteel.starlingroundup.network.StarlingService
@@ -14,12 +13,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object StarlingServiceModule {
-
-    @Provides
-    @Singleton
-    fun provideTokenManager(
-        tokenStore: SecureTokenStore
-    ): TokenManager = TokenManager(tokenStore)
 
     @Provides
     @Singleton

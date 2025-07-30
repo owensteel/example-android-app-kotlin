@@ -113,6 +113,7 @@ dependencies {
     testImplementation(libs.turbine)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
+    testImplementation(libs.mockk.v1138)
 
     mockitoAgent(libs.mockito.core) { isTransitive = false }
 }
