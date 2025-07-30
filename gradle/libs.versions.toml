@@ -26,6 +26,7 @@ mockitoKotlin = "6.0.0"
 mockk = "1.14.5"
 navigationCompose = "2.9.2"
 retrofit = "3.0.0"
+robolectric = "4.15.1"
 rootbeerLib = "0.1.1"
 securityCrypto = "1.1.0-beta01"
 turbine = "1.2.1"
@@ -66,6 +67,7 @@ mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockito
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 rootbeer-lib = { module = "com.scottyab:rootbeer-lib", version.ref = "rootbeerLib" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }

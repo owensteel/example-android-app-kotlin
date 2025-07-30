@@ -45,27 +45,34 @@ object DeviceSecurityCheck {
         return fridaPaths.any { File(it).exists() }
     }
 
+    internal var adbEnabledHook: (Context) -> Boolean = { context ->
+        try {
+            android.provider.Settings.Secure.getInt(
+                context.contentResolver,
+                ADB_ENABLED,
+                0
+            ) == 1
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     // USB debugging can be a sign of attempted hooking
     // or inspecting
     private fun isUsbDebuggingEnabled(context: Context): Boolean {
         // Note: will always return positive if app is
         // being run on an emulator, due to the nature
         // of the simulated device
-        return try {
-            android.provider.Settings.Secure.getInt(
-                context.contentResolver,
-                ADB_ENABLED,
-                0
-            ) == 1
-        } catch (e: Exception){
-            false // fallback
-        }
+        return adbEnabledHook(context)
     }
 
     // Runtime check for debugger
     private fun isDebuggerAttached(): Boolean {
         return android.os.Debug.isDebuggerConnected()
     }
+
+    // Testable hook for hasSuspiciousClasses()
+    internal var classLoaderHook: (String) -> Class<*> = { name -> Class.forName(name) }
 
     // Detect class injection via reflection
     private fun hasSuspiciousClasses(): Boolean {
@@ -77,7 +84,7 @@ object DeviceSecurityCheck {
 
         return suspiciousClassNames.any {
             try {
-                Class.forName(it)
+                classLoaderHook(it)
                 true // Found suspicious class
             } catch (e: ClassNotFoundException) {
                 false

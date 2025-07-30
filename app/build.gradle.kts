@@ -112,6 +112,7 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.turbine)
     testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
 
     mockitoAgent(libs.mockito.core) { isTransitive = false }
 }
