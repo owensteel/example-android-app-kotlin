@@ -1,6 +1,5 @@
 package com.owensteel.starlingroundup.data.local
 
-import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import java.security.KeyStore
@@ -27,7 +26,7 @@ private const val KEYSTORE_PROVIDER = "AndroidKeyStore"
 // require padding
 private const val TRANSFORMATION = "AES/GCM/NoPadding"
 
-class CryptoManager(context: Context) {
+class CryptoManager {
 
     private val keyAlias = "starling_api_key"
     private val keyStore = KeyStore.getInstance(KEYSTORE_PROVIDER).apply { load(null) }

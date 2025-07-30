@@ -23,7 +23,7 @@ class SecureTokenStore(
     private val dataStoreManager: DataStoreManager = DataStoreManager(context)
 ) {
 
-    private val crypto = CryptoManager(context)
+    private val crypto = CryptoManager()
 
     private suspend fun saveToken(
         token: String,
