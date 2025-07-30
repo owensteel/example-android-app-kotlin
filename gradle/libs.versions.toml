@@ -20,9 +20,11 @@ activityCompose = "1.8.0"
 composeBom = "2024.09.00"
 material = "1.12.0"
 material3 = "1.3.2"
+mockitoAndroid = "5.18.0"
 mockitoCore = "5.18.0"
 mockitoInline = "5.2.0"
 mockitoKotlin = "6.0.0"
+mockitoKotlinVersion = "5.2.1"
 mockk = "1.14.5"
 mockkVersion = "1.13.8"
 navigationCompose = "2.9.2"
@@ -44,6 +46,8 @@ androidx-security-crypto = { module = "androidx.security:security-crypto", versi
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
+hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hiltAndroid" }
+hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltAndroid" }
 javapoet = { module = "com.squareup.javapoet:javapoet", version.ref = "javapoet" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -63,9 +67,11 @@ kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-c
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockitoAndroid" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
 mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockitoInline" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
+mockito-kotlin-v521 = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlinVersion" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 mockk-v1138 = { module = "io.mockk:mockk", version.ref = "mockkVersion" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
