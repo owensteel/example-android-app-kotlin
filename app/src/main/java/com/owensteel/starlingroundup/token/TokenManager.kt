@@ -4,12 +4,18 @@ import android.content.Context
 import com.owensteel.starlingroundup.BuildConfig
 import com.owensteel.starlingroundup.data.local.SecureTokenStore
 import com.owensteel.starlingroundup.model.TokenResponse
-import com.owensteel.starlingroundup.network.StarlingService
+import com.owensteel.starlingroundup.network.RegularHeadersInterceptor
+import com.owensteel.starlingroundup.network.StarlingAuthApi
+import com.owensteel.starlingroundup.network.certificatePinner
+import com.owensteel.starlingroundup.util.SharedConstants.ApiConfig.BASE_URL
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import okhttp3.OkHttpClient
 import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Inject
 
 /*
@@ -66,7 +72,7 @@ class TokenManager @Inject constructor(
             throw IllegalStateException("No refresh token found")
         }
 
-        val response = StarlingService.refreshAccessToken(refreshToken)
+        val response = refreshAccessToken(refreshToken)
 
         return handleTokenResponse(response)
     }
@@ -103,6 +109,34 @@ class TokenManager @Inject constructor(
         val expiryTime = tokenStore.getAccessTokenExpiryTime()
         val now = System.currentTimeMillis()
         return expiryTime == null || now >= expiryTime
+    }
+
+    // OAuth API calls
+    // StarlingService itself cannot be used due to circular dependency
+
+    private fun createAuthApi(): StarlingAuthApi {
+        val okHttp = OkHttpClient.Builder()
+            .certificatePinner(certificatePinner)
+            // Just add regular headers
+            .addInterceptor(RegularHeadersInterceptor())
+            .build()
+
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(okHttp)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(StarlingAuthApi::class.java)
+    }
+
+    private suspend fun refreshAccessToken(refreshToken: String): Response<TokenResponse> {
+        val api = createAuthApi()
+        return api.refreshAccessToken(
+            grantType = "refresh_token",
+            refreshToken = refreshToken,
+            clientId = BuildConfig.CLIENT_ID,
+            clientSecret = BuildConfig.CLIENT_SECRET
+        )
     }
 
 }

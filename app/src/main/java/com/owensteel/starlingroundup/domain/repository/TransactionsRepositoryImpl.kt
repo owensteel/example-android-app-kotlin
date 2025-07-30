@@ -2,12 +2,11 @@ package com.owensteel.starlingroundup.domain.repository
 
 import com.owensteel.starlingroundup.model.TransactionFeedResponse
 import com.owensteel.starlingroundup.network.StarlingService
-import com.owensteel.starlingroundup.token.TokenManager
 import retrofit2.Response
 import javax.inject.Inject
 
 class TransactionsRepositoryImpl @Inject constructor(
-    private val tokenManager: TokenManager
+    private val starlingService: StarlingService
 ) : TransactionsRepository {
 
     override suspend fun getTransactionsFeed(
@@ -16,8 +15,7 @@ class TransactionsRepositoryImpl @Inject constructor(
     ): TransactionFeedResponse? {
         return try {
             val transactionFeedResponse: Response<TransactionFeedResponse> =
-                StarlingService.getTransactionsForCurrentWeek(
-                    tokenManager,
+                starlingService.getTransactionsForCurrentWeek(
                     accountUid,
                     categoryUid
                 )

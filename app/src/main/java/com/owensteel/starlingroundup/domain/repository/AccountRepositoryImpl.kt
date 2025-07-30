@@ -4,18 +4,17 @@ import com.owensteel.starlingroundup.model.Account
 import com.owensteel.starlingroundup.model.AccountHolderIndividualResponse
 import com.owensteel.starlingroundup.model.AccountResponse
 import com.owensteel.starlingroundup.network.StarlingService
-import com.owensteel.starlingroundup.token.TokenManager
 import retrofit2.Response
 import javax.inject.Inject
 
 class AccountRepositoryImpl @Inject constructor(
-    private val tokenManager: TokenManager
+    private val starlingService: StarlingService
 ) : AccountRepository {
 
     override suspend fun getPrimaryAccount(): Account? {
         return try {
             val accountResponse: Response<AccountResponse> =
-                StarlingService.getAccountDetails(tokenManager)
+                starlingService.getAccountDetails()
             if (accountResponse.isSuccessful) {
                 accountResponse.body()?.accounts?.firstOrNull()
             } else {
@@ -29,7 +28,7 @@ class AccountRepositoryImpl @Inject constructor(
     override suspend fun getAccountHolder(): AccountHolderIndividualResponse? {
         return try {
             val accountHolderIndividualResponse: Response<AccountHolderIndividualResponse> =
-                StarlingService.getAccountHolderIndividual(tokenManager)
+                starlingService.getAccountHolderIndividual()
             if (accountHolderIndividualResponse.isSuccessful) {
                 accountHolderIndividualResponse.body()
             } else {

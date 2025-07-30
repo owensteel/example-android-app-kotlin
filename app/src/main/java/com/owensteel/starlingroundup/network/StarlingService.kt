@@ -1,12 +1,10 @@
 package com.owensteel.starlingroundup.network
 
-import com.owensteel.starlingroundup.BuildConfig
 import com.owensteel.starlingroundup.model.AccountHolderIndividualResponse
 import com.owensteel.starlingroundup.model.AccountResponse
 import com.owensteel.starlingroundup.model.CreateSavingsGoalRequest
 import com.owensteel.starlingroundup.model.CreateSavingsGoalResponse
 import com.owensteel.starlingroundup.model.GetSavingsGoalsResponse
-import com.owensteel.starlingroundup.model.TokenResponse
 import com.owensteel.starlingroundup.model.TransactionFeedResponse
 import com.owensteel.starlingroundup.model.TransferRequest
 import com.owensteel.starlingroundup.model.TransferResponse
@@ -17,9 +15,6 @@ import com.owensteel.starlingroundup.util.SharedConstants.ApiConfig.HOSTNAME
 import com.owensteel.starlingroundup.util.SharedConstants.ApiHeaders.ACCEPT
 import com.owensteel.starlingroundup.util.SharedConstants.ApiHeaders.AUTHORIZATION
 import com.owensteel.starlingroundup.util.SharedConstants.ApiHeaders.USER_AGENT
-import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
 import okhttp3.CertificatePinner
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -29,6 +24,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.time.DayOfWeek
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /*
 
@@ -46,9 +43,10 @@ val certificatePinner = CertificatePinner.Builder()
     .add(HOSTNAME, API_SERVER_CERT_HASH)
     .build()
 
-@Module
-@InstallIn(SingletonComponent::class)
-object StarlingService {
+@Singleton
+class StarlingService @Inject constructor(
+    private val tokenManager: TokenManager
+) {
 
     /*
 
@@ -58,7 +56,7 @@ object StarlingService {
 
     // Create authenticated API client
     // This is the primary client for API calls
-    private fun createAuthenticatedApi(tokenManager: TokenManager): StarlingApi {
+    private fun createAuthenticatedApi(): StarlingApi {
         val okHttp = OkHttpClient.Builder()
             .certificatePinner(certificatePinner)
             // Fetch access token and add Authorization
@@ -77,34 +75,6 @@ object StarlingService {
             .create(StarlingApi::class.java)
     }
 
-    // Unauthenticated client necessary for calls to token refresh API
-    private fun createAuthApi(): StarlingAuthApi {
-        val okHttp = OkHttpClient.Builder()
-            .certificatePinner(certificatePinner)
-            // Just add regular headers
-            .addInterceptor(RegularHeadersInterceptor())
-            .build()
-
-        return Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .client(okHttp)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(StarlingAuthApi::class.java)
-    }
-
-    // OAuth functions
-
-    suspend fun refreshAccessToken(refreshToken: String): Response<TokenResponse> {
-        val api = createAuthApi()
-        return api.refreshAccessToken(
-            grantType = "refresh_token",
-            refreshToken = refreshToken,
-            clientId = BuildConfig.CLIENT_ID,
-            clientSecret = BuildConfig.CLIENT_SECRET
-        )
-    }
-
     /*
 
         API functions
@@ -114,7 +84,6 @@ object StarlingService {
     // Transactions feed
 
     suspend fun getTransactionsForCurrentWeek(
-        tokenManager: TokenManager,
         accountUid: String,
         categoryUid: String
     ): Response<TransactionFeedResponse> {
@@ -124,7 +93,7 @@ object StarlingService {
         val startOfWeek = now.with(DayOfWeek.MONDAY).toLocalDate().atStartOfDay(now.zone)
         val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
-        val api = createAuthenticatedApi(tokenManager)
+        val api = createAuthenticatedApi()
         return api.getTransactionsForCurrentWeek(
             accountUid = accountUid,
             categoryUid = categoryUid,
@@ -136,13 +105,12 @@ object StarlingService {
     // Savings goals
 
     suspend fun transferToSavingsGoal(
-        tokenManager: TokenManager,
         accountUid: String,
         goalUid: String,
         transferUid: String,
         request: TransferRequest
     ): Response<TransferResponse> {
-        val api = createAuthenticatedApi(tokenManager)
+        val api = createAuthenticatedApi()
         return api.transferToSavingsGoal(
             accountUid = accountUid,
             goalUid = goalUid,
@@ -152,11 +120,10 @@ object StarlingService {
     }
 
     suspend fun createSavingsGoal(
-        tokenManager: TokenManager,
         accountUid: String,
         request: CreateSavingsGoalRequest
     ): Response<CreateSavingsGoalResponse> {
-        val api = createAuthenticatedApi(tokenManager)
+        val api = createAuthenticatedApi()
         return api.createSavingsGoal(
             accountUid = accountUid,
             request = request
@@ -164,10 +131,9 @@ object StarlingService {
     }
 
     suspend fun getSavingsGoals(
-        tokenManager: TokenManager,
         accountUid: String
     ): Response<GetSavingsGoalsResponse> {
-        val api = createAuthenticatedApi(tokenManager)
+        val api = createAuthenticatedApi()
         return api.getSavingsGoals(
             accountUid = accountUid
         )
@@ -175,17 +141,13 @@ object StarlingService {
 
     // Account details
 
-    suspend fun getAccountDetails(
-        tokenManager: TokenManager
-    ): Response<AccountResponse> {
-        val api = createAuthenticatedApi(tokenManager)
+    suspend fun getAccountDetails(): Response<AccountResponse> {
+        val api = createAuthenticatedApi()
         return api.getAccountDetails()
     }
 
-    suspend fun getAccountHolderIndividual(
-        tokenManager: TokenManager
-    ): Response<AccountHolderIndividualResponse> {
-        val api = createAuthenticatedApi(tokenManager)
+    suspend fun getAccountHolderIndividual(): Response<AccountHolderIndividualResponse> {
+        val api = createAuthenticatedApi()
         return api.getAccountHolderIndividual()
     }
 

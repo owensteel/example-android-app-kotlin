@@ -8,12 +8,11 @@ import com.owensteel.starlingroundup.model.SavingsGoal
 import com.owensteel.starlingroundup.model.TransferRequest
 import com.owensteel.starlingroundup.model.TransferResponse
 import com.owensteel.starlingroundup.network.StarlingService
-import com.owensteel.starlingroundup.token.TokenManager
 import retrofit2.Response
 import javax.inject.Inject
 
 class SavingsGoalRepositoryImpl @Inject constructor(
-    private val tokenManager: TokenManager
+    private val starlingService: StarlingService
 ) : SavingsGoalRepository {
 
     override suspend fun transferToGoal(
@@ -27,8 +26,7 @@ class SavingsGoalRepositoryImpl @Inject constructor(
                 amount = roundUpAmount
             )
             val transferResponse: Response<TransferResponse> =
-                StarlingService.transferToSavingsGoal(
-                    tokenManager,
+                starlingService.transferToSavingsGoal(
                     accountUid,
                     savingsGoalUid,
                     transferUid,
@@ -57,8 +55,7 @@ class SavingsGoalRepositoryImpl @Inject constructor(
                 base64EncodedPhoto = null
             )
             val createSavingsGoalResponse: Response<CreateSavingsGoalResponse> =
-                StarlingService.createSavingsGoal(
-                    tokenManager,
+                starlingService.createSavingsGoal(
                     accountUid,
                     createSavingsGoalRequest,
                 )
@@ -75,8 +72,7 @@ class SavingsGoalRepositoryImpl @Inject constructor(
     override suspend fun getAccountSavingsGoals(accountUid: String): List<SavingsGoal>? {
         return try {
             val getSavingsGoalResponse: Response<GetSavingsGoalsResponse> =
-                StarlingService.getSavingsGoals(
-                    tokenManager,
+                starlingService.getSavingsGoals(
                     accountUid
                 )
             if (getSavingsGoalResponse.isSuccessful) {
