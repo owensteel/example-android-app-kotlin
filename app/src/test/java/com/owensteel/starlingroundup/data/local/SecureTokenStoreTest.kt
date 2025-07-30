@@ -1,6 +1,5 @@
 package com.owensteel.starlingroundup.data.local
 
-import android.content.Context
 import androidx.datastore.preferences.core.byteArrayPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.ACCESS_TOKEN_EXPIRY
@@ -23,7 +22,6 @@ import org.mockito.kotlin.whenever
 
 class SecureTokenStoreTest {
 
-    private val context: Context = mock()
     private val crypto: CryptoManager = mock()
     private val dataStore: DataStoreManager = mock()
 
@@ -35,7 +33,7 @@ class SecureTokenStoreTest {
     @Before
     fun setup() {
         // Override crypto with our mock for this test
-        secureTokenStore = SecureTokenStore(context, dataStore, crypto)
+        secureTokenStore = SecureTokenStore(dataStore, crypto)
         secureTokenStore.javaClass.getDeclaredField("crypto").apply {
             isAccessible = true
             set(secureTokenStore, crypto)

@@ -15,7 +15,7 @@ class RoundUpCutoffTimestampStoreTest {
 
     @Before
     fun setup() {
-        store = RoundUpCutoffTimestampStore(mock(), dataStoreManager)
+        store = RoundUpCutoffTimestampStore(dataStoreManager)
     }
 
     @Test

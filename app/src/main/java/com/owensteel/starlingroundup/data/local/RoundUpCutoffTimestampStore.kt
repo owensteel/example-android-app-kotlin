@@ -1,9 +1,7 @@
 package com.owensteel.starlingroundup.data.local
 
-import android.content.Context
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.LATEST_ROUNDUP_CUTOFF_TIMESTAMP
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 /*
@@ -13,8 +11,7 @@ import javax.inject.Inject
  */
 
 class RoundUpCutoffTimestampStore @Inject constructor(
-    @ApplicationContext val context: Context,
-    private val dataStoreManager: DataStoreManager = DataStoreManager(context)
+    private val dataStoreManager: DataStoreManager
 ) {
 
     suspend fun saveLatestRoundUpCutoffTimestamp(cutoffTimestamp: String) {

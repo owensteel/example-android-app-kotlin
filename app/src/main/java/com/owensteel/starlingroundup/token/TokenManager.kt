@@ -1,6 +1,5 @@
 package com.owensteel.starlingroundup.token
 
-import android.content.Context
 import com.owensteel.starlingroundup.BuildConfig
 import com.owensteel.starlingroundup.data.local.SecureTokenStore
 import com.owensteel.starlingroundup.model.TokenResponse
@@ -8,7 +7,6 @@ import com.owensteel.starlingroundup.network.StarlingAuthApi
 import com.owensteel.starlingroundup.network.certificatePinner
 import com.owensteel.starlingroundup.network.interceptors.RegularHeadersInterceptor
 import com.owensteel.starlingroundup.util.SharedConstants.ApiConfig.BASE_URL
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -25,10 +23,9 @@ import javax.inject.Inject
  */
 
 class TokenManager @Inject constructor(
-    @ApplicationContext private val context: Context
+    private val tokenStore: SecureTokenStore
 ) {
 
-    private val tokenStore = SecureTokenStore(context)
     private val mutex = Mutex()
 
     private suspend fun getValidAccessToken(): String {

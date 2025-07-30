@@ -1,6 +1,6 @@
 package com.owensteel.starlingroundup.di
 
-import android.content.Context
+import com.owensteel.starlingroundup.data.local.SecureTokenStore
 import com.owensteel.starlingroundup.network.DefaultStarlingApiProvider
 import com.owensteel.starlingroundup.network.StarlingApiProvider
 import com.owensteel.starlingroundup.network.StarlingService
@@ -8,7 +8,6 @@ import com.owensteel.starlingroundup.token.TokenManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -19,8 +18,8 @@ object StarlingServiceModule {
     @Provides
     @Singleton
     fun provideTokenManager(
-        @ApplicationContext context: Context
-    ): TokenManager = TokenManager(context)
+        tokenStore: SecureTokenStore
+    ): TokenManager = TokenManager(tokenStore)
 
     @Provides
     @Singleton

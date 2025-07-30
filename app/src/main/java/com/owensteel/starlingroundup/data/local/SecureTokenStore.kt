@@ -1,6 +1,5 @@
 package com.owensteel.starlingroundup.data.local
 
-import android.content.Context
 import androidx.datastore.preferences.core.byteArrayPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.ACCESS_TOKEN_EXPIRY
@@ -9,6 +8,7 @@ import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.ENCRYPT
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.ENCRYPTED_REFRESH_TOKEN
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.REFRESH_TOKEN_EXPIRY
 import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.REFRESH_TOKEN_IV
+import javax.inject.Inject
 
 /*
 
@@ -18,9 +18,8 @@ import com.owensteel.starlingroundup.util.SharedConstants.PreferenceKeys.REFRESH
 
  */
 
-class SecureTokenStore(
-    private val context: Context,
-    private val dataStoreManager: DataStoreManager = DataStoreManager(context),
+class SecureTokenStore @Inject constructor(
+    private val dataStoreManager: DataStoreManager,
     private val crypto: CryptoManager = CryptoManager() // allows mocking
 ) {
     private suspend fun saveToken(

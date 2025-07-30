@@ -7,6 +7,7 @@ import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
+import javax.inject.Inject
 
 /*
 
@@ -26,7 +27,7 @@ private const val KEYSTORE_PROVIDER = "AndroidKeyStore"
 // require padding
 private const val TRANSFORMATION = "AES/GCM/NoPadding"
 
-class CryptoManager {
+class CryptoManager @Inject constructor(){
 
     private val keyAlias = "starling_api_key"
     private val keyStore = KeyStore.getInstance(KEYSTORE_PROVIDER).apply { load(null) }
