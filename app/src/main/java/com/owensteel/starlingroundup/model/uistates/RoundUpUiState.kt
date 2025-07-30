@@ -16,7 +16,7 @@ data class RoundUpUiState(
     val accountHolderName: String = "",
     val accountCurrency: Currency? = null,
     val savingsGoals: List<SavingsGoal> = emptyList(),
-    val cutoffTimestamp: String = "",
+    val cutoffTimestamp: String? = null,
     val isLoadingSavingsGoals: Boolean = false,
     val isLoadingTransactionsFeed: Boolean = false,
     val showModal: Boolean = false,

@@ -78,7 +78,8 @@ fun RoundUpAndSaveFeature(
             enabled = roundUpAmount.minorUnits > 0L
         )
 
-        if(uiState.cutoffTimestamp.isNotBlank()) {
+        // Show "last round-up" if there has ever been one
+        if(!uiState.cutoffTimestamp.isNullOrBlank()) {
             Text(
                 text = stringResource(
                     R.string.main_feature_last_round_up,

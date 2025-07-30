@@ -105,8 +105,7 @@ class RoundUpAndSaveViewModel @Inject constructor(
             cachedTransactions = fetchedTransactions
 
             val cutoff = roundUpCutoffTimestampStore.getLatestRoundUpCutOffTimestamp()
-                ?: roundUpCutoffTimestampFallback
-            val roundUp = calculateRoundUp(fetchedTransactions, cutoff)
+            val roundUp = calculateRoundUp(fetchedTransactions, cutoff ?: roundUpCutoffTimestampFallback)
             lastRoundUpTotal = roundUp
 
             _uiState.update {

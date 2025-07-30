@@ -17,6 +17,9 @@ import androidx.compose.ui.unit.dp
 import com.owensteel.starlingroundup.R
 import com.owensteel.starlingroundup.model.uistates.RoundUpUiError
 import com.owensteel.starlingroundup.model.uistates.RoundUpUiState
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 /*
 
@@ -24,6 +27,12 @@ import com.owensteel.starlingroundup.model.uistates.RoundUpUiState
     Displays the feed, with a title, when ready
 
  */
+
+private val roundUpCutoffTimestampFallback = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(
+    Instant.EPOCH.atOffset(
+        ZoneOffset.UTC
+    )
+)
 
 @Composable
 fun TransactionsFeedFeature(
@@ -56,7 +65,7 @@ fun TransactionsFeedFeature(
 
             else -> TransactionsFeed(
                 roundUpUiState.transactions,
-                roundUpUiState.cutoffTimestamp
+                roundUpUiState.cutoffTimestamp ?: roundUpCutoffTimestampFallback
             )
         }
     }
