@@ -27,7 +27,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.never
+import org.mockito.Mockito.spy
 import org.mockito.kotlin.any
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.Currency
 import java.util.UUID
@@ -217,6 +220,103 @@ class RoundUpAndSaveViewModelTest {
 
         val state = viewModel.uiState.value
         assertEquals(RoundUpUiError.Transfer, state.error)
+    }
+
+    @Test
+    fun `loadSavingsGoals updates savings goals in state`() = runTest {
+        val goals = listOf(
+            SavingsGoal(
+                savingsGoalUid = UUID.randomUUID().toString(),
+                name = "TestGoal1",
+                target = Money(FAKE_ACCOUNT_CURRENCY, 1000L),
+                totalSaved = Money(FAKE_ACCOUNT_CURRENCY, 500L),
+                savedPercentage = 50,
+                state = FAKE_SAVINGS_GOAL_STATE
+            ),
+            SavingsGoal(
+                savingsGoalUid = UUID.randomUUID().toString(),
+                name = "TestGoal2",
+                target = Money(FAKE_ACCOUNT_CURRENCY, 1000L),
+                totalSaved = Money(FAKE_ACCOUNT_CURRENCY, 500L),
+                savedPercentage = 50,
+                state = FAKE_SAVINGS_GOAL_STATE
+            )
+        )
+        whenever(getSavingsGoals(any())).thenReturn(goals)
+
+        viewModel.loadSavingsGoals()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals(goals, state.savingsGoals)
+        assertFalse(state.isLoadingSavingsGoals)
+    }
+
+    @Test
+    fun `Won't initialise and does nothing if account details are null`() = runTest {
+        whenever(initAccountDetails()).thenReturn(
+            Result.failure(
+                exception = Exception("Simulated account details failure")
+            )
+        )
+        val uninitialisedViewModel = RoundUpAndSaveViewModel(
+            initAccountDetails,
+            fetchTransactions,
+            transferToSavingsGoal,
+            getSavingsGoals,
+            roundUpCutoffTimestampStore,
+            calculateRoundUp
+        )
+        val spyViewModel = spy(uninitialisedViewModel)
+
+        advanceUntilIdle()
+
+        assertFalse(uninitialisedViewModel.uiState.value.hasInitialised)
+        verify(spyViewModel, never()).refreshTransactionsAndRoundUp()
+    }
+
+    @Test
+    fun `createGoalAndTransfer does nothing if account or currency is null`() = runTest {
+        whenever(initAccountDetails()).thenReturn(
+            Result.failure(
+                exception = Exception("Simulated account details failure")
+            )
+        )
+        val uninitialisedViewModel = RoundUpAndSaveViewModel(
+            initAccountDetails,
+            fetchTransactions,
+            transferToSavingsGoal,
+            getSavingsGoals,
+            roundUpCutoffTimestampStore,
+            calculateRoundUp
+        )
+
+        uninitialisedViewModel.createGoalAndTransfer("Goal", 1000)
+
+        verify(transferToSavingsGoal, never()).createAndTransferToNewSavingsGoal(
+            any(),
+            any(),
+            any(),
+            any()
+        )
+    }
+
+    @Test
+    fun `showModal sets the modal flag in state`() = runTest {
+        viewModel.showModal(true)
+        assertTrue(viewModel.uiState.value.showModal)
+
+        viewModel.showModal(false)
+        assertFalse(viewModel.uiState.value.showModal)
+    }
+
+    @Test
+    fun `showRoundUpTransferCompleteDialog sets the dialog flag in state`() = runTest {
+        viewModel.showRoundUpTransferCompleteDialog(true)
+        assertTrue(viewModel.uiState.value.showRoundUpTransferCompleteDialog)
+
+        viewModel.showRoundUpTransferCompleteDialog(false)
+        assertFalse(viewModel.uiState.value.showRoundUpTransferCompleteDialog)
     }
 
 }
