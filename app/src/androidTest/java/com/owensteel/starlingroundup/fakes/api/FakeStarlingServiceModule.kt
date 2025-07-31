@@ -3,8 +3,11 @@ package com.owensteel.starlingroundup.fakes.api
 import com.owensteel.starlingroundup.di.StarlingServiceModule
 import com.owensteel.starlingroundup.fakes.api.FakeStarlingServiceResponses.FakeAccount
 import com.owensteel.starlingroundup.fakes.api.FakeStarlingServiceResponses.FakeAccountHolder
+import com.owensteel.starlingroundup.fakes.api.FakeStarlingServiceResponses.FakeSavingsGoal
+import com.owensteel.starlingroundup.fakes.api.FakeStarlingServiceResponses.FakeSavingsGoal2
 import com.owensteel.starlingroundup.fakes.api.FakeStarlingServiceResponses.FakeTransactionFeed
 import com.owensteel.starlingroundup.model.AccountResponse
+import com.owensteel.starlingroundup.model.GetSavingsGoalsResponse
 import com.owensteel.starlingroundup.network.StarlingApi
 import com.owensteel.starlingroundup.network.StarlingApiProvider
 import com.owensteel.starlingroundup.network.StarlingService
@@ -54,6 +57,13 @@ object FakeStarlingServiceModule {
             ).thenReturn(
                 Response.success(
                     FakeTransactionFeed
+                )
+            )
+            whenever(
+                mockStarlingApi.getSavingsGoals(any())
+            ).thenReturn(
+                Response.success(
+                    GetSavingsGoalsResponse(listOf(FakeSavingsGoal, FakeSavingsGoal2))
                 )
             )
         }
