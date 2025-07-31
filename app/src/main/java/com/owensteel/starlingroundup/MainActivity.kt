@@ -13,6 +13,7 @@ import com.owensteel.starlingroundup.ui.theme.StarlingRoundupTheme
 import com.owensteel.starlingroundup.util.DeviceSecurityCheck
 import com.owensteel.starlingroundup.viewmodel.RoundUpAndSaveViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /*
 
@@ -24,13 +25,16 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    @Inject
+    lateinit var deviceSecurityCheck: DeviceSecurityCheck
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         // Perform device security check immediately
         // Even in debug mode, so there is no single point
         // of failure here
-        if (DeviceSecurityCheck.isCompromised(this)) {
+        if (deviceSecurityCheck.isCompromised(this)) {
             Toast.makeText(this, "This device is not secure. Exiting.", Toast.LENGTH_LONG).show()
             finish()
             return

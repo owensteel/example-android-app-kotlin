@@ -6,6 +6,8 @@ import com.owensteel.starlingroundup.BuildConfig
 import com.scottyab.rootbeer.RootBeer
 import java.io.File
 import java.net.Socket
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /*
 
@@ -22,7 +24,8 @@ import java.net.Socket
 
 */
 
-object DeviceSecurityCheck {
+@Singleton
+class DeviceSecurityCheck @Inject constructor() {
 
     // Check for rooting with RootBeer library
     private fun isRooted(context: Context): Boolean {
