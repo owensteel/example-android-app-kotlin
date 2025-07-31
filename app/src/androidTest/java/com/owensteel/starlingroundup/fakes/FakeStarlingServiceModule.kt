@@ -1,4 +1,4 @@
-package com.owensteel.starlingroundup.testutil
+package com.owensteel.starlingroundup.fakes
 
 import com.owensteel.starlingroundup.di.StarlingServiceModule
 import com.owensteel.starlingroundup.model.AccountResponse
