@@ -7,8 +7,6 @@ plugins {
 
     alias(libs.plugins.google.ksp)
     alias(libs.plugins.google.hilt)
-
-    kotlin("kapt")
 }
 
 // Get secret keys from local properties
@@ -32,7 +30,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "dagger.hilt.android.testing.HiltTestRunner"
+        testInstrumentationRunner = "com.owensteel.starlingroundup.CustomTestRunner"
 
         // Inject secret keys into BuildConfig
         buildConfigField("String", "CLIENT_ID", "\"$clientId\"")
@@ -111,8 +109,7 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.junit)
-    testImplementation(libs.hilt.android.testing)
-    kaptTest(libs.hilt.compiler)
+    androidTestImplementation(libs.androidx.runner)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -120,7 +117,7 @@ dependencies {
     androidTestImplementation(libs.hilt.android.testing)
     androidTestImplementation(libs.mockito.android)
     androidTestImplementation(libs.mockito.kotlin)
-    kaptAndroidTest(libs.hilt.compiler)
+    kspAndroidTest(libs.hilt.android.compiler)
 
     mockitoAgent(libs.mockito.core) { isTransitive = false }
 }
