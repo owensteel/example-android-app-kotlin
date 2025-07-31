@@ -27,6 +27,8 @@ class DeviceSecurityCheckTest {
     private val packageManager: PackageManager = mock()
     private val log: Log = mock()
 
+    private val deviceSecurityCheck = DeviceSecurityCheck()
+
     @Before
     fun setup() {
         whenever(context.contentResolver).thenReturn(contentResolver)
@@ -39,7 +41,7 @@ class DeviceSecurityCheckTest {
         mockConstruction(RootBeer::class.java) { mock, _ ->
             whenever(mock.isRooted).thenReturn(true)
         }.use {
-            val result = DeviceSecurityCheck.isCompromised(context)
+            val result = deviceSecurityCheck.isCompromised(context)
             assertTrue(result)
         }
     }
@@ -50,7 +52,7 @@ class DeviceSecurityCheckTest {
         whenever(testFile.exists()).thenReturn(true)
 
         mockConstruction(File::class.java) { _, _ -> testFile }.use {
-            val result = DeviceSecurityCheck.isCompromised(context)
+            val result = deviceSecurityCheck.isCompromised(context)
             assertTrue(result)
         }
     }
@@ -58,16 +60,16 @@ class DeviceSecurityCheckTest {
     @Test
     fun `isCompromised reports USB debugging if app is not in debug mode`() {
         // Stub the ADB check
-        DeviceSecurityCheck.adbEnabledHook = { true }
+        deviceSecurityCheck.adbEnabledHook = { true }
 
-        val result = DeviceSecurityCheck.isCompromised(context)
+        val result = deviceSecurityCheck.isCompromised(context)
 
         // Currently no reliable way to mock BuildConfig without
         // making DeviceSecurityCheck vulnerable
         assertTrue(result)
 
         // Clean up the hook
-        DeviceSecurityCheck.adbEnabledHook = DeviceSecurityCheck::class.java
+        deviceSecurityCheck.adbEnabledHook = DeviceSecurityCheck::class.java
             .getDeclaredMethod("isUsbDebuggingEnabled", Context::class.java)
             .apply { isAccessible = true }
             .let { method -> { context: Context -> method.invoke(null, context) as Boolean } }
@@ -78,14 +80,14 @@ class DeviceSecurityCheckTest {
         mockStatic(android.os.Debug::class.java).use { debugStatic ->
             debugStatic.`when`<Boolean> { android.os.Debug.isDebuggerConnected() }.thenReturn(true)
 
-            val result = DeviceSecurityCheck.isCompromised(context)
+            val result = deviceSecurityCheck.isCompromised(context)
             assertTrue(result)
         }
     }
 
     @Test
     fun `isCompromised returns true if suspicious class is found`() {
-        DeviceSecurityCheck.classLoaderHook = { name ->
+        deviceSecurityCheck.classLoaderHook = { name ->
             if (name == "de.robv.android.xposed.XposedBridge") {
                 String::class.java // simulate class present
             } else {
@@ -93,17 +95,17 @@ class DeviceSecurityCheckTest {
             }
         }
 
-        val result = DeviceSecurityCheck.isCompromised(context)
+        val result = deviceSecurityCheck.isCompromised(context)
         assertTrue(result)
 
         // Cleanup
-        DeviceSecurityCheck.classLoaderHook = { Class.forName(it) }
+        deviceSecurityCheck.classLoaderHook = { Class.forName(it) }
     }
 
     @Test
     fun `isCompromised returns true if Frida port is open`() {
         mockConstruction(Socket::class.java) { _, _ -> mock(Socket::class.java) }.use {
-            val result = DeviceSecurityCheck.isCompromised(context)
+            val result = deviceSecurityCheck.isCompromised(context)
             assertTrue(result)
         }
     }
@@ -120,7 +122,7 @@ class DeviceSecurityCheckTest {
         mockStatic(Runtime::class.java).use { runtimeStatic ->
             runtimeStatic.`when`<Runtime> { Runtime.getRuntime() }.thenReturn(runtime)
 
-            val result = DeviceSecurityCheck.isCompromised(context)
+            val result = deviceSecurityCheck.isCompromised(context)
             assertTrue(result)
         }
     }

@@ -24,8 +24,12 @@ import javax.inject.Singleton
 
 */
 
+interface IDeviceSecurityCheck {
+    fun isCompromised(context: Context): Boolean
+}
+
 @Singleton
-class DeviceSecurityCheck @Inject constructor() {
+class DeviceSecurityCheck @Inject constructor() : IDeviceSecurityCheck {
 
     // Check for rooting with RootBeer library
     private fun isRooted(context: Context): Boolean {
@@ -149,7 +153,7 @@ class DeviceSecurityCheck @Inject constructor() {
     }
 
     // Main
-    fun isCompromised(context: Context): Boolean {
+    override fun isCompromised(context: Context): Boolean {
         return isRooted(context) ||
                 isFridaDetected() ||
                 // USB debugging is always "on" during debugging
