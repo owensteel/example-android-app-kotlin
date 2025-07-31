@@ -1,5 +1,7 @@
 package com.owensteel.starlingroundup.util
 
+import android.content.Context
+import android.content.res.Resources
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -16,7 +18,15 @@ object DateTimeUtils {
     fun timeSince(isoString: String): String {
         val context = LocalContext.current
         val resources = context.resources
+        return timeSince(resources, isoString)
+    }
 
+    fun timeSince(context: Context, isoString: String): String {
+        val resources = context.resources
+        return timeSince(resources, isoString)
+    }
+
+    fun timeSince(resources: Resources, isoString: String): String {
         val now = ZonedDateTime.now()
         val then = Instant.parse(isoString).atZone(ZoneId.systemDefault())
 
