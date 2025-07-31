@@ -45,6 +45,13 @@ fun RoundUpTransferCompleteDialog(
                 text = stringResource(R.string.dialog_button_ok),
             )
         },
+        title = {
+            Text(
+                text = stringResource(R.string.roundup_transfer_complete_dialog_title),
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold
+            )
+        },
         text = {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally

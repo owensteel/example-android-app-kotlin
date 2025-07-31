@@ -33,6 +33,7 @@
     <string name="create_savings_goal_dialog_error_invalid_name">Please enter a name for the Savings Goal.</string>
 
     <!-- Round-up Transfer Complete dialog -->
+    <string name="roundup_transfer_complete_dialog_title">Transfer successful</string>
     <string name="roundup_transfer_complete_dialog">Your Round Up Total of %1$s has been successfully transferred to %2$s!</string>
 
     <!-- Generic -->

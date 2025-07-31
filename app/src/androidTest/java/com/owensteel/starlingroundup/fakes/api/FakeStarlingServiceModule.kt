@@ -7,7 +7,9 @@ import com.owensteel.starlingroundup.fakes.api.FakeStarlingServiceResponses.Fake
 import com.owensteel.starlingroundup.fakes.api.FakeStarlingServiceResponses.FakeSavingsGoal2
 import com.owensteel.starlingroundup.fakes.api.FakeStarlingServiceResponses.FakeTransactionFeed
 import com.owensteel.starlingroundup.model.AccountResponse
+import com.owensteel.starlingroundup.model.CreateSavingsGoalResponse
 import com.owensteel.starlingroundup.model.GetSavingsGoalsResponse
+import com.owensteel.starlingroundup.model.TransferResponse
 import com.owensteel.starlingroundup.network.StarlingApi
 import com.owensteel.starlingroundup.network.StarlingApiProvider
 import com.owensteel.starlingroundup.network.StarlingService
@@ -20,6 +22,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import retrofit2.Response
+import java.util.UUID
 import javax.inject.Singleton
 
 @Module
@@ -64,6 +67,30 @@ object FakeStarlingServiceModule {
             ).thenReturn(
                 Response.success(
                     GetSavingsGoalsResponse(listOf(FakeSavingsGoal, FakeSavingsGoal2))
+                )
+            )
+            whenever(
+                mockStarlingApi.createSavingsGoal(any(), any())
+            ).thenReturn(
+                Response.success(
+                    CreateSavingsGoalResponse(
+                        savingsGoalUid = UUID.randomUUID().toString(),
+                        success = true
+                    )
+                )
+            )
+            whenever(
+                mockStarlingApi.transferToSavingsGoal(
+                    any(),
+                    goalUid = any(),
+                    transferUid = any(),
+                    transfer = any()
+                )
+            ).thenReturn(
+                Response.success(
+                    TransferResponse(
+                        success = true
+                    )
                 )
             )
         }
