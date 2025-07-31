@@ -49,6 +49,21 @@ object FakeStarlingServiceResponses {
         state = "active"
     )
 
+    val FakeSavingsGoal2 = SavingsGoal(
+        savingsGoalUid = "269243bb-54c6-4524-9137-445b68a17925",
+        name = "TestGoal2",
+        target = Money(
+            FakeAccount.currency,
+            100L
+        ),
+        totalSaved = Money(
+            FakeAccount.currency,
+            25L
+        ),
+        savedPercentage = 25,
+        state = "active"
+    )
+
     val FakeCreateSavingsGoalResponseSuccess = CreateSavingsGoalResponse(
         savingsGoalUid = "0c39ceda-f672-4638-b360-13735431b950",
         success = true
