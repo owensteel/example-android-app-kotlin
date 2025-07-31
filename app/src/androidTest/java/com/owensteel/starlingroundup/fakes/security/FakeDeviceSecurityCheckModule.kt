@@ -11,7 +11,7 @@ import javax.inject.Singleton
 @Module
 @TestInstallIn(
     components = [SingletonComponent::class],
-    replaces = [DeviceSecurityCheckModule::class] // replace your app's real provider
+    replaces = [DeviceSecurityCheckModule::class]
 )
 object FakeDeviceSecurityCheckModule {
 
