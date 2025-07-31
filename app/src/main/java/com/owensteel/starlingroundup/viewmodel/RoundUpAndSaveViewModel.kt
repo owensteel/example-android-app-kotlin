@@ -32,7 +32,7 @@ private val roundUpCutoffTimestampFallback = DateTimeFormatter.ISO_OFFSET_DATE_T
 )
 
 @HiltViewModel
-class RoundUpAndSaveViewModel @Inject constructor(
+open class RoundUpAndSaveViewModel @Inject constructor(
     private val initAccountDetails: InitAccountDetailsUseCase,
     private val fetchTransactions: FetchTransactionsUseCase,
     private val transferToSavingsGoal: TransferToSavingsGoalUseCase,
