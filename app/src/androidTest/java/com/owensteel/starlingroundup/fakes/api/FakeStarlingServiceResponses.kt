@@ -1,4 +1,4 @@
-package com.owensteel.starlingroundup.fakes
+package com.owensteel.starlingroundup.fakes.api
 
 import com.owensteel.starlingroundup.model.Account
 import com.owensteel.starlingroundup.model.AccountHolderIndividualResponse
