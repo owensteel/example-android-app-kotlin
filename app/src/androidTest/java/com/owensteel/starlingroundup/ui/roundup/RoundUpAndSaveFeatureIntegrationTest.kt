@@ -14,7 +14,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @HiltAndroidTest
-class RoundUpAndSaveFullIntegrationTest {
+class RoundUpAndSaveFeatureIntegrationTest {
 
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
