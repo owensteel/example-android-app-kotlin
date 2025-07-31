@@ -1,29 +1,23 @@
 package com.owensteel.starlingroundup.fakes.security
 
-import android.content.Context
 import com.owensteel.starlingroundup.di.DeviceSecurityCheckModule
-import com.owensteel.starlingroundup.util.IDeviceSecurityCheck
+import com.owensteel.starlingroundup.util.DeviceSecurityCheck
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
+import javax.inject.Singleton
 
 @Module
 @TestInstallIn(
     components = [SingletonComponent::class],
-    replaces = [DeviceSecurityCheckModule::class]
+    replaces = [DeviceSecurityCheckModule::class] // replace your app's real provider
 )
 object FakeDeviceSecurityCheckModule {
-    val spy = SpyDeviceSecurityCheck()
+
+    val sharedDeviceSecurityCheck = DeviceSecurityCheck()
 
     @Provides
-    fun provideSpyDeviceSecurityCheck(): IDeviceSecurityCheck = spy
-}
-
-class SpyDeviceSecurityCheck : IDeviceSecurityCheck {
-    var wasCalled = false
-    override fun isCompromised(context: Context): Boolean {
-        wasCalled = true
-        return false
-    }
+    @Singleton
+    fun provideFakeSecurityCheck(): DeviceSecurityCheck = sharedDeviceSecurityCheck
 }
