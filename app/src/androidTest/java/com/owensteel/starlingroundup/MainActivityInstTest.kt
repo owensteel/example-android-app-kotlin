@@ -13,11 +13,10 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-
-@UninstallModules(StarlingServiceModule::class)
 @HiltAndroidTest
+@UninstallModules(StarlingServiceModule::class)
 @RunWith(AndroidJUnit4::class)
-class MainActivityInstrumentedTest {
+class MainActivityInstTest {
 
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
