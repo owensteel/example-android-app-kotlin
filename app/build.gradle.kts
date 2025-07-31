@@ -30,7 +30,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "dagger.hilt.android.testing.HiltTestRunner"
 
         // Inject secret keys into BuildConfig
         buildConfigField("String", "CLIENT_ID", "\"$clientId\"")
