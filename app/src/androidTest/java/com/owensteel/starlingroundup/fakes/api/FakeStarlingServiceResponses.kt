@@ -16,67 +16,71 @@ import com.owensteel.starlingroundup.util.SharedConstants.Transactions.TRANSACTI
 
  */
 
-val FakeAccount = Account(
-    accountUid = "c9df9210-ad10-4c66-b695-be2fc3719ed4",
-    defaultCategory = "d784caae-5210-42bc-aca4-3e580f126e7d",
-    currency = "GBP",
-    name = "PERSONAL"
-)
+object FakeStarlingServiceResponses {
 
-val FakeAccountHolder = AccountHolderIndividualResponse(
-    title = "Mr",
-    firstName = "Joe",
-    lastName = "Smith",
-    dateOfBirth = "01/01/2000",
-    email = "joesmith@example.com",
-    phone = "+44 12345678901"
-)
+    val FakeAccount = Account(
+        accountUid = "c9df9210-ad10-4c66-b695-be2fc3719ed4",
+        defaultCategory = "d784caae-5210-42bc-aca4-3e580f126e7d",
+        currency = "GBP",
+        name = "PERSONAL"
+    )
 
-val FakeSavingsGoal = SavingsGoal(
-    savingsGoalUid = "369243aa-54c6-4524-9137-445b68a17920",
-    name = "TestGoal",
-    target = Money(
-        FakeAccount.currency,
-        100L
-    ),
-    totalSaved = Money(
-        FakeAccount.currency,
-        50L
-    ),
-    savedPercentage = 50,
-    state = "active"
-)
+    val FakeAccountHolder = AccountHolderIndividualResponse(
+        title = "Mr",
+        firstName = "Joe",
+        lastName = "Smith",
+        dateOfBirth = "01/01/2000",
+        email = "joesmith@example.com",
+        phone = "+44 12345678901"
+    )
 
-val FakeCreateSavingsGoalResponseSuccess = CreateSavingsGoalResponse(
-    savingsGoalUid = "0c39ceda-f672-4638-b360-13735431b950",
-    success = true
-)
+    val FakeSavingsGoal = SavingsGoal(
+        savingsGoalUid = "369243aa-54c6-4524-9137-445b68a17920",
+        name = "TestGoal",
+        target = Money(
+            FakeAccount.currency,
+            100L
+        ),
+        totalSaved = Money(
+            FakeAccount.currency,
+            50L
+        ),
+        savedPercentage = 50,
+        state = "active"
+    )
 
-val FakeCreateSavingsGoalResponseFailure = CreateSavingsGoalResponse(
-    savingsGoalUid = "0c39ceda-f672-4638-b360-13735431b950",
-    success = false
-)
+    val FakeCreateSavingsGoalResponseSuccess = CreateSavingsGoalResponse(
+        savingsGoalUid = "0c39ceda-f672-4638-b360-13735431b950",
+        success = true
+    )
 
-val FakeTransferResponseSuccess = TransferResponse(
-    success = true
-)
+    val FakeCreateSavingsGoalResponseFailure = CreateSavingsGoalResponse(
+        savingsGoalUid = "0c39ceda-f672-4638-b360-13735431b950",
+        success = false
+    )
 
-val FakeTransferResponseFailure = TransferResponse(
-    success = false
-)
+    val FakeTransferResponseSuccess = TransferResponse(
+        success = true
+    )
 
-val FakeTransaction = Transaction(
-    feedItemUid = "e46981a6-111e-4214-98bb-e13757e8fd3b",
-    amount = Money(
-        FakeAccount.currency,
-        158L
-    ),
-    direction = TRANSACTION_DIRECTION_OUT,
-    spendingCategory = FakeAccount.defaultCategory,
-    transactionTime = "2025-01-01T09:00:00Z",
-    source = "MASTER_CARD"
-)
+    val FakeTransferResponseFailure = TransferResponse(
+        success = false
+    )
 
-val FakeTransactionFeed = TransactionFeedResponse(
-    feedItems = listOf(FakeTransaction)
-)
+    val FakeTransaction = Transaction(
+        feedItemUid = "e46981a6-111e-4214-98bb-e13757e8fd3b",
+        amount = Money(
+            FakeAccount.currency,
+            158L
+        ),
+        direction = TRANSACTION_DIRECTION_OUT,
+        spendingCategory = FakeAccount.defaultCategory,
+        transactionTime = "2025-01-01T09:00:00Z",
+        source = "MASTER_CARD"
+    )
+
+    val FakeTransactionFeed = TransactionFeedResponse(
+        feedItems = listOf(FakeTransaction)
+    )
+
+}

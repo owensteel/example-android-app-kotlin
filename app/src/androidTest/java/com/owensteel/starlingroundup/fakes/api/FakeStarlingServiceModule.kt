@@ -1,6 +1,9 @@
 package com.owensteel.starlingroundup.fakes.api
 
 import com.owensteel.starlingroundup.di.StarlingServiceModule
+import com.owensteel.starlingroundup.fakes.api.FakeStarlingServiceResponses.FakeAccount
+import com.owensteel.starlingroundup.fakes.api.FakeStarlingServiceResponses.FakeAccountHolder
+import com.owensteel.starlingroundup.fakes.api.FakeStarlingServiceResponses.FakeTransactionFeed
 import com.owensteel.starlingroundup.model.AccountResponse
 import com.owensteel.starlingroundup.network.StarlingApi
 import com.owensteel.starlingroundup.network.StarlingApiProvider
