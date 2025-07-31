@@ -30,7 +30,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "com.owensteel.starlingroundup.CustomTestRunner"
+        testInstrumentationRunner = "com.owensteel.starlingroundup.android.dagger.CustomTestRunner"
 
         // Inject secret keys into BuildConfig
         buildConfigField("String", "CLIENT_ID", "\"$clientId\"")

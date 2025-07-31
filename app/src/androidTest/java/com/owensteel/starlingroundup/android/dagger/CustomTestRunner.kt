@@ -1,4 +1,4 @@
-package com.owensteel.starlingroundup
+package com.owensteel.starlingroundup.android.dagger
 
 import android.app.Application
 import android.content.Context
