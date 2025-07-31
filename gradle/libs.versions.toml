@@ -4,6 +4,7 @@ agp = "8.11.1"
 converterGson = "3.0.0"
 datastorePreferences = "1.1.7"
 hiltAndroid = "2.57"
+hiltCompiler = "2.48"
 hiltNavigationCompose = "1.2.0"
 javapoet = "1.14.0"
 kotlin = "2.0.21"
@@ -46,6 +47,7 @@ androidx-security-crypto = { module = "androidx.security:security-crypto", versi
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
+hilt-compiler-v248 = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltCompiler" }
 hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hiltAndroid" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltAndroid" }
 javapoet = { module = "com.squareup.javapoet:javapoet", version.ref = "javapoet" }
