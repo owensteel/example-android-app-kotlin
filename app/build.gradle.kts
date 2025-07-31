@@ -113,9 +113,7 @@ dependencies {
     testImplementation(libs.turbine)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
-    testImplementation(libs.mockk.v1138)
     androidTestImplementation(libs.hilt.android.testing)
-    androidTestAnnotationProcessor(libs.hilt.compiler)
     androidTestImplementation(libs.mockito.android)
     androidTestImplementation(libs.mockito.kotlin)
 
