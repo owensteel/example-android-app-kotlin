@@ -79,8 +79,23 @@ object FakeStarlingServiceResponses {
         source = "MASTER_CARD"
     )
 
+    val FakeTransaction2 = Transaction(
+        feedItemUid = "1770b501-dbc8-4bb2-a1bd-0254f474a2bb",
+        amount = Money(
+            FakeAccount.currency,
+            42L
+        ),
+        direction = TRANSACTION_DIRECTION_OUT,
+        spendingCategory = FakeAccount.defaultCategory,
+        transactionTime = "2025-01-01T10:00:00Z",
+        source = "MASTER_CARD"
+    )
+
     val FakeTransactionFeed = TransactionFeedResponse(
-        feedItems = listOf(FakeTransaction)
+        feedItems = listOf(
+            FakeTransaction,
+            FakeTransaction2
+        )
     )
 
 }
