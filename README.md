@@ -7,6 +7,8 @@ This feature will take a feed of a customer's transactions and allow the user to
 This Android app was built in Android Studio and tested on mobile.
 It is written in Kotlin, uses Hilt for dependency injection, Jetpack Compose for UI, Retrofit and Okhttp3 for the network layer, and JUnit and Hilt for testing (unit, instrumented, and end-to-end).
 
+Even though hypothetical, it being a fintech app meant security was a top consideration when building this. As such, tokens are encrypted, a device vulnerability check is run on initialisation, and the network layer only uses TLS and applies certificate pinning (both programmatically and in the Manifest).
+
 I followed an OOP/modularised approach, which Hilt encourages, for extensibility and testability.
 DataStore is used for storing tokens (encrypted with a custom util) due to the deprecation of SharedPreferences. It is also used for storing the timestamp of the latest round-up, which works for this demo but hypothetically wouldn't work if the user had this app on multiple devices.
 
