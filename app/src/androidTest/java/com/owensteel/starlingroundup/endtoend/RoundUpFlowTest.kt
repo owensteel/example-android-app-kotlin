@@ -42,7 +42,7 @@ class RoundUpFlowTest {
 
         // Tap Round Up button
         composeTestRule
-            .onNodeWithText(context.getString(R.string.main_feature_button_round_up_and_save)) // adjust to match actual text used
+            .onNodeWithText(context.getString(R.string.main_feature_button_round_up_and_save))
             .assertIsDisplayed()
             .performClick()
 
@@ -84,7 +84,7 @@ class RoundUpFlowTest {
 
         // Tap Round Up button
         composeTestRule
-            .onNodeWithText(context.getString(R.string.main_feature_button_round_up_and_save)) // adjust to match actual text used
+            .onNodeWithText(context.getString(R.string.main_feature_button_round_up_and_save))
             .assertIsDisplayed()
             .performClick()
 
