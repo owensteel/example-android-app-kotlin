@@ -12,7 +12,7 @@ DataStore is used for storing tokens (encrypted with a custom util) due to the d
 
 ## Setup instructions
 
-Since this a demo app, there is no OAuth flow, and so to initialise tokens and secrets need to be entered manually.
+Since this a demo app, there is no OAuth flow, and so to initialise tokens and secrets need to be entered manually. This app has only been tested with the Sandbox API and a Sandbox Customer.
 
 Please add the following into your "local.properties" file.
 
