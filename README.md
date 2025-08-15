@@ -1,4 +1,4 @@
-# Round-Up Feature for Starling Bank
+# Demo app: "Round-Up" Feature for Starling Bank
 
 This feature will take a feed of a customer's transactions and allow the user to "round up" — calculate a total of all their spare change (the remainder of a spending transaction when rounded to the nearest Pound), and allow them to put it to good use in a Savings Goal.
 
